@@ -1,4 +1,11 @@
 .error-box {
+	/*
+		Warning: any better way to do this ?
+	*/
+	position: relative;
+	z-index: 9999;
+	height: 100dvh;
+	background-color: $default-background;
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;

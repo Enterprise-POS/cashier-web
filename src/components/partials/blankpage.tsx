@@ -1,6 +1,18 @@
+'use client';
 import Footer from '@/components/partials/footer';
+import { useEffect, useState } from 'react';
 
 export default function BlankPage() {
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	if (!isMounted) {
+		return null;
+	}
+
 	return (
 		<div className="page-wrapper pagehead d-flex flex-column justify-content-between">
 			<div className="content flex-grow-1">

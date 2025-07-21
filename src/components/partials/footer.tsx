@@ -6,8 +6,8 @@ export default function Footer() {
 			<p className="mb-0">{currentYear} &copy; Enterprise POS. All Right Reserved</p>
 			<p>
 				Designed &amp; Developed by{' '}
-				<a href="javascript:void(0);" className="text-primary">
-					Aaron Fabian
+				<a href="https://github.com/AaronFabian" className="text-primary">
+					Aaron Fabian Saputra
 				</a>
 			</p>
 		</div>

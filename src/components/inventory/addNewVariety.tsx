@@ -31,6 +31,10 @@ function AddNewVariety() {
 		setIsMounted(true);
 	}, []);
 
+	if (!isMounted) {
+		return null;
+	}
+
 	return (
 		<div className="modal fade" id="add-variation">
 			<div className="modal-dialog modal-dialog-centered">

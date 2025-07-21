@@ -1,5 +1,4 @@
 'use client';
-/* eslint-disable @next/next/no-img-element */
 
 import CounterThree from '@/components/counter/counterThree';
 import Footer from '@/components/partials/footer';
@@ -15,6 +14,7 @@ import Addunits from '@/components/inventory/modal/addunits';
 import AddVariant from '@/components/inventory/modal/addvariant';
 import AddVarientNew from '@/components/inventory/addNewVariety';
 import { all_routes } from '@/components/core/data/all_routes';
+
 import { DatePicker } from 'antd';
 import { ArrowLeft, Calendar, Info, LifeBuoy, List, Plus, PlusCircle, X, Image } from 'react-feather';
 import Link from 'next/link';
@@ -110,6 +110,10 @@ export default function AddProductComponent() {
 	useEffect(() => {
 		setIsMounted(true);
 	}, []);
+
+	if (!isMounted) {
+		return null;
+	}
 
 	return (
 		<>

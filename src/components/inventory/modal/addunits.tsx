@@ -33,7 +33,7 @@ const Addunits = () => {
 									<Link href="#" className="btn btn-cancel me-2" data-bs-dismiss="modal">
 										Cancel
 									</Link>
-									<Link href={route.addproduct} className="btn btn-submit">
+									<Link href={route.addProduct} className="btn btn-submit">
 										Submit
 									</Link>
 								</div>

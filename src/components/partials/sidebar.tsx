@@ -1,6 +1,14 @@
+'use client';
+
 import Image from 'next/image';
+import { all_routes } from '../core/data/all_routes';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation.js';
 
 export default function Sidebar() {
+	const routes = all_routes;
+	const pathname = usePathname();
+
 	return (
 		<div className="sidebar" id="sidebar">
 			{/* <!-- Logo --> */}
@@ -112,7 +120,7 @@ export default function Sidebar() {
 									</a>
 									<ul>
 										<li className="active">
-											<a href="index.html">Admin Dashboard</a>
+											<Link href={routes.index}>Admin Dashboard</Link>
 										</li>
 										<li>
 											<a href="admin-dashboard.html">Admin Dashboard 2</a>
@@ -274,10 +282,10 @@ export default function Sidebar() {
 									</a>
 								</li>
 								<li>
-									<a href="add-product.html">
+									<Link href={routes.addProduct}>
 										<i className="ti ti-table-plus fs-16 me-2"></i>
 										<span>Create Product</span>
-									</a>
+									</Link>
 								</li>
 								<li>
 									<a href="expired-products.html">
@@ -674,17 +682,23 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Reports</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<a className={pathname == routes.salesReport || pathname === routes.bestSeller ? 'subdrop' : ''}>
 										<i className="ti ti-chart-bar fs-16 me-2"></i>
 										<span>Sales Report</span>
 										<span className="menu-arrow"></span>
 									</a>
-									<ul>
+									<ul
+										style={pathname == routes.salesReport || pathname === routes.bestSeller ? { display: 'block' } : {}}
+									>
 										<li>
-											<a href="sales-report.html">Sales Report</a>
+											<Link href={routes.salesReport} className={routes.salesReport === pathname ? 'active' : ''}>
+												Sales Report
+											</Link>
 										</li>
 										<li>
-											<a href="best-seller.html">Best Seller</a>
+											<Link href={routes.bestSeller} className={routes.bestSeller === pathname ? 'active' : ''}>
+												Best Seller
+											</Link>
 										</li>
 									</ul>
 								</li>
@@ -1021,11 +1035,11 @@ export default function Sidebar() {
 										</li>
 									</ul>
 								</li>
-								<li className="active">
-									<a href="blank-page.html">
+								<li className={pathname === routes.blankpage ? 'active' : ''}>
+									<Link href={routes.blankpage}>
 										<i className="ti ti-file fs-16 me-2"></i>
 										<span>Blank Page</span>{' '}
-									</a>
+									</Link>
 								</li>
 								<li>
 									<a href="pricing.html">
