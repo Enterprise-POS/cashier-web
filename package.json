@@ -1,25 +1,36 @@
 {
-  "name": "test-2-epos",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.4.2"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.4.2",
-    "@eslint/eslintrc": "^3"
-  }
+	"name": "enterprise-pos",
+	"version": "0.1.0",
+	"author": {
+		"name": "Aaron Fabian Saputra",
+		"email": "aaronfabian78@gmail.com"
+	},
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@types/prop-types": "^15.7.15",
+		"antd": "^5.26.5",
+		"next": "15.4.2",
+		"prop-types": "^15.8.1",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
+		"react-feather": "^2.0.10",
+		"react-select": "^5.10.2",
+		"react-simple-wysiwyg": "^3.4.0"
+	},
+	"devDependencies": {
+		"@eslint/eslintrc": "^3",
+		"@types/node": "^20",
+		"@types/react": "^19",
+		"@types/react-dom": "^19",
+		"eslint": "^9",
+		"eslint-config-next": "15.4.2",
+		"sass": "^1.89.2",
+		"typescript": "^5"
+	}
 }
