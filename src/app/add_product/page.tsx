@@ -131,7 +131,7 @@ export default function AddProductComponent() {
 							<CollapesIcon />
 							<li>
 								<div className="page-btn">
-									<Link href={route.productlist} className="btn btn-secondary">
+									<Link href={route.productList} className="btn btn-secondary">
 										<ArrowLeft className="me-2" />
 										Back to Product
 									</Link>

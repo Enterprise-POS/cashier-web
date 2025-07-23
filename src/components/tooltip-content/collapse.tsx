@@ -3,7 +3,7 @@ import { Tooltip } from 'antd';
 import Link from 'next/link';
 import { useState } from 'react';
 
-const CollapesIcon = () => {
+const CollapseIcon = () => {
 	// Local state to manage toggle_header
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -38,4 +38,4 @@ const CollapesIcon = () => {
 	);
 };
 
-export default CollapesIcon;
+export default CollapseIcon;

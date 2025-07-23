@@ -1,27 +1,32 @@
 'use client';
 
+import { all_routes as routes } from '@/components/core/data/all_routes';
 import Image from 'next/image';
-import { all_routes } from '../core/data/all_routes';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation.js';
+import { usePathname } from 'next/navigation';
+
+const excludedPathnames = [routes.login, routes.register];
 
 export default function Sidebar() {
-	const routes = all_routes;
+	// I don't use this at 404 because the pathname is unknown
 	const pathname = usePathname();
+	if (excludedPathnames.includes(pathname)) {
+		return null;
+	}
 
 	return (
 		<div className="sidebar" id="sidebar">
 			{/* <!-- Logo --> */}
 			<div className="sidebar-logo">
-				<a href="index.html" className="logo logo-normal">
+				<Link href="/" className="logo logo-normal">
 					<Image src="/assets/img/logo.svg" alt="Img" width={30} height={30} />
-				</a>
-				<a href="index.html" className="logo logo-white">
+				</Link>
+				<Link href="/" className="logo logo-white">
 					<Image src="/assets/img/logo-white.svg" alt="Img" width={30} height={30} />
-				</a>
-				<a href="index.html" className="logo-small">
+				</Link>
+				<Link href="/" className="logo-small">
 					<Image src="/assets/img/logo-small.png" alt="Img" width={30} height={30} />
-				</a>
+				</Link>
 				<a id="toggle_btn" href="#">
 					<i className="ti ti-chevrons-left"></i>
 				</a>
@@ -79,30 +84,30 @@ export default function Sidebar() {
 				</div>
 				<div className="d-flex align-items-center justify-content-between menu-item mb-3">
 					<div>
-						<a href="index.html" className="btn btn-sm btn-icon bg-light">
+						<Link href="index.html" className="btn btn-sm btn-icon bg-light">
 							<i className="ti ti-layout-grid-remove"></i>
-						</a>
+						</Link>
 					</div>
 					<div>
-						<a href="chat.html" className="btn btn-sm btn-icon bg-light">
+						<Link href="chat.html" className="btn btn-sm btn-icon bg-light">
 							<i className="ti ti-brand-hipchat"></i>
-						</a>
+						</Link>
 					</div>
 					<div>
-						<a href="email.html" className="btn btn-sm btn-icon bg-light position-relative">
+						<Link href="email.html" className="btn btn-sm btn-icon bg-light position-relative">
 							<i className="ti ti-message"></i>
-						</a>
+						</Link>
 					</div>
 					<div className="notification-item">
-						<a href="activities.html" className="btn btn-sm btn-icon bg-light position-relative">
+						<Link href="activities.html" className="btn btn-sm btn-icon bg-light position-relative">
 							<i className="ti ti-bell"></i>
 							<span className="notification-status-dot"></span>
-						</a>
+						</Link>
 					</div>
 					<div className="me-0">
-						<a href="general-settings.html" className="btn btn-sm btn-icon bg-light">
+						<Link href="general-settings.html" className="btn btn-sm btn-icon bg-light">
 							<i className="ti ti-settings"></i>
-						</a>
+						</Link>
 					</div>
 				</div>
 			</div>
@@ -113,262 +118,262 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Main</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-layout-grid fs-16 me-2"></i>
 										<span>Dashboard</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li className="active">
 											<Link href={routes.index}>Admin Dashboard</Link>
 										</li>
 										<li>
-											<a href="admin-dashboard.html">Admin Dashboard 2</a>
+											<Link href="admin-dashboard.html">Admin Dashboard 2</Link>
 										</li>
 										<li>
-											<a href="sales-dashboard.html">Sales Dashboard</a>
+											<Link href="sales-dashboard.html">Sales Dashboard</Link>
 										</li>
 									</ul>
 								</li>
-								<li className="submenu">
-									<a href="#">
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-user-edit fs-16 me-2"></i>
 										<span>Super Admin</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="dashboard.html">Dashboard</a>
+											<Link href="dashboard.html">Dashboard</Link>
 										</li>
 										<li>
-											<a href="companies.html">Companies</a>
+											<Link href="companies.html">Companies</Link>
 										</li>
 										<li>
-											<a href="subscription.html">Subscriptions</a>
+											<Link href="subscription.html">Subscriptions</Link>
 										</li>
 										<li>
-											<a href="packages.html">Packages</a>
+											<Link href="packages.html">Packages</Link>
 										</li>
 										<li>
-											<a href="domain.html">Domain</a>
+											<Link href="domain.html">Domain</Link>
 										</li>
 										<li>
-											<a href="purchase-transaction.html">Purchase Transaction</a>
+											<Link href="purchase-transaction.html">Purchase Transaction</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-brand-apple-arcade fs-16 me-2"></i>
 										<span>Application</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="chat.html">Chat</a>
+											<Link href="chat.html">Chat</Link>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Call<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="video-call.html">Video Call</a>
+													<Link href="video-call.html">Video Call</Link>
 												</li>
 												<li>
-													<a href="audio-call.html">Audio Call</a>
+													<Link href="audio-call.html">Audio Call</Link>
 												</li>
 												<li>
-													<a href="call-history.html">Call History</a>
+													<Link href="call-history.html">Call History</Link>
 												</li>
 											</ul>
 										</li>
 										<li>
-											<a href="calendar.html">Calendar</a>
+											<Link href="calendar.html">Calendar</Link>
 										</li>
 										<li>
-											<a href="contacts.html">Contacts</a>
+											<Link href="contacts.html">Contacts</Link>
 										</li>
 										<li>
-											<a href="email.html">Email</a>
+											<Link href="email.html">Email</Link>
 										</li>
 										<li>
-											<a href="todo.html">To Do</a>
+											<Link href="todo.html">To Do</Link>
 										</li>
 										<li>
-											<a href="notes.html">Notes</a>
+											<Link href="notes.html">Notes</Link>
 										</li>
 										<li>
-											<a href="file-manager.html">File Manager</a>
+											<Link href="file-manager.html">File Manager</Link>
 										</li>
 										<li>
-											<a href="projects.html">Projects</a>
+											<Link href="projects.html">Projects</Link>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Ecommerce<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="products.html">Products</a>
+													<Link href="products.html">Products</Link>
 												</li>
 												<li>
-													<a href="orders.html">Orders</a>
+													<Link href="orders.html">Orders</Link>
 												</li>
 												<li>
-													<a href="customers.html">Customers</a>
+													<Link href="customers.html">Customers</Link>
 												</li>
 												<li>
-													<a href="cart.html">Cart</a>
+													<Link href="cart.html">Cart</Link>
 												</li>
 												<li>
-													<a href="checkout.html">Checkout</a>
+													<Link href="checkout.html">Checkout</Link>
 												</li>
 												<li>
-													<a href="wishlist.html">Wishlist</a>
+													<Link href="wishlist.html">Wishlist</Link>
 												</li>
 												<li>
-													<a href="reviews.html">Reviews</a>
+													<Link href="reviews.html">Reviews</Link>
 												</li>
 											</ul>
 										</li>
 										<li>
-											<a href="social-feed.html">Social Feed</a>
+											<Link href="social-feed.html">Social Feed</Link>
 										</li>
 										<li>
-											<a href="search-list.html">Search List</a>
+											<Link href="search-list.html">Search List</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-layout-sidebar-right-collapse fs-16 me-2"></i>
 										<span>Layouts</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="layout-horizontal.html">Horizontal</a>
+											<Link href="layout-horizontal.html">Horizontal</Link>
 										</li>
 										<li>
-											<a href="layout-detached.html">Detached</a>
+											<Link href="layout-detached.html">Detached</Link>
 										</li>
 										<li>
-											<a href="layout-two-column.html">Two Column</a>
+											<Link href="layout-two-column.html">Two Column</Link>
 										</li>
 										<li>
-											<a href="layout-hovered.html">Hovered</a>
+											<Link href="layout-hovered.html">Hovered</Link>
 										</li>
 										<li>
-											<a href="layout-boxed.html">Boxed</a>
+											<Link href="layout-boxed.html">Boxed</Link>
 										</li>
 										<li>
-											<a href="layout-rtl.html">RTL</a>
+											<Link href="layout-rtl.html">RTL</Link>
 										</li>
 										<li>
-											<a href="layout-dark.html">Dark</a>
+											<Link href="layout-dark.html">Dark</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Inventory</h6>
 							<ul>
 								<li>
-									<a href="product-list.html">
+									<Link href={routes.productList} className={routes.productList === pathname ? 'active' : ''}>
 										<i className="ti ti-box fs-16 me-2"></i>
 										<span>Products</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<Link href={routes.addProduct}>
+									<Link href={routes.addProduct} className={routes.addProduct === pathname ? 'active' : ''}>
 										<i className="ti ti-table-plus fs-16 me-2"></i>
 										<span>Create Product</span>
 									</Link>
 								</li>
 								<li>
-									<a href="expired-products.html">
+									<Link href={routes.expiredProducts}>
 										<i className="ti ti-progress-alert fs-16 me-2"></i>
 										<span>Expired Products</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="low-stocks.html">
+									<Link href={routes.lowStocks}>
 										<i className="ti ti-trending-up-2 fs-16 me-2"></i>
 										<span>Low Stocks</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="category-list.html">
+									<Link href={routes.categoryList}>
 										<i className="ti ti-list-details fs-16 me-2"></i>
 										<span>Category</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="sub-categories.html">
+								{/* <li>
+									<Link href="sub-categories.html">
 										<i className="ti ti-carousel-vertical fs-16 me-2"></i>
 										<span>Sub Category</span>
-									</a>
-								</li>
+									</Link>
+								</li> */}
 								<li>
-									<a href="brand-list.html">
+									<Link href={routes.brandList}>
 										<i className="ti ti-triangles fs-16 me-2"></i>
 										<span>Brands</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="units.html">
+								{/* <li>
+									<Link href="units.html">
 										<i className="ti ti-brand-unity fs-16 me-2"></i>
 										<span>Units</span>
-									</a>
-								</li>
-								<li>
-									<a href="varriant-attributes.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="varriant-attributes.html">
 										<i className="ti ti-checklist fs-16 me-2"></i>
 										<span>Variant Attributes</span>
-									</a>
-								</li>
-								<li>
-									<a href="warranty.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="warranty.html">
 										<i className="ti ti-certificate fs-16 me-2"></i>
 										<span>Warranties</span>
-									</a>
-								</li>
-								<li>
-									<a href="barcode.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="barcode.html">
 										<i className="ti ti-barcode fs-16 me-2"></i>
 										<span>Print Barcode</span>
-									</a>
-								</li>
-								<li>
-									<a href="qrcode.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="qrcode.html">
 										<i className="ti ti-qrcode fs-16 me-2"></i>
 										<span>Print QR Code</span>
-									</a>
-								</li>
+									</Link>
+								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Stock</h6>
 							<ul>
 								<li>
-									<a href="manage-stocks.html">
+									<Link href={routes.manageStocks}>
 										<i className="ti ti-stack-3 fs-16 me-2"></i>
-										<span>Manage Stock</span>
-									</a>
+										<span>Manage Stocks</span>
+									</Link>
 								</li>
 								<li>
-									<a href="stock-adjustment.html">
+									<Link href={routes.stockAdjustment}>
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
 										<span>Stock Adjustment</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="stock-transfer.html">
+									<Link href={routes.stockTransfer}>
 										<i className="ti ti-stack-pop fs-16 me-2"></i>
 										<span>Stock Transfer</span>
-									</a>
+									</Link>
 								</li>
 							</ul>
 						</li>
@@ -376,306 +381,306 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Sales</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-layout-grid fs-16 me-2"></i>
 										<span>Sales</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="online-orders.html">Online Orders</a>
+											<Link href={routes.onlineOrders}>Online Orders</Link>
 										</li>
 										<li>
-											<a href="pos-orders.html">POS Orders</a>
+											<Link href={routes.posOrders}>POS Orders</Link>
 										</li>
 									</ul>
 								</li>
-								<li>
-									<a href="invoice.html">
+								{/* <li>
+									<Link href="invoice.html">
 										<i className="ti ti-file-invoice fs-16 me-2"></i>
 										<span>Invoices</span>
-									</a>
-								</li>
-								<li>
-									<a href="sales-returns.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="sales-returns.html">
 										<i className="ti ti-receipt-refund fs-16 me-2"></i>
 										<span>Sales Return</span>
-									</a>
-								</li>
-								<li>
-									<a href="quotation-list.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="quotation-list.html">
 										<i className="ti ti-files fs-16 me-2"></i>
 										<span>Quotation</span>
-									</a>
-								</li>
-								<li className="submenu">
-									<a href="#">
+									</Link>
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-device-laptop fs-16 me-2"></i>
 										<span>POS</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="pos.html">POS 1</a>
+											<Link href="pos.html">POS 1</Link>
 										</li>
 										<li>
-											<a href="pos-2.html">POS 2</a>
+											<Link href="pos-2.html">POS 2</Link>
 										</li>
 										<li>
-											<a href="pos-3.html">POS 3</a>
+											<Link href="pos-3.html">POS 3</Link>
 										</li>
 										<li>
-											<a href="pos-4.html">POS 4</a>
+											<Link href="pos-4.html">POS 4</Link>
 										</li>
 										<li>
-											<a href="pos-5.html">POS 5</a>
+											<Link href="pos-5.html">POS 5</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Promo</h6>
 							<ul>
 								<li>
-									<a href="coupons.html">
+									<Link href={routes.coupons}>
 										<i className="ti ti-ticket fs-16 me-2"></i>
 										<span>Coupons</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="gift-cards.html">
+								{/* <li>
+									<Link href="gift-cards.html">
 										<i className="ti ti-cards fs-16 me-2"></i>
 										<span>Gift Cards</span>
-									</a>
-								</li>
-								<li className="submenu">
-									<a href="#">
+									</Link>
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-file-percent fs-16 me-2"></i>
 										<span>Discount</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="discount-plan.html">Discount Plan</a>
+											<Link href="discount-plan.html">Discount Plan</Link>
 										</li>
 										<li>
-											<a href="discount.html">Discount</a>
+											<Link href="discount.html">Discount</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Purchases</h6>
 							<ul>
 								<li>
-									<a href="purchase-list.html">
+									<Link href="purchase-list.html">
 										<i className="ti ti-shopping-bag fs-16 me-2"></i>
 										<span>Purchases</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="purchase-order-report.html">
+									<Link href="purchase-order-report.html">
 										<i className="ti ti-file-unknown fs-16 me-2"></i>
 										<span>Purchase Order</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="purchase-returns.html">
+									<Link href="purchase-returns.html">
 										<i className="ti ti-file-upload fs-16 me-2"></i>
 										<span>Purchase Return</span>
-									</a>
+									</Link>
 								</li>
 							</ul>
-						</li>
-						<li className="submenu-open">
+						</li> */}
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Finance & Accounts</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-file-stack fs-16 me-2"></i>
 										<span>Expenses</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="expense-list.html">Expenses</a>
+											<Link href="expense-list.html">Expenses</Link>
 										</li>
 										<li>
-											<a href="expense-category.html">Expense Category</a>
+											<Link href="expense-category.html">Expense Category</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-file-pencil fs-16 me-2"></i>
 										<span>Income</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="income.html">Income</a>
+											<Link href="income.html">Income</Link>
 										</li>
 										<li>
-											<a href="income-category.html">Income Category</a>
+											<Link href="income-category.html">Income Category</Link>
 										</li>
 									</ul>
 								</li>
 								<li>
-									<a href="account-list.html">
+									<Link href="account-list.html">
 										<i className="ti ti-building-bank fs-16 me-2"></i>
 										<span>Bank Accounts</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="money-transfer.html">
+									<Link href="money-transfer.html">
 										<i className="ti ti-moneybag fs-16 me-2"></i>
 										<span>Money Transfer</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="balance-sheet.html">
+									<Link href="balance-sheet.html">
 										<i className="ti ti-report-money fs-16 me-2"></i>
 										<span>Balance Sheet</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="trial-balance.html">
+									<Link href="trial-balance.html">
 										<i className="ti ti-alert-circle fs-16 me-2"></i>
 										<span>Trial Balance</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="cash-flow.html">
+									<Link href="cash-flow.html">
 										<i className="ti ti-zoom-money fs-16 me-2"></i>
 										<span>Cash Flow</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="account-statement.html">
+									<Link href="account-statement.html">
 										<i className="ti ti-file-infinity fs-16 me-2"></i>
 										<span>Account Statement</span>
-									</a>
+									</Link>
 								</li>
 							</ul>
-						</li>
+						</li> */}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Peoples</h6>
 							<ul>
 								<li>
-									<a href="customers.html">
+									<Link href={routes.customers}>
 										<i className="ti ti-users-group fs-16 me-2"></i>
 										<span>Customers</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="billers.html">
+								{/* <li>
+									<Link href="billers.html">
 										<i className="ti ti-user-up fs-16 me-2"></i>
 										<span>Billers</span>
-									</a>
-								</li>
-								<li>
-									<a href="suppliers.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="suppliers.html">
 										<i className="ti ti-user-dollar fs-16 me-2"></i>
 										<span>Suppliers</span>
-									</a>
-								</li>
-								<li>
-									<a href="store-list.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="store-list.html">
 										<i className="ti ti-home-bolt fs-16 me-2"></i>
 										<span>Stores</span>
-									</a>
-								</li>
-								<li>
-									<a href="warehouse.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="warehouse.html">
 										<i className="ti ti-archive fs-16 me-2"></i>
 										<span>Warehouses</span>
-									</a>
-								</li>
+									</Link>
+								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">HRM</h6>
 							<ul>
 								<li>
-									<a href="employees-grid.html">
+									<Link href={routes.employees}>
 										<i className="ti ti-user fs-16 me-2"></i>
 										<span>Employees</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="department-grid.html">
+								{/* <li>
+									<Link href="department-grid.html">
 										<i className="ti ti-compass fs-16 me-2"></i>
 										<span>Departments</span>
-									</a>
-								</li>
-								<li>
-									<a href="designation.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="designation.html">
 										<i className="ti ti-git-merge fs-16 me-2"></i>
 										<span>Designation</span>
-									</a>
-								</li>
-								<li>
-									<a href="shift.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="shift.html">
 										<i className="ti ti-arrows-shuffle fs-16 me-2"></i>
 										<span>Shifts</span>
-									</a>
-								</li>
-								<li className="submenu">
-									<a href="#">
+									</Link>
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-user-cog fs-16 me-2"></i>
 										<span>Attendence</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="attendance-employee.html">Employee</a>
+											<Link href="attendance-employee.html">Employee</Link>
 										</li>
 										<li>
-											<a href="attendance-admin.html">Admin</a>
+											<Link href="attendance-admin.html">Admin</Link>
 										</li>
 									</ul>
-								</li>
-								<li className="submenu">
-									<a href="#">
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-calendar fs-16 me-2"></i>
 										<span>Leaves</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="leaves-admin.html">Admin Leaves</a>
+											<Link href="leaves-admin.html">Admin Leaves</Link>
 										</li>
 										<li>
-											<a href="leaves-employee.html">Employee Leaves</a>
+											<Link href="leaves-employee.html">Employee Leaves</Link>
 										</li>
 										<li>
-											<a href="leave-types.html">Leave Types</a>
+											<Link href="leave-types.html">Leave Types</Link>
 										</li>
 									</ul>
-								</li>
-								<li>
-									<a href="holidays.html">
+								</li> */}
+								{/* <li>
+									<Link href="holidays.html">
 										<i className="ti ti-calendar-share fs-16 me-2"></i>
 										<span>Holidays</span>
-									</a>
-								</li>
-								<li className="submenu">
-									<a href="employee-salary.html">
+									</Link>
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="employee-salary.html">
 										<i className="ti ti-file-dollar fs-16 me-2"></i>
 										<span>Payroll</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="employee-salary.html">Employee Salary</a>
+											<Link href="employee-salary.html">Employee Salary</Link>
 										</li>
 										<li>
-											<a href="payslip.html">Payslip</a>
+											<Link href="payslip.html">Payslip</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">
@@ -703,335 +708,335 @@ export default function Sidebar() {
 									</ul>
 								</li>
 								<li>
-									<a href="purchase-report.html">
+									<Link href={routes.purchaseReport}>
 										<i className="ti ti-chart-pie-2 fs-16 me-2"></i>
 										<span>Purchase report</span>
-									</a>
+									</Link>
 								</li>
-								<li className="submenu">
-									<a href="#">
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-triangle-inverted fs-16 me-2"></i>
 										<span>Inventory Report</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="inventory-report.html">Inventory Report</a>
+											<Link href="inventory-report.html">Inventory Report</Link>
 										</li>
 										<li>
-											<a href="stock-history.html">Stock History</a>
+											<Link href="stock-history.html">Stock History</Link>
 										</li>
 										<li>
-											<a href="sold-stock.html">Sold Stock</a>
+											<Link href="sold-stock.html">Sold Stock</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 								<li>
-									<a href="invoice-report.html">
+									<Link href={routes.invoiceReport}>
 										<i className="ti ti-businessplan fs-16 me-2"></i>
 										<span>Invoice Report</span>
-									</a>
+									</Link>
 								</li>
-								<li className="submenu">
-									<a href="#">
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-user-star fs-16 me-2"></i>
 										<span>Supplier Report</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="supplier-report.html">Supplier Report</a>
+											<Link href="supplier-report.html">Supplier Report</Link>
 										</li>
 										<li>
-											<a href="supplier-due-report.html">Supplier Due Report</a>
+											<Link href="supplier-due-report.html">Supplier Due Report</Link>
 										</li>
 									</ul>
-								</li>
-								<li className="submenu">
-									<a href="#">
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-report fs-16 me-2"></i>
 										<span>Customer Report</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="customer-report.html">Customer Report</a>
+											<Link href="customer-report.html">Customer Report</Link>
 										</li>
 										<li>
-											<a href="customer-due-report.html">Customer Due Report</a>
+											<Link href="customer-due-report.html">Customer Due Report</Link>
 										</li>
 									</ul>
-								</li>
-								<li className="submenu">
-									<a href="#">
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-report-analytics fs-16 me-2"></i>
 										<span>Product Report</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="product-report.html">Product Report</a>
+											<Link href="product-report.html">Product Report</Link>
 										</li>
 										<li>
-											<a href="product-expiry-report.html">Product Expiry Report</a>
+											<Link href="product-expiry-report.html">Product Expiry Report</Link>
 										</li>
 										<li>
-											<a href="product-quantity-alert.html">Product Quantity Alert</a>
+											<Link href="product-quantity-alert.html">Product Quantity Alert</Link>
 										</li>
 									</ul>
-								</li>
-								<li>
-									<a href="expense-report.html">
+								</li> */}
+								{/* <li>
+									<Link href="expense-report.html">
 										<i className="ti ti-file-vector fs-16 me-2"></i>
 										<span>Expense Report</span>
-									</a>
-								</li>
+									</Link>
+								</li> */}
 								<li>
-									<a href="income-report.html">
+									<Link href={routes.incomeReport}>
 										<i className="ti ti-chart-ppf fs-16 me-2"></i>
 										<span>Income Report</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="tax-reports.html">
+								{/* <li>
+									<Link href="tax-reports.html">
 										<i className="ti ti-chart-dots-2 fs-16 me-2"></i>
 										<span>Tax Report</span>
-									</a>
-								</li>
+									</Link>
+								</li> */}
 								<li>
-									<a href="profit-and-loss.html">
+									<Link href={routes.profitAndLoss}>
 										<i className="ti ti-chart-donut fs-16 me-2"></i>
 										<span>Profit & Loss</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="annual-report.html">
+									<Link href={routes.annualReport}>
 										<i className="ti ti-report-search fs-16 me-2"></i>
 										<span>Annual Report</span>
-									</a>
+									</Link>
 								</li>
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Content (CMS)</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-page-break fs-16 me-2"></i>
 										<span>Pages</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="pages.html">Pages</a>
+											<Link href="pages.html">Pages</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-wallpaper fs-16 me-2"></i>
 										<span>Blog</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="all-blog.html">All Blog</a>
+											<Link href="all-blog.html">All Blog</Link>
 										</li>
 										<li>
-											<a href="blog-tag.html">Blog Tags</a>
+											<Link href="blog-tag.html">Blog Tags</Link>
 										</li>
 										<li>
-											<a href="blog-categories.html">Categories</a>
+											<Link href="blog-categories.html">Categories</Link>
 										</li>
 										<li>
-											<a href="blog-comments.html">Blog Comments</a>
+											<Link href="blog-comments.html">Blog Comments</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-map-pin fs-16 me-2"></i>
 										<span>Location</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="countries.html">Countries</a>
+											<Link href="countries.html">Countries</Link>
 										</li>
 										<li>
-											<a href="states.html">States</a>
+											<Link href="states.html">States</Link>
 										</li>
 										<li>
-											<a href="cities.html">Cities</a>
+											<Link href="cities.html">Cities</Link>
 										</li>
 									</ul>
 								</li>
 								<li>
-									<a href="testimonials.html">
+									<Link href="testimonials.html">
 										<i className="ti ti-star fs-16 me-2"></i>
 										<span>Testimonials</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="faq.html">
+									<Link href="faq.html">
 										<i className="ti ti-help-circle fs-16 me-2"></i>
 										<span>FAQ</span>
-									</a>
+									</Link>
 								</li>
 							</ul>
-						</li>
+						</li> */}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">User Management</h6>
 							<ul>
 								<li>
-									<a href="users.html">
+									<Link href={routes.users}>
 										<i className="ti ti-shield-up fs-16 me-2"></i>
 										<span>Users</span>
-									</a>
+									</Link>
 								</li>
-								<li>
-									<a href="roles-permissions.html">
+								{/* <li>
+									<Link href="roles-permissions.html">
 										<i className="ti ti-jump-rope fs-16 me-2"></i>
 										<span>Roles & Permissions</span>
-									</a>
-								</li>
-								<li>
-									<a href="delete-account.html">
+									</Link>
+								</li> */}
+								{/* <li>
+									<Link href="delete-account.html">
 										<i className="ti ti-trash-x fs-16 me-2"></i>
 										<span>Delete Account Request</span>
-									</a>
-								</li>
+									</Link>
+								</li> */}
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Pages</h6>
 							<ul>
 								<li>
-									<a href="profile.html">
+									<Link href="profile.html">
 										<i className="ti ti-user-circle fs-16 me-2"></i>
 										<span>Profile</span>
-									</a>
+									</Link>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-shield fs-16 me-2"></i>
 										<span>Authentication</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Login<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="signin.html">Cover</a>
+													<Link href="signin.html">Cover</Link>
 												</li>
 												<li>
-													<a href="signin-2.html">Illustration</a>
+													<Link href="signin-2.html">Illustration</Link>
 												</li>
 												<li>
-													<a href="signin-3.html">Basic</a>
+													<Link href="signin-3.html">Basic</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Register<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="register.html">Cover</a>
+													<Link href="register.html">Cover</Link>
 												</li>
 												<li>
-													<a href="register-2.html">Illustration</a>
+													<Link href="register-2.html">Illustration</Link>
 												</li>
 												<li>
-													<a href="register-3.html">Basic</a>
+													<Link href="register-3.html">Basic</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Forgot Password<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="forgot-password.html">Cover</a>
+													<Link href="forgot-password.html">Cover</Link>
 												</li>
 												<li>
-													<a href="forgot-password-2.html">Illustration</a>
+													<Link href="forgot-password-2.html">Illustration</Link>
 												</li>
 												<li>
-													<a href="forgot-password-3.html">Basic</a>
+													<Link href="forgot-password-3.html">Basic</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Reset Password<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="reset-password.html">Cover</a>
+													<Link href="reset-password.html">Cover</Link>
 												</li>
 												<li>
-													<a href="reset-password-2.html">Illustration</a>
+													<Link href="reset-password-2.html">Illustration</Link>
 												</li>
 												<li>
-													<a href="reset-password-3.html">Basic</a>
+													<Link href="reset-password-3.html">Basic</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Email Verification<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="email-verification.html">Cover</a>
+													<Link href="email-verification.html">Cover</Link>
 												</li>
 												<li>
-													<a href="email-verification-2.html">Illustration</a>
+													<Link href="email-verification-2.html">Illustration</Link>
 												</li>
 												<li>
-													<a href="email-verification-3.html">Basic</a>
+													<Link href="email-verification-3.html">Basic</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												2 Step Verification<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="two-step-verification.html">Cover</a>
+													<Link href="two-step-verification.html">Cover</Link>
 												</li>
 												<li>
-													<a href="two-step-verification-2.html">Illustration</a>
+													<Link href="two-step-verification-2.html">Illustration</Link>
 												</li>
 												<li>
-													<a href="two-step-verification-3.html">Basic</a>
+													<Link href="two-step-verification-3.html">Basic</Link>
 												</li>
 											</ul>
 										</li>
 										<li>
-											<a href="lock-screen.html">Lock Screen</a>
+											<Link href="lock-screen.html">Lock Screen</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-file-x fs-16 me-2"></i>
 										<span>Error Pages</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="error-404.html">404 Error </a>
+											<Link href="error-404.html">404 Error </Link>
 										</li>
 										<li>
-											<a href="error-500.html">500 Error </a>
+											<Link href="error-500.html">500 Error </Link>
 										</li>
 									</ul>
 								</li>
@@ -1042,555 +1047,555 @@ export default function Sidebar() {
 									</Link>
 								</li>
 								<li>
-									<a href="pricing.html">
+									<Link href="pricing.html">
 										<i className="ti ti-currency-dollar fs-16 me-2"></i>
 										<span>Pricing</span>{' '}
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="coming-soon.html">
+									<Link href="coming-soon.html">
 										<i className="ti ti-send fs-16 me-2"></i>
 										<span>Coming Soon</span>{' '}
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="under-maintenance.html">
+									<Link href="under-maintenance.html">
 										<i className="ti ti-alert-triangle fs-16 me-2"></i>
 										<span>Under Maintenance</span>
-									</a>
+									</Link>
 								</li>
 							</ul>
-						</li>
+						</li> */}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Settings</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-settings fs-16 me-2"></i>
 										<span>General Settings</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="general-settings.html">Profile</a>
+											<Link href={routes.profileSettings}>Profile</Link>
 										</li>
-										<li>
-											<a href="security-settings.html">Security</a>
-										</li>
-										<li>
-											<a href="notification.html">Notifications</a>
-										</li>
-										<li>
-											<a href="connected-apps.html">Connected Apps</a>
-										</li>
+										{/* <li>
+											<Link href="security-settings.html">Security</Link>
+										</li> */}
+										{/* <li>
+											<Link href="notification.html">Notifications</Link>
+										</li> */}
+										{/* <li>
+											<Link href="connected-apps.html">Connected Apps</Link>
+										</li> */}
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-world fs-16 me-2"></i>
 										<span>Website Settings</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
+										{/* <li>
+											<Link href="system-settings.html">System Settings</Link>
+										</li> */}
 										<li>
-											<a href="system-settings.html">System Settings</a>
+											<Link href="company-settings.html">Company Settings </Link>
+										</li>
+										{/* <li>
+											<Link href="localization-settings.html">Localization</Link>
 										</li>
 										<li>
-											<a href="company-settings.html">Company Settings </a>
+											<Link href="prefixes.html">Prefixes</Link>
 										</li>
 										<li>
-											<a href="localization-settings.html">Localization</a>
+											<Link href="preference.html">Preference</Link>
 										</li>
 										<li>
-											<a href="prefixes.html">Prefixes</a>
+											<Link href="appearance.html">Appearance</Link>
 										</li>
 										<li>
-											<a href="preference.html">Preference</a>
-										</li>
+											<Link href="social-authentication.html">Social Authentication</Link>
+										</li> */}
 										<li>
-											<a href="appearance.html">Appearance</a>
-										</li>
-										<li>
-											<a href="social-authentication.html">Social Authentication</a>
-										</li>
-										<li>
-											<a href="language-settings.html">Language</a>
+											<Link href={routes.languageSettings}>Language</Link>
 										</li>
 									</ul>
 								</li>
-								<li className="submenu">
-									<a href="#">
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-device-mobile fs-16 me-2"></i> <span>App Settings</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Invoice<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="invoice-settings.html">Invoice Settings</a>
+													<Link href="invoice-settings.html">Invoice Settings</Link>
 												</li>
 												<li>
-													<a href="invoice-template.html">Invoice Template</a>
+													<Link href="invoice-template.html">Invoice Template</Link>
 												</li>
 											</ul>
 										</li>
 										<li>
-											<a href="printer-settings.html">Printer</a>
+											<Link href="printer-settings.html">Printer</Link>
 										</li>
 										<li>
-											<a href="pos-settings.html">POS</a>
+											<Link href="pos-settings.html">POS</Link>
 										</li>
 										<li>
-											<a href="custom-fields.html">Custom Fields</a>
+											<Link href="custom-fields.html">Custom Fields</Link>
 										</li>
 									</ul>
-								</li>
-								<li className="submenu">
-									<a href="#">
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-device-desktop fs-16 me-2"></i> <span>System Settings</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Email<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="email-settings.html">Email Settings</a>
+													<Link href="email-settings.html">Email Settings</Link>
 												</li>
 												<li>
-													<a href="email-template.html">Email Template</a>
+													<Link href="email-template.html">Email Template</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												SMS<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="sms-settings.html">SMS Settings</a>
+													<Link href="sms-settings.html">SMS Settings</Link>
 												</li>
 												<li>
-													<a href="sms-template.html">SMS Template</a>
+													<Link href="sms-template.html">SMS Template</Link>
 												</li>
 											</ul>
 										</li>
 										<li>
-											<a href="otp-settings.html">OTP</a>
+											<Link href="otp-settings.html">OTP</Link>
 										</li>
 										<li>
-											<a href="gdpr-settings.html">GDPR Cookies</a>
+											<Link href="gdpr-settings.html">GDPR Cookies</Link>
 										</li>
 									</ul>
-								</li>
-								<li className="submenu">
-									<a href="#">
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-settings-dollar fs-16 me-2"></i> <span>Financial Settings</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="payment-gateway-settings.html">Payment Gateway</a>
+											<Link href="payment-gateway-settings.html">Payment Gateway</Link>
 										</li>
 										<li>
-											<a href="bank-settings-grid.html">Bank Accounts</a>
+											<Link href="bank-settings-grid.html">Bank Accounts</Link>
 										</li>
 										<li>
-											<a href="tax-rates.html">Tax Rates</a>
+											<Link href="tax-rates.html">Tax Rates</Link>
 										</li>
 										<li>
-											<a href="currency-settings.html">Currencies</a>
+											<Link href="currency-settings.html">Currencies</Link>
 										</li>
 									</ul>
-								</li>
-								<li className="submenu">
-									<a href="#">
+								</li> */}
+								{/* <li className="submenu">
+									<Link href="#">
 										<i className="ti ti-settings-2 fs-16 me-2"></i> <span>Other Settings</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="storage-settings.html">Storage</a>
+											<Link href="storage-settings.html">Storage</Link>
 										</li>
 										<li>
-											<a href="ban-ip-address.html">Ban IP Address</a>
+											<Link href="ban-ip-address.html">Ban IP Address</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 								<li>
-									<a href="signin.html">
+									<Link href={routes.login}>
 										<i className="ti ti-logout fs-16 me-2"></i>
 										<span>Logout</span>{' '}
-									</a>
+									</Link>
 								</li>
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">UI Interface</h6>
 							<ul>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-vector-bezier fs-16 me-2"></i>
 										<span>Base UI</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="ui-alerts.html">Alerts</a>
+											<Link href="ui-alerts.html">Alerts</Link>
 										</li>
 										<li>
-											<a href="ui-accordion.html">Accordion</a>
+											<Link href="ui-accordion.html">Accordion</Link>
 										</li>
 										<li>
-											<a href="ui-avatar.html">Avatar</a>
+											<Link href="ui-avatar.html">Avatar</Link>
 										</li>
 										<li>
-											<a href="ui-badges.html">Badges</a>
+											<Link href="ui-badges.html">Badges</Link>
 										</li>
 										<li>
-											<a href="ui-borders.html">Border</a>
+											<Link href="ui-borders.html">Border</Link>
 										</li>
 										<li>
-											<a href="ui-buttons.html">Buttons</a>
+											<Link href="ui-buttons.html">Buttons</Link>
 										</li>
 										<li>
-											<a href="ui-buttons-group.html">Button Group</a>
+											<Link href="ui-buttons-group.html">Button Group</Link>
 										</li>
 										<li>
-											<a href="ui-breadcrumb.html">Breadcrumb</a>
+											<Link href="ui-breadcrumb.html">Breadcrumb</Link>
 										</li>
 										<li>
-											<a href="ui-cards.html">Card</a>
+											<Link href="ui-cards.html">Card</Link>
 										</li>
 										<li>
-											<a href="ui-carousel.html">Carousel</a>
+											<Link href="ui-carousel.html">Carousel</Link>
 										</li>
 										<li>
-											<a href="ui-colors.html">Colors</a>
+											<Link href="ui-colors.html">Colors</Link>
 										</li>
 										<li>
-											<a href="ui-dropdowns.html">Dropdowns</a>
+											<Link href="ui-dropdowns.html">Dropdowns</Link>
 										</li>
 										<li>
-											<a href="ui-grid.html">Grid</a>
+											<Link href="ui-grid.html">Grid</Link>
 										</li>
 										<li>
-											<a href="ui-images.html">Images</a>
+											<Link href="ui-images.html">Images</Link>
 										</li>
 										<li>
-											<a href="ui-lightbox.html">Lightbox</a>
+											<Link href="ui-lightbox.html">Lightbox</Link>
 										</li>
 										<li>
-											<a href="ui-media.html">Media</a>
+											<Link href="ui-media.html">Media</Link>
 										</li>
 										<li>
-											<a href="ui-modals.html">Modals</a>
+											<Link href="ui-modals.html">Modals</Link>
 										</li>
 										<li>
-											<a href="ui-offcanvas.html">Offcanvas</a>
+											<Link href="ui-offcanvas.html">Offcanvas</Link>
 										</li>
 										<li>
-											<a href="ui-pagination.html">Pagination</a>
+											<Link href="ui-pagination.html">Pagination</Link>
 										</li>
 										<li>
-											<a href="ui-popovers.html">Popovers</a>
+											<Link href="ui-popovers.html">Popovers</Link>
 										</li>
 										<li>
-											<a href="ui-progress.html">Progress</a>
+											<Link href="ui-progress.html">Progress</Link>
 										</li>
 										<li>
-											<a href="ui-placeholders.html">Placeholders</a>
+											<Link href="ui-placeholders.html">Placeholders</Link>
 										</li>
 										<li>
-											<a href="ui-rangeslider.html">Range Slider</a>
+											<Link href="ui-rangeslider.html">Range Slider</Link>
 										</li>
 										<li>
-											<a href="ui-spinner.html">Spinner</a>
+											<Link href="ui-spinner.html">Spinner</Link>
 										</li>
 										<li>
-											<a href="ui-sweetalerts.html">Sweet Alerts</a>
+											<Link href="ui-sweetalerts.html">Sweet Alerts</Link>
 										</li>
 										<li>
-											<a href="ui-nav-tabs.html">Tabs</a>
+											<Link href="ui-nav-tabs.html">Tabs</Link>
 										</li>
 										<li>
-											<a href="ui-toasts.html">Toasts</a>
+											<Link href="ui-toasts.html">Toasts</Link>
 										</li>
 										<li>
-											<a href="ui-tooltips.html">Tooltips</a>
+											<Link href="ui-tooltips.html">Tooltips</Link>
 										</li>
 										<li>
-											<a href="ui-typography.html">Typography</a>
+											<Link href="ui-typography.html">Typography</Link>
 										</li>
 										<li>
-											<a href="ui-video.html">Video</a>
+											<Link href="ui-video.html">Video</Link>
 										</li>
 										<li>
-											<a href="ui-sortable.html">Sortable</a>
+											<Link href="ui-sortable.html">Sortable</Link>
 										</li>
 										<li>
-											<a href="ui-swiperjs.html">Swiperjs</a>
+											<Link href="ui-swiperjs.html">Swiperjs</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i data-feather="layers"></i>
 										<span>Advanced UI</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="ui-ribbon.html">Ribbon</a>
+											<Link href="ui-ribbon.html">Ribbon</Link>
 										</li>
 										<li>
-											<a href="ui-clipboard.html">Clipboard</a>
+											<Link href="ui-clipboard.html">Clipboard</Link>
 										</li>
 										<li>
-											<a href="ui-drag-drop.html">Drag & Drop</a>
+											<Link href="ui-drag-drop.html">Drag & Drop</Link>
 										</li>
 										<li>
-											<a href="ui-rangeslider.html">Range Slider</a>
+											<Link href="ui-rangeslider.html">Range Slider</Link>
 										</li>
 										<li>
-											<a href="ui-rating.html">Rating</a>
+											<Link href="ui-rating.html">Rating</Link>
 										</li>
 										<li>
-											<a href="ui-text-editor.html">Text Editor</a>
+											<Link href="ui-text-editor.html">Text Editor</Link>
 										</li>
 										<li>
-											<a href="ui-counter.html">Counter</a>
+											<Link href="ui-counter.html">Counter</Link>
 										</li>
 										<li>
-											<a href="ui-scrollbar.html">Scrollbar</a>
+											<Link href="ui-scrollbar.html">Scrollbar</Link>
 										</li>
 										<li>
-											<a href="ui-stickynote.html">Sticky Note</a>
+											<Link href="ui-stickynote.html">Sticky Note</Link>
 										</li>
 										<li>
-											<a href="ui-timeline.html">Timeline</a>
+											<Link href="ui-timeline.html">Timeline</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-chart-infographic fs-16 me-2"></i> <span>Charts</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="chart-apex.html">Apex Charts</a>
+											<Link href="chart-apex.html">Apex Charts</Link>
 										</li>
 										<li>
-											<a href="chart-c3.html">Chart C3</a>
+											<Link href="chart-c3.html">Chart C3</Link>
 										</li>
 										<li>
-											<a href="chart-js.html">Chart Js</a>
+											<Link href="chart-js.html">Chart Js</Link>
 										</li>
 										<li>
-											<a href="chart-morris.html">Morris Charts</a>
+											<Link href="chart-morris.html">Morris Charts</Link>
 										</li>
 										<li>
-											<a href="chart-flot.html">Flot Charts</a>
+											<Link href="chart-flot.html">Flot Charts</Link>
 										</li>
 										<li>
-											<a href="chart-peity.html">Peity Charts</a>
+											<Link href="chart-peity.html">Peity Charts</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-icons fs-16 me-2"></i> <span>Icons</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="icon-fontawesome.html">Fontawesome Icons</a>
+											<Link href="icon-fontawesome.html">Fontawesome Icons</Link>
 										</li>
 										<li>
-											<a href="icon-feather.html">Feather Icons</a>
+											<Link href="icon-feather.html">Feather Icons</Link>
 										</li>
 										<li>
-											<a href="icon-ionic.html">Ionic Icons</a>
+											<Link href="icon-ionic.html">Ionic Icons</Link>
 										</li>
 										<li>
-											<a href="icon-material.html">Material Icons</a>
+											<Link href="icon-material.html">Material Icons</Link>
 										</li>
 										<li>
-											<a href="icon-pe7.html">Pe7 Icons</a>
+											<Link href="icon-pe7.html">Pe7 Icons</Link>
 										</li>
 										<li>
-											<a href="icon-simpleline.html">Simpleline Icons</a>
+											<Link href="icon-simpleline.html">Simpleline Icons</Link>
 										</li>
 										<li>
-											<a href="icon-themify.html">Themify Icons</a>
+											<Link href="icon-themify.html">Themify Icons</Link>
 										</li>
 										<li>
-											<a href="icon-weather.html">Weather Icons</a>
+											<Link href="icon-weather.html">Weather Icons</Link>
 										</li>
 										<li>
-											<a href="icon-typicon.html">Typicon Icons</a>
+											<Link href="icon-typicon.html">Typicon Icons</Link>
 										</li>
 										<li>
-											<a href="icon-flag.html">Flag Icons</a>
+											<Link href="icon-flag.html">Flag Icons</Link>
 										</li>
 										<li>
-											<a href="icon-tabler.html">Tabler Icons</a>
+											<Link href="icon-tabler.html">Tabler Icons</Link>
 										</li>
 										<li>
-											<a href="icon-bootstrap.html">Bootstrap Icons</a>
+											<Link href="icon-bootstrap.html">Bootstrap Icons</Link>
 										</li>
 										<li>
-											<a href="icon-remix.html">Remix Icons</a>
+											<Link href="icon-remix.html">Remix Icons</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-input-search fs-16 me-2"></i>
 										<span>Forms</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Form Elements<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="form-basic-inputs.html">Basic Inputs</a>
+													<Link href="form-basic-inputs.html">Basic Inputs</Link>
 												</li>
 												<li>
-													<a href="form-checkbox-radios.html">Checkbox & Radios</a>
+													<Link href="form-checkbox-radios.html">Checkbox & Radios</Link>
 												</li>
 												<li>
-													<a href="form-input-groups.html">Input Groups</a>
+													<Link href="form-input-groups.html">Input Groups</Link>
 												</li>
 												<li>
-													<a href="form-grid-gutters.html">Grid & Gutters</a>
+													<Link href="form-grid-gutters.html">Grid & Gutters</Link>
 												</li>
 												<li>
-													<a href="form-select.html">Form Select</a>
+													<Link href="form-select.html">Form Select</Link>
 												</li>
 												<li>
-													<a href="form-mask.html">Input Masks</a>
+													<Link href="form-mask.html">Input Masks</Link>
 												</li>
 												<li>
-													<a href="form-fileupload.html">File Uploads</a>
+													<Link href="form-fileupload.html">File Uploads</Link>
 												</li>
 											</ul>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Layouts<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="form-horizontal.html">Horizontal Form</a>
+													<Link href="form-horizontal.html">Horizontal Form</Link>
 												</li>
 												<li>
-													<a href="form-vertical.html">Vertical Form</a>
+													<Link href="form-vertical.html">Vertical Form</Link>
 												</li>
 												<li>
-													<a href="form-floating-labels.html">Floating Labels</a>
+													<Link href="form-floating-labels.html">Floating Labels</Link>
 												</li>
 											</ul>
 										</li>
 										<li>
-											<a href="form-validation.html">Form Validation</a>
+											<Link href="form-validation.html">Form Validation</Link>
 										</li>
 										<li>
-											<a href="form-select2.html">Select2</a>
+											<Link href="form-select2.html">Select2</Link>
 										</li>
 										<li>
-											<a href="form-wizard.html">Form Wizard</a>
+											<Link href="form-wizard.html">Form Wizard</Link>
 										</li>
 										<li>
-											<a href="form-pickers.html">Form Picker</a>
+											<Link href="form-pickers.html">Form Picker</Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-table fs-16 me-2"></i>
 										<span>Tables</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="tables-basic.html">Basic Tables </a>
+											<Link href="tables-basic.html">Basic Tables </Link>
 										</li>
 										<li>
-											<a href="data-tables.html">Data Table </a>
+											<Link href="data-tables.html">Data Table </Link>
 										</li>
 									</ul>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-map-pin-pin fs-16 me-2"></i>
 										<span>Maps</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="maps-vector.html">Vector</a>
+											<Link href="maps-vector.html">Vector</Link>
 										</li>
 										<li>
-											<a href="maps-leaflet.html">Leaflet</a>
+											<Link href="maps-leaflet.html">Leaflet</Link>
 										</li>
 									</ul>
 								</li>
 							</ul>
-						</li>
-						<li className="submenu-open">
+						</li> */}
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Help</h6>
 							<ul>
 								<li>
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-file-text fs-16 me-2"></i>
 										<span>Documentation</span>
-									</a>
+									</Link>
 								</li>
 								<li>
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-exchange fs-16 me-2"></i>
 										<span>Changelog </span>
 										<span className="badge bg-primary badge-xs text-white fs-10 ms-2">v2.1.3</span>
-									</a>
+									</Link>
 								</li>
 								<li className="submenu">
-									<a href="#">
+									<Link href="#">
 										<i className="ti ti-menu-2 fs-16 me-2"></i>
 										<span>Multi Level</span>
 										<span className="menu-arrow"></span>
-									</a>
+									</Link>
 									<ul>
 										<li>
-											<a href="#">Level 1.1</a>
+											<Link href="#">Level 1.1</Link>
 										</li>
 										<li className="submenu submenu-two">
-											<a href="#">
+											<Link href="#">
 												Level 1.2<span className="menu-arrow inside-submenu"></span>
-											</a>
+											</Link>
 											<ul>
 												<li>
-													<a href="#">Level 2.1</a>
+													<Link href="#">Level 2.1</Link>
 												</li>
 												<li className="submenu submenu-two submenu-three">
-													<a href="#">
+													<Link href="#">
 														Level 2.2<span className="menu-arrow inside-submenu inside-submenu-two"></span>
-													</a>
+													</Link>
 													<ul>
 														<li>
-															<a href="#">Level 3.1</a>
+															<Link href="#">Level 3.1</Link>
 														</li>
 														<li>
-															<a href="#">Level 3.2</a>
+															<Link href="#">Level 3.2</Link>
 														</li>
 													</ul>
 												</li>
@@ -1599,7 +1604,7 @@ export default function Sidebar() {
 									</ul>
 								</li>
 							</ul>
-						</li>
+						</li> */}
 					</ul>
 				</div>
 			</div>

@@ -113,7 +113,7 @@ export default function ProductListComponent() {
 							<CollapesIcon />
 						</ul>
 						<div className="page-btn">
-							<Link href={route.addproduct} className="btn btn-primary">
+							<Link href={route.addProduct} className="btn btn-primary">
 								<i className="ti ti-circle-plus me-1"></i>
 								Add New Product
 							</Link>

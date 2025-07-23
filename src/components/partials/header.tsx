@@ -1,6 +1,16 @@
+'use client';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+
+const excludedPathnames = [routes.login, routes.register];
 
 export default function Header() {
+	const pathname = usePathname();
+	if (excludedPathnames.includes(pathname)) {
+		return null;
+	}
+
 	return (
 		<div className="header">
 			<div className="main-header">
@@ -205,7 +215,7 @@ export default function Header() {
 						<div className="dropdown-menu dropdown-xl dropdown-menu-center">
 							<div className="row g-2">
 								<div className="col-md-2">
-									<a href="category-list.html" className="link-item">
+									<a href={routes.categoryList} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-brand-codepen"></i>
 										</span>
@@ -213,7 +223,7 @@ export default function Header() {
 									</a>
 								</div>
 								<div className="col-md-2">
-									<a href="add-product.html" className="link-item">
+									<a href={routes.addProduct} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-square-plus"></i>
 										</span>
@@ -221,79 +231,79 @@ export default function Header() {
 									</a>
 								</div>
 								<div className="col-md-2">
-									<a href="category-list.html" className="link-item">
+									<a href={routes.categoryList} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-shopping-bag"></i>
 										</span>
 										<p>Purchase</p>
 									</a>
 								</div>
-								<div className="col-md-2">
+								{/* <div className="col-md-2">
 									<a href="online-orders.html" className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-shopping-cart"></i>
 										</span>
 										<p>Sale</p>
 									</a>
-								</div>
-								<div className="col-md-2">
+								</div> */}
+								{/* <div className="col-md-2">
 									<a href="expense-list.html" className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-file-text"></i>
 										</span>
 										<p>Expense</p>
 									</a>
-								</div>
-								<div className="col-md-2">
+								</div> */}
+								{/* <div className="col-md-2">
 									<a href="quotation-list.html" className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-device-floppy"></i>
 										</span>
 										<p>Quotation</p>
 									</a>
-								</div>
-								<div className="col-md-2">
+								</div> */}
+								{/* <div className="col-md-2">
 									<a href="sales-returns.html" className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-copy"></i>
 										</span>
 										<p>Return</p>
 									</a>
-								</div>
+								</div> */}
 								<div className="col-md-2">
-									<a href="users.html" className="link-item">
+									<a href={routes.users} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-user"></i>
 										</span>
-										<p>User</p>
+										<p>Users</p>
 									</a>
 								</div>
 								<div className="col-md-2">
-									<a href="customers.html" className="link-item">
+									<a href={routes.customers} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-users"></i>
 										</span>
-										<p>Customer</p>
+										<p>Customers</p>
 									</a>
 								</div>
-								<div className="col-md-2">
+								{/* <div className="col-md-2">
 									<a href="sales-report.html" className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-shield"></i>
 										</span>
 										<p>Biller</p>
 									</a>
-								</div>
-								<div className="col-md-2">
+								</div> */}
+								{/* <div className="col-md-2">
 									<a href="suppliers.html" className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-user-check"></i>
 										</span>
 										<p>Supplier</p>
 									</a>
-								</div>
+								</div> */}
 								<div className="col-md-2">
-									<a href="stock-transfer.html" className="link-item">
+									<a href={routes.stockTransfer} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-truck"></i>
 										</span>
@@ -313,7 +323,7 @@ export default function Header() {
 					{/* <!-- Flag --> */}
 					<li className="nav-item dropdown has-arrow flag-nav nav-item-box">
 						<a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
-							<Image src="/assets/img/flags/us-flag.svg" alt="Language" className="img-fluid" width={30} height={30} />
+							<i className="ti ti-language"></i>
 						</a>
 						<div className="dropdown-menu dropdown-menu-right">
 							<a href="#" className="dropdown-item">
@@ -321,8 +331,12 @@ export default function Header() {
 								English
 							</a>
 							<a href="#" className="dropdown-item">
-								<Image src="/assets/img/flags/arabic.svg" alt="Img" height={16} width={16} />
-								Arabic
+								<Image src="/assets/img/flags/jp.png" alt="Img" height={16} width={16} />
+								日本語
+							</a>
+							<a href="#" className="dropdown-item">
+								<Image src="/assets/img/flags/id.png" alt="Img" height={16} width={16} />
+								Indonesia
 							</a>
 						</div>
 					</li>

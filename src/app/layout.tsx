@@ -4,7 +4,6 @@ import { Nunito } from 'next/font/google';
 import '@/assets/plugins/fontawesome/css/all.min.css';
 import '@/assets/plugins/fontawesome/css/fontawesome.min.css';
 
-// import '@/assets/plugins/@simonwep/pickr/themes/nano.min.css';
 import '@/assets/plugins/tabler-icons/tabler-icons.min.css';
 
 import '@/assets/css/bootstrap.min.css';
@@ -15,12 +14,12 @@ import Sidebar from '@/components/partials/sidebar';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-	title: 'Enterprise POS',
+	title: 'Enterprise POS - Inventory Management & Admin Dashboard',
 	description:
-		'Dreams POS is a powerful Bootstrap-based Inventory Management Admin Template designed for businesses, offering seamless invoicing, project tracking, and estimates.',
+		'Enterprise POS is a powerful Bootstrap-based Inventory Management Admin Template designed for businesses, offering seamless invoicing, project tracking, and estimates.',
 	keywords:
 		'inventory management, admin dashboard, bootstrap template, invoicing, estimates, business management, responsive admin, POS system',
-	authors: [{ name: 'Aaron Fabian' }],
+	authors: [{ name: 'Aaron Fabian Saputra' }],
 	icons: {
 		icon: '/assets/favicon.png',
 		shortcut: '/assets/favicon.png', // Add shortcut icon for better support
@@ -51,10 +50,6 @@ export default function RootLayout({
 			<head>
 				{/* <!-- Meta Tags --> */}
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
-				<title>Dreams POS - Inventory Management & Admin Dashboard Template</title>
-
-				{/* eslint-disable-next-line @next/next/no-sync-scripts */}
-				{/* <script src="/assets/js/theme-script.js"></script> */}
 			</head>
 			<body className={`${nunito.variable} ${nunito.variable} antialiased main-wrapper`} data-layout="default">
 				<Header />
@@ -75,7 +70,6 @@ export default function RootLayout({
 				<Script src="/assets/js/jquery.slimscroll.min.js" />
 
 				{/* <!-- Color Picker JS --> */}
-				{/* <Script src="/assets/plugins/@simonwep/pickr/pickr.es5.min.js" /> */}
 				<Script src="/assets/js/script.js" />
 			</body>
 		</html>

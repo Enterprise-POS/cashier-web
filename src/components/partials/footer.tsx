@@ -1,5 +1,5 @@
 export default function Footer() {
-	const currentYear = new Date().getFullYear();
+	const currentYear = new Date().getFullYear().toString();
 
 	return (
 		<div className="footer d-sm-flex align-items-center justify-content-between border-top bg-white p-3 align-content-end">

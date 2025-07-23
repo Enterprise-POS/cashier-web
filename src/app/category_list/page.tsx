@@ -6,12 +6,15 @@ import { categorylist } from '@/components/core/json/categorylistdata';
 import Table from '@/components/inventory/datatable';
 import EditCategoryList from '@/components/inventory/editcategorylist';
 import CommonDeleteModal from '@/components/inventory/modal/commonDeleteModal';
-import CollapesIcon from '@/components/tooltip-content/collapse';
+import CollapseIcon from '@/components/tooltip-content/collapse';
 import { default as RefreshIcon, default as TooltipIcons } from '@/components/tooltip-content/refresh';
 import Footer from '@/components/partials/footer';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
 	const data = categorylist;
+	const [isMounted, setIsMounted] = useState(false);
+
 	const columns = [
 		{
 			title: 'Category',
@@ -52,6 +55,15 @@ export default function Home() {
 			),
 		},
 	];
+
+	useEffect(() => {
+		setIsMounted(true);
+	}, []);
+
+	if (!isMounted) {
+		return null;
+	}
+
 	return (
 		<div>
 			<div className="page-wrapper">
@@ -66,7 +78,7 @@ export default function Home() {
 						<ul className="table-top-head">
 							<TooltipIcons />
 							<RefreshIcon />
-							<CollapesIcon />
+							<CollapseIcon />
 						</ul>
 						<div className="page-btn">
 							<Link href="#" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-category">

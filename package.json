@@ -20,6 +20,7 @@
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
 		"react-feather": "^2.0.10",
+		"react-perfect-scrollbar": "^1.5.8",
 		"react-select": "^5.10.2",
 		"react-simple-wysiwyg": "^3.4.0"
 	},
