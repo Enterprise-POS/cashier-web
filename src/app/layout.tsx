@@ -14,7 +14,10 @@ import Sidebar from '@/components/partials/sidebar';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
-	title: 'Enterprise POS - Inventory Management & Admin Dashboard',
+	title: {
+		template: '%s - Enterprise POS',
+		default: 'Enterprise POS - Inventory Management & Admin Dashboard',
+	},
 	description:
 		'Enterprise POS is a powerful Bootstrap-based Inventory Management Admin Template designed for businesses, offering seamless invoicing, project tracking, and estimates.',
 	keywords:
