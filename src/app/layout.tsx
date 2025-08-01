@@ -9,7 +9,7 @@ import '@/assets/plugins/tabler-icons/tabler-icons.min.css';
 import '@/assets/css/bootstrap.min.css';
 import '@/assets/scss/main.scss';
 
-import Header from '@/components/partials/header';
+import Header from '@/components/partials/header/header';
 import Sidebar from '@/components/partials/sidebar';
 import Script from 'next/script';
 
@@ -24,8 +24,6 @@ export const metadata: Metadata = {
 		'inventory management, admin dashboard, bootstrap template, invoicing, estimates, business management, responsive admin, POS system',
 	authors: [{ name: 'Aaron Fabian Saputra' }],
 	icons: {
-		icon: '/assets/favicon.png',
-		shortcut: '/assets/favicon.png', // Add shortcut icon for better support
 		apple: '/assets/favicon.png', // Optional: for Apple devices (place in `public/`)
 	},
 	robots: {

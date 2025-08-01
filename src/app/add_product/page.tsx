@@ -168,9 +168,7 @@ export default function AddProductComponent() {
 														<label className="form-label">
 															Store<span className="text-danger ms-1">*</span>
 														</label>
-														{isMounted ? (
-															<Select className="react-select" options={store} placeholder="Choose" />
-														) : null}
+														<Select className="react-select" options={store} placeholder="Choose" />
 													</div>
 												</div>
 												<div className="col-sm-6 col-12">
@@ -179,9 +177,7 @@ export default function AddProductComponent() {
 															Warehouse
 															<span className="text-danger ms-1">*</span>
 														</label>
-														{isMounted ? (
-															<Select className="react-select" options={warehouse} placeholder="Choose" />
-														) : null}
+														<Select className="react-select" options={warehouse} placeholder="Choose" />
 													</div>
 												</div>
 											</div>
@@ -222,9 +218,7 @@ export default function AddProductComponent() {
 															Selling Type
 															<span className="text-danger ms-1">*</span>
 														</label>
-														{isMounted ? (
-															<Select className="react-select" options={sellingtype} placeholder="Choose" />
-														) : null}
+														<Select className="react-select" options={sellingtype} placeholder="Choose" />
 													</div>
 												</div>
 											</div>
@@ -242,9 +236,7 @@ export default function AddProductComponent() {
 																	<span>Add New</span>
 																</Link>
 															</div>
-															{isMounted ? (
-																<Select className="react-select" options={category} placeholder="Choose" />
-															) : null}
+															<Select className="react-select" options={category} placeholder="Choose" />
 														</div>
 													</div>
 													<div className="col-sm-6 col-12">
@@ -253,9 +245,7 @@ export default function AddProductComponent() {
 																Sub Category
 																<span className="text-danger ms-1">*</span>
 															</label>
-															{isMounted ? (
-																<Select className="react-select" options={subcategory} placeholder="Choose" />
-															) : null}
+															<Select className="react-select" options={subcategory} placeholder="Choose" />
 														</div>
 													</div>
 												</div>
@@ -270,9 +260,7 @@ export default function AddProductComponent() {
 																	<span className="text-danger ms-1">*</span>
 																</label>
 															</div>
-															{isMounted ? (
-																<Select className="react-select" options={brand} placeholder="Choose" />
-															) : null}
+															<Select className="react-select" options={brand} placeholder="Choose" />
 														</div>
 													</div>
 													<div className="col-sm-6 col-12">
@@ -283,9 +271,7 @@ export default function AddProductComponent() {
 																	<span className="text-danger ms-1">*</span>
 																</label>
 															</div>
-															{isMounted ? (
-																<Select className="react-select" options={unit} placeholder="Choose" />
-															) : null}
+															<Select className="react-select" options={unit} placeholder="Choose" />
 														</div>
 													</div>
 												</div>
@@ -297,9 +283,7 @@ export default function AddProductComponent() {
 															Barcode Symbology
 															<span className="text-danger ms-1">*</span>
 														</label>
-														{isMounted ? (
-															<Select className="react-select" options={barcodesymbol} placeholder="Choose" />
-														) : null}
+														<Select className="react-select" options={barcodesymbol} placeholder="Choose" />
 													</div>
 												</div>
 												<div className="col-lg-6 col-sm-6 col-12">
@@ -417,9 +401,7 @@ export default function AddProductComponent() {
 																		Tax Type
 																		<span className="text-danger ms-1">*</span>
 																	</label>
-																	{isMounted ? (
-																		<Select className="react-select" options={taxtype} placeholder="Select Option" />
-																	) : null}
+																	<Select className="react-select" options={taxtype} placeholder="Select Option" />
 																</div>
 															</div>
 															<div className="col-lg-4 col-sm-6 col-12">
@@ -428,9 +410,7 @@ export default function AddProductComponent() {
 																		Discount Type
 																		<span className="text-danger ms-1">*</span>
 																	</label>
-																	{isMounted ? (
-																		<Select className="react-select" options={discounttype} placeholder="Choose" />
-																	) : null}
+																	<Select className="react-select" options={discounttype} placeholder="Choose" />
 																</div>
 															</div>
 															<div className="col-lg-4 col-sm-6 col-12">
@@ -763,9 +743,7 @@ export default function AddProductComponent() {
 																Warranty
 																<span className="text-danger ms-1">*</span>
 															</label>
-															{isMounted ? (
-																<Select className="react-select" options={warrenty} placeholder="Choose" />
-															) : null}
+															<Select className="react-select" options={warrenty} placeholder="Choose" />
 														</div>
 													</div>
 													<div className="col-sm-6 col-12">

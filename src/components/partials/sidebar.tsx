@@ -1,21 +1,42 @@
 'use client';
 
-import { all_routes as routes } from '@/components/core/data/all_routes';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+
+import { signOut } from '@/_lib/action';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 
 const excludedPathnames = [routes.login, routes.register];
 
 export default function Sidebar() {
 	// I don't use this at 404 because the pathname is unknown
+	const router = useRouter();
 	const pathname = usePathname();
+	const [whileSigningOut, setWhileSigningOut] = useState(false);
+
+	async function handleSignOut() {
+		if (whileSigningOut) return;
+		setWhileSigningOut(true);
+
+		const { result, error } = await signOut();
+		if (error !== null) {
+			setWhileSigningOut(false);
+			throw new Error(error);
+		} else {
+			router.push('/login');
+			router.refresh();
+		}
+	}
+
+	let hideSidebar = false;
 	if (excludedPathnames.includes(pathname)) {
-		return null;
+		hideSidebar = true;
 	}
 
 	return (
-		<div className="sidebar" id="sidebar">
+		<div className={`sidebar ${hideSidebar ? 'sidebar-hide' : ''}`} id="sidebar">
 			{/* <!-- Logo --> */}
 			<div className="sidebar-logo">
 				<Link href="/" className="logo logo-normal">
@@ -1228,7 +1249,13 @@ export default function Sidebar() {
 									</ul>
 								</li> */}
 								<li>
-									<Link href={routes.login}>
+									<Link
+										href={routes.login}
+										onClick={event => {
+											event.preventDefault();
+											handleSignOut();
+										}}
+									>
 										<i className="ti ti-logout fs-16 me-2"></i>
 										<span>Logout</span>{' '}
 									</Link>

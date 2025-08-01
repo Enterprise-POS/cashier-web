@@ -1,11 +1,12 @@
 'use client';
-import { all_routes as routes } from '@/components/core/data/all_routes';
+
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 
 const excludedPathnames = [routes.login, routes.register];
 
-export default function Header() {
+export default function HeaderTop({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 	if (excludedPathnames.includes(pathname)) {
 		return null;
@@ -347,14 +348,15 @@ export default function Header() {
 							<i className="ti ti-maximize"></i>
 						</a>
 					</li>
-					<li className="nav-item nav-item-box">
+					{/* <li className="nav-item nav-item-box">
 						<a href="email.html">
 							<i className="ti ti-mail"></i>
 							<span className="badge rounded-pill">1</span>
 						</a>
-					</li>
+					</li> */}
+
 					{/* <!-- Notifications --> */}
-					<li className="nav-item dropdown nav-item-box">
+					{/* <li className="nav-item dropdown nav-item-box">
 						<a href="#" className="dropdown-toggle nav-link" data-bs-toggle="dropdown">
 							<i className="ti ti-bell"></i>
 						</a>
@@ -441,7 +443,7 @@ export default function Header() {
 								</a>
 							</div>
 						</div>
-					</li>
+					</li> */}
 					{/* <!-- /Notifications --> */}
 
 					<li className="nav-item nav-item-box">
@@ -463,30 +465,7 @@ export default function Header() {
 								</span>
 							</span>
 						</a>
-						<div className="dropdown-menu menu-drop-user">
-							<div className="profileset d-flex align-items-center">
-								<span className="user-img me-2">
-									<Image src="/assets/img/profiles/avator1.jpg" alt="Img" width={30} height={30} />
-								</span>
-								<div>
-									<h6 className="fw-medium">John Smilga</h6>
-									<p>Admin</p>
-								</div>
-							</div>
-							<a className="dropdown-item" href="profile.html">
-								<i className="ti ti-user-circle me-2"></i>MyProfile
-							</a>
-							<a className="dropdown-item" href="sales-report.html">
-								<i className="ti ti-file-text me-2"></i>Reports
-							</a>
-							<a className="dropdown-item" href="general-settings.html">
-								<i className="ti ti-settings-2 me-2"></i>Settings
-							</a>
-							<hr className="my-2" />
-							<a className="dropdown-item logout pb-0" href="signin.html">
-								<i className="ti ti-logout me-2"></i>Logout
-							</a>
-						</div>
+						{children}
 					</li>
 				</ul>
 				{/* <!-- /Header Menu --> */}

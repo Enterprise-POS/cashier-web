@@ -20,6 +20,9 @@
 	@include respond-below(custom575) {
 		width: 100%;
 	}
+	&.sidebar-hide {
+		display: none;
+	}
 	.slimScrollDiv {
 		@include respond-below(custom575) {
 			width: 100% !important;

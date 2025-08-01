@@ -1,14 +1,47 @@
 'use client';
-import { all_routes as routes } from '@/components/core/data/all_routes';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+
+import { emailAndPasswordSignInAction } from '@/_lib/action';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 
 export default function Login() {
+	const router = useRouter();
 	const [isPasswordVisible, setPasswordVisible] = useState(false);
+	const [isFormLoading, setFormLoading] = useState(false);
+
+	const [isShowError, setShowError] = useState(false);
+	const [errorMessage, setErrorMessage] = useState('');
 
 	const togglePasswordVisibility = () => {
 		setPasswordVisible(prevState => !prevState);
+	};
+
+	const handleFormAction = async function (formData: FormData) {
+		if (isFormLoading) return;
+		setFormLoading(true);
+
+		const { result, error } = await emailAndPasswordSignInAction(formData);
+		if (error !== null) {
+			// show error
+			console.warn('DEV NOTE: ', error);
+			setErrorMessage(error);
+			setShowError(true);
+		} else {
+			// redirect to dashboard page / index
+			// refresh will re-render the UI
+			setShowError(false);
+			router.push('/');
+			router.refresh();
+		}
+
+		setFormLoading(false);
+	};
+
+	const handleCloseError = function () {
+		setShowError(false);
 	};
 
 	return (
@@ -18,7 +51,14 @@ export default function Login() {
 				<div className="account-content">
 					<div className="login-wrapper bg-img">
 						<div className="login-content authent-content">
-							<form>
+							<form
+								onSubmit={e => {
+									// If use action: react don't want to render the UI
+									e.preventDefault();
+									const formData = new FormData(e.currentTarget);
+									handleFormAction(formData);
+								}}
+							>
 								<div className="login-userset">
 									<div className="login-logo logo-normal">
 										<Image src="/assets/img/logo.png" alt="img" width={150} height={45} />
@@ -30,12 +70,51 @@ export default function Login() {
 										<h3>Sign In</h3>
 										<h4 className="fs-16">Access the Enterprise POS panel using your email and passcode.</h4>
 									</div>
+									{isShowError && (
+										<>
+											<div className="col-xl-3">
+												<div className="card border-0">
+													<div className="alert alert-danger border border-danger mb-0 p-3">
+														<div className="d-flex align-items-start">
+															<div className="me-2">
+																<i className="feather-alert-octagon flex-shrink-0" />
+															</div>
+															<div className="text-danger w-100">
+																<div className="fw-semibold d-flex justify-content-between">
+																	Danger Alert
+																	<button
+																		onClick={e => {
+																			e.preventDefault();
+																			handleCloseError();
+																		}}
+																		type="button"
+																		className="btn-close p-0"
+																		data-bs-dismiss="alert"
+																		aria-label="Close"
+																	>
+																		<i className="fas fa-xmark" />
+																	</button>
+																</div>
+																<div className="fs-12 op-8 mb-1">{errorMessage}</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</>
+									)}
 									<div className="mb-3">
 										<label className="form-label">
 											Email <span className="text-danger"> *</span>
 										</label>
 										<div className="input-group">
-											<input type="text" defaultValue="" className="form-control border-end-0" />
+											<input
+												type="text"
+												defaultValue=""
+												className="form-control border-end-0"
+												name="email"
+												disabled={isFormLoading}
+											/>
 											<span className="input-group-text border-start-0">
 												<i className="ti ti-mail" />
 											</span>
@@ -46,7 +125,12 @@ export default function Login() {
 											Password <span className="text-danger"> *</span>
 										</label>
 										<div className="pass-group">
-											<input type={isPasswordVisible ? 'text' : 'password'} className="pass-input form-control" />
+											<input
+												type={isPasswordVisible ? 'text' : 'password'}
+												className="pass-input form-control"
+												name="password"
+												disabled={isFormLoading}
+											/>
 											<span
 												className={`text-gray-9 ti toggle-password ${isPasswordVisible ? 'ti-eye' : 'ti-eye-off'}`}
 												onClick={togglePasswordVisibility}
@@ -72,9 +156,9 @@ export default function Login() {
 										</div>
 									</div>
 									<div className="form-login">
-										<Link href={routes.newdashboard} className="btn btn-primary w-100">
-											Sign In
-										</Link>
+										<button type="submit" className="btn btn-primary w-100" disabled={isFormLoading}>
+											{isFormLoading ? 'Signing in' : 'Sign In'}
+										</button>
 									</div>
 									<div className="signinform">
 										<h4>
