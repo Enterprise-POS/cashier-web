@@ -8,7 +8,7 @@ export default async function Header() {
 
 	return (
 		<HeaderBody>
-			<HeaderFloatingMenu name={auth.name} />
+			<HeaderFloatingMenu name={auth.name} sub={auth.sub} />
 		</HeaderBody>
 	);
 }

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Nunito } from 'next/font/google';
+import Script from 'next/script';
 
 import '@/assets/plugins/fontawesome/css/all.min.css';
 import '@/assets/plugins/fontawesome/css/fontawesome.min.css';
@@ -11,7 +12,7 @@ import '@/assets/scss/main.scss';
 
 import Header from '@/components/partials/header/header';
 import Sidebar from '@/components/partials/sidebar';
-import Script from 'next/script';
+import { TenantProvider } from '@/components/provider/TenantProvider';
 
 export const metadata: Metadata = {
 	title: {
@@ -53,11 +54,12 @@ export default function RootLayout({
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 			</head>
 			<body className={`${nunito.variable} ${nunito.variable} antialiased main-wrapper`} data-layout="default">
-				<Header />
-
 				<Sidebar />
 
-				{children}
+				<TenantProvider>
+					<Header />
+					{children}
+				</TenantProvider>
 
 				<Script src="/assets/js/jquery-3.7.1.min.js" />
 

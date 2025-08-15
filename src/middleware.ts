@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
 		// Clone the request and attach custom header
 		const requestHeaders = new Headers(request.headers);
 		requestHeaders.set(Constants.HeaderKey.xEnterprisePayload, JSON.stringify(payload));
+		requestHeaders.set(Constants.HeaderKey.xEnterprisePayloadToken, token)
 
 		// Anything beyond could go through
 		return NextResponse.next({ request: { headers: requestHeaders } });

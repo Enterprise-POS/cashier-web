@@ -1010,7 +1010,7 @@ $('.quantity-btn').on('click', function () {
 });
 
 // Custom Country Code Selector
-
+/*
 if ($('#phone').length > 0) {
 	var input = document.querySelector('#phone');
 	window.intlTelInput(input, {
@@ -1033,6 +1033,7 @@ if ($('#phone3').length > 0) {
 		utilsScript: 'assets/plugins/intltelinput/js/utils.js',
 	});
 }
+ */
 
 // Remove Product
 $(document).on('click', '.remove-product', function () {
