@@ -45,23 +45,28 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 
 		const { result: tenantDefs, error } = await getTenantWithUser();
 		if (error !== null) {
-			if (error.includes('[LOGIN]')) return;
-			else {
+			if (error.includes('[LOGIN]')) {
+				setTenantState(val => ({ ...val, tenantList: [] }));
+				setIsLoading(false);
+				return;
+			} else {
 				console.warn(error);
+				setTenantState(val => ({ ...val, tenantList: [] }));
+				setIsLoading(false);
 				return;
 			}
 		}
 
 		const tenants = tenantDefs!.map(tenantDef => new Tenant(tenantDef));
 		setTenantState(val => ({ ...val, tenantList: tenants }));
-
 		setIsLoading(false);
 	}
 
 	// When this page first open then this effect will run to fetch immediately user tenant
+	// Will not re fetch when the user logout and login again.
+	// The refetch for this case handled by HeaderFloatingMenu.tsx,
+	// will trigger refetchGetTenant when user cookie 'sub' change
 	useEffect(() => {
-		setIsLoading(true);
-
 		// Get cached tenant
 		const cachedCurrentTenantId: string | null = localStorage.getItem(Constants.LocalStorageKey.currentSelectedTenant);
 		const num = Number(cachedCurrentTenantId);
@@ -72,22 +77,13 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 
 		// if (cachedCurrentTenant === null) return;
 
+		refetchGetTenants();
+		/*
 		async function doAction() {
-			// Here we don't need the getAuth, already at server
-			const { result: tenantDefs, error } = await getTenantWithUser();
-			if (error !== null) {
-				if (error.includes('[LOGIN]')) return;
-				else {
-					console.warn(error);
-				}
-			}
-
-			const tenants = tenantDefs!.map(tenantDef => new Tenant(tenantDef));
-			setTenantState(val => ({ ...val, tenantList: tenants }));
-
-			setIsLoading(false);
+			// ... fetch()
 		}
 		doAction();
+		 */
 	}, []);
 
 	return (

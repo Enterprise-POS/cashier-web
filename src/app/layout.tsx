@@ -2,12 +2,10 @@ import type { Metadata, Viewport } from 'next';
 import { Nunito } from 'next/font/google';
 import Script from 'next/script';
 
+import '@/assets/css/bootstrap.min.css';
 import '@/assets/plugins/fontawesome/css/all.min.css';
 import '@/assets/plugins/fontawesome/css/fontawesome.min.css';
-
 import '@/assets/plugins/tabler-icons/tabler-icons.min.css';
-
-import '@/assets/css/bootstrap.min.css';
 import '@/assets/scss/main.scss';
 
 import Header from '@/components/partials/header/header';
@@ -42,11 +40,7 @@ export const nunito = Nunito({
 	variable: '--Nunito',
 });
 
-export default function RootLayout({
-	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en">
 			<head>
@@ -58,6 +52,7 @@ export default function RootLayout({
 
 				<TenantProvider>
 					<Header />
+
 					{children}
 				</TenantProvider>
 

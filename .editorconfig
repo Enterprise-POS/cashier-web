@@ -1,0 +1,17 @@
+root = true
+
+[*]
+charset = utf-8
+max_line_length=120 # Property does not exist
+indent_style = tab
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+
+[*.tsx]
+end_of_line = lf
+indent_size = 2
+
+[*.scss]
+end_of_line = lf
+indent_size = 4

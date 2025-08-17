@@ -72,10 +72,11 @@ export default function Login() {
 							>
 								<div className="login-userset">
 									<div className="login-logo logo-normal">
-										<Image src="/assets/img/logo.png" alt="img" width={150} height={45} />
+										{/* <Image src="/assets/img/logo.png" alt="img" width={150} height={45} /> */}
 									</div>
 									<Link href={routes.dashboard} className="login-logo logo-white">
-										<Image src="/assets/img/logo-white.png" alt="Img" width={150} height={45} />
+										{/* <Image src="/assets/img/logo-white.png" alt="Img" width={150} height={45} /> */}
+										{/* <Image src="/favicon.png" alt="Img" width={150} height={45} /> */}
 									</Link>
 									<div className="login-userheading">
 										<h3>Sign In</h3>
@@ -154,11 +155,11 @@ export default function Login() {
 										<div className="row">
 											<div className="col-12 d-flex align-items-center justify-content-between">
 												<div className="custom-control custom-checkbox">
-													<label className="checkboxs ps-4 mb-0 pb-0 line-height-1 fs-16 text-gray-6">
+													{/* <label className="checkboxs ps-4 mb-0 pb-0 line-height-1 fs-16 text-gray-6">
 														<input type="checkbox" className="form-control" />
 														<span className="checkmarks" />
 														Remember me
-													</label>
+													</label> */}
 												</div>
 												<div className="text-end">
 													<Link className="text-orange fs-16 fw-medium" href={routes.forgotPassword}>

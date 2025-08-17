@@ -32,12 +32,20 @@ export default function Register() {
 		if (isFormLoading) return;
 		setFormLoading(true);
 
-		const { result, error } = await emailAndPasswordSignUpAction(formData);
+		const { error } = await emailAndPasswordSignUpAction(formData);
 		if (error !== null) {
 			// show error
 			console.warn('DEV NOTE: ', error);
-			setErrorMessage(error);
-			setShowError(true);
+
+			if (error.includes('duplicate key value violates unique constraint "user_email_key"')) {
+				setErrorMessage(
+					'The email you entered is already associated with another account. Please use a different email address.'
+				);
+				setShowError(true);
+			} else {
+				setErrorMessage(error);
+				setShowError(true);
+			}
 		} else {
 			// redirect to dashboard page / index
 			// refresh will re-render the UI
@@ -69,12 +77,12 @@ export default function Register() {
 								}}
 							>
 								<div className="login-userset">
-									<div className="login-logo logo-normal">
+									{/* <div className="login-logo logo-normal">
 										<img src="assets/img/logo.png" alt="img" />
-									</div>
-									<Link href={routes.dashboard} className="login-logo logo-white">
+									</div> */}
+									{/* <Link href={routes.dashboard} className="login-logo logo-white">
 										<img src="assets/img/logo-white.png" alt="Img" />
-									</Link>
+									</Link> */}
 									<div className="login-userheading">
 										<h3>Sign up</h3>
 										<h4>Create New Enterprise POS Account</h4>
@@ -82,31 +90,29 @@ export default function Register() {
 
 									{isShowError && (
 										<>
-											<div className="col-xl-3">
-												<div className="card border-0">
-													<div className="alert alert-danger border border-danger mb-0 p-3">
-														<div className="d-flex align-items-start">
-															<div className="me-2">
-																<i className="feather-alert-octagon flex-shrink-0" />
+											<div className="card border-0">
+												<div className="alert alert-danger border border-danger mb-0 p-3">
+													<div className="d-flex align-items-start">
+														<div className="me-2">
+															<i className="feather-alert-octagon flex-shrink-0" />
+														</div>
+														<div className="text-danger w-100">
+															<div className="fw-semibold d-flex justify-content-between">
+																Warning
+																<button
+																	onClick={e => {
+																		e.preventDefault();
+																		handleCloseError();
+																	}}
+																	type="button"
+																	className="btn-close p-0"
+																	data-bs-dismiss="alert"
+																	aria-label="Close"
+																>
+																	<i className="fas fa-xmark" />
+																</button>
 															</div>
-															<div className="text-danger w-100">
-																<div className="fw-semibold d-flex justify-content-between">
-																	Danger Alert
-																	<button
-																		onClick={e => {
-																			e.preventDefault();
-																			handleCloseError();
-																		}}
-																		type="button"
-																		className="btn-close p-0"
-																		data-bs-dismiss="alert"
-																		aria-label="Close"
-																	>
-																		<i className="fas fa-xmark" />
-																	</button>
-																</div>
-																<div className="fs-12 op-8 mb-1">{errorMessage}</div>
-															</div>
+															<div className="fs-12 op-8 mb-1">{errorMessage}</div>
 														</div>
 													</div>
 												</div>
@@ -183,7 +189,7 @@ export default function Register() {
 										</div>
 									</div>
 									<div className="form-login authentication-check">
-										<div className="row">
+										{/* <div className="row">
 											<div className="col-sm-8">
 												<div className="custom-control custom-checkbox justify-content-start">
 													<div className="custom-control custom-checkbox">
@@ -197,7 +203,7 @@ export default function Register() {
 													</div>
 												</div>
 											</div>
-										</div>
+										</div> */}
 									</div>
 									<div className="form-login">
 										<button type="submit" className="btn btn-login" disabled={isFormLoading}>

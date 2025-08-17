@@ -41,13 +41,13 @@ export default function Sidebar() {
 			{/* <!-- Logo --> */}
 			<div className="sidebar-logo">
 				<Link href="/" className="logo logo-normal">
-					<Image src="/assets/img/logo.svg" alt="Img" width={30} height={30} />
+					{/* <Image src="/favicon.png" alt="Img" width={30} height={30} /> */}
 				</Link>
 				<Link href="/" className="logo logo-white">
-					<Image src="/assets/img/logo-white.svg" alt="Img" width={30} height={30} />
+					<Image src="/favicon.png" alt="Img" width={30} height={30} />
 				</Link>
 				<Link href="/" className="logo-small">
-					<Image src="/assets/img/logo-small.png" alt="Img" width={30} height={30} />
+					<Image src="/favicon.png" alt="Img" width={30} height={30} />
 				</Link>
 				<a id="toggle_btn" href="#">
 					<i className="ti ti-chevrons-left"></i>
