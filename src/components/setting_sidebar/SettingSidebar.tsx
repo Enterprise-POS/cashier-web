@@ -1,13 +1,13 @@
 'use client';
 
+import 'react-perfect-scrollbar/dist/css/styles.css';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'; // Import usePathname from next/navigation
 import { useState } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 import { all_routes as routes } from '@/components/core/data/all_routes';
-
-import 'react-perfect-scrollbar/dist/css/styles.css';
 
 /*
 	I don't apply the isMounted here because the parent element already do that for this component

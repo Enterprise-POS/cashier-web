@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { signOut } from '@/_lib/action';
@@ -14,6 +14,7 @@ export default function Sidebar() {
 	// I don't use this at 404 because the pathname is unknown
 	const router = useRouter();
 	const pathname = usePathname();
+
 	const [whileSigningOut, setWhileSigningOut] = useState(false);
 
 	async function handleSignOut() {
@@ -40,13 +41,13 @@ export default function Sidebar() {
 			{/* <!-- Logo --> */}
 			<div className="sidebar-logo">
 				<Link href="/" className="logo logo-normal">
-					<Image src="/assets/img/logo.svg" alt="Img" width={30} height={30} />
+					{/* <Image src="/favicon.png" alt="Img" width={30} height={30} /> */}
 				</Link>
 				<Link href="/" className="logo logo-white">
-					<Image src="/assets/img/logo-white.svg" alt="Img" width={30} height={30} />
+					<Image src="/favicon.png" alt="Img" width={30} height={30} />
 				</Link>
 				<Link href="/" className="logo-small">
-					<Image src="/assets/img/logo-small.png" alt="Img" width={30} height={30} />
+					<Image src="/favicon.png" alt="Img" width={30} height={30} />
 				</Link>
 				<a id="toggle_btn" href="#">
 					<i className="ti ti-chevrons-left"></i>
@@ -149,10 +150,10 @@ export default function Sidebar() {
 											<Link href={routes.index}>Admin Dashboard</Link>
 										</li>
 										<li>
-											<Link href="admin-dashboard.html">Admin Dashboard 2</Link>
+											<Link href="#">Admin Dashboard 2</Link>
 										</li>
 										<li>
-											<Link href="sales-dashboard.html">Sales Dashboard</Link>
+											<Link href="#">Sales Dashboard</Link>
 										</li>
 									</ul>
 								</li>
@@ -628,6 +629,12 @@ export default function Sidebar() {
 									<Link href={routes.employees}>
 										<i className="ti ti-user fs-16 me-2"></i>
 										<span>Employees</span>
+									</Link>
+								</li>
+								<li>
+									<Link href={routes.tenantMembers}>
+										<i className="ti ti-archive fs-16 me-2"></i>
+										<span>Tenant Members</span>
 									</Link>
 								</li>
 								{/* <li>

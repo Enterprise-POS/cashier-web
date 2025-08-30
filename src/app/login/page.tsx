@@ -15,6 +15,9 @@ export default function Login() {
 	const [isShowError, setShowError] = useState(false);
 	const [errorMessage, setErrorMessage] = useState('');
 
+	const [isShowSuccess, setShowSuccess] = useState(false);
+	const [successMessage, setSuccessMessage] = useState('');
+
 	const togglePasswordVisibility = () => {
 		setPasswordVisible(prevState => !prevState);
 	};
@@ -29,11 +32,16 @@ export default function Login() {
 			console.warn('DEV NOTE: ', error);
 			setErrorMessage(error);
 			setShowError(true);
+			setShowSuccess(false);
 		} else {
 			// redirect to dashboard page / index
 			// refresh will re-render the UI
 			setShowError(false);
+			setShowSuccess(true);
+			setSuccessMessage(result!);
 			router.push('/');
+
+			// Will force to re-render again header
 			router.refresh();
 		}
 
@@ -42,6 +50,9 @@ export default function Login() {
 
 	const handleCloseError = function () {
 		setShowError(false);
+	};
+	const handleCloseSuccess = function () {
+		setShowSuccess(false);
 	};
 
 	return (
@@ -61,47 +72,50 @@ export default function Login() {
 							>
 								<div className="login-userset">
 									<div className="login-logo logo-normal">
-										<Image src="/assets/img/logo.png" alt="img" width={150} height={45} />
+										{/* <Image src="/assets/img/logo.png" alt="img" width={150} height={45} /> */}
 									</div>
 									<Link href={routes.dashboard} className="login-logo logo-white">
-										<Image src="/assets/img/logo-white.png" alt="Img" width={150} height={45} />
+										{/* <Image src="/assets/img/logo-white.png" alt="Img" width={150} height={45} /> */}
+										{/* <Image src="/favicon.png" alt="Img" width={150} height={45} /> */}
 									</Link>
 									<div className="login-userheading">
 										<h3>Sign In</h3>
 										<h4 className="fs-16">Access the Enterprise POS panel using your email and passcode.</h4>
 									</div>
 									{isShowError && (
-										<>
-											<div className="col-xl-3">
-												<div className="card border-0">
-													<div className="alert alert-danger border border-danger mb-0 p-3">
-														<div className="d-flex align-items-start">
-															<div className="me-2">
-																<i className="feather-alert-octagon flex-shrink-0" />
-															</div>
-															<div className="text-danger w-100">
-																<div className="fw-semibold d-flex justify-content-between">
-																	Danger Alert
-																	<button
-																		onClick={e => {
-																			e.preventDefault();
-																			handleCloseError();
-																		}}
-																		type="button"
-																		className="btn-close p-0"
-																		data-bs-dismiss="alert"
-																		aria-label="Close"
-																	>
-																		<i className="fas fa-xmark" />
-																	</button>
-																</div>
-																<div className="fs-12 op-8 mb-1">{errorMessage}</div>
-															</div>
+										<div className="card border-0">
+											<div className="alert alert-danger border border-danger mb-0 p-3">
+												<div className="d-flex align-items-start">
+													<div className="me-2">
+														<i className="feather-alert-octagon flex-shrink-0" />
+													</div>
+													<div className="text-danger w-100">
+														<div className="fw-semibold d-flex justify-content-between">
+															Could not signing in
+															<button
+																onClick={e => {
+																	e.preventDefault();
+																	handleCloseError();
+																}}
+																type="button"
+																className="btn-close p-0"
+																data-bs-dismiss="alert"
+																aria-label="Close"
+															>
+																<i className="fas fa-xmark" />
+															</button>
 														</div>
+														<div className="fs-12 op-8 mb-1">{errorMessage}</div>
 													</div>
 												</div>
 											</div>
-										</>
+										</div>
+									)}
+									{isShowSuccess && (
+										<div className="alert alert-success d-flex align-items-center" role="alert">
+											<i className="feather-check-circle flex-shrink-0 me-2" />
+											<div>Welcome !</div>
+										</div>
 									)}
 									<div className="mb-3">
 										<label className="form-label">
@@ -141,11 +155,11 @@ export default function Login() {
 										<div className="row">
 											<div className="col-12 d-flex align-items-center justify-content-between">
 												<div className="custom-control custom-checkbox">
-													<label className="checkboxs ps-4 mb-0 pb-0 line-height-1 fs-16 text-gray-6">
+													{/* <label className="checkboxs ps-4 mb-0 pb-0 line-height-1 fs-16 text-gray-6">
 														<input type="checkbox" className="form-control" />
 														<span className="checkmarks" />
 														Remember me
-													</label>
+													</label> */}
 												</div>
 												<div className="text-end">
 													<Link className="text-orange fs-16 fw-medium" href={routes.forgotPassword}>
@@ -157,7 +171,7 @@ export default function Login() {
 									</div>
 									<div className="form-login">
 										<button type="submit" className="btn btn-primary w-100" disabled={isFormLoading}>
-											{isFormLoading ? 'Signing in' : 'Sign In'}
+											{isFormLoading ? 'Signing in...' : 'Sign In'}
 										</button>
 									</div>
 									<div className="signinform">

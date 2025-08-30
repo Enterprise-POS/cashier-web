@@ -1,5 +1,6 @@
 export const all_routes = {
 	index: '/',
+	newTenant: '/new_tenant',
 	newdashboard: '/new_dashboard',
 	dashboard: '/admin_dashboard',
 	productList: '/product_list',
@@ -193,12 +194,13 @@ export const all_routes = {
 	permissions: '/permissions',
 	deleteaccount: '/delete_account',
 	employees: '/employees',
-	addemployee: '/add_employee',
+	addUserToTenant: '/add_user_to_tenant',
 	editemployee: '/edit_employee',
 	leavesadmin: 'leaves_admin',
 	leavesemployee: '/leaves_employee',
 	leavestype: '/leave_types',
 	warehouses: '/warehouse',
+	tenantMembers: '/tenant_members',
 	coupons: '/coupons',
 	payrollList: '/employee_salary',
 

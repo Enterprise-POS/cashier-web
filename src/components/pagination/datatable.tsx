@@ -1,7 +1,21 @@
 import { Table } from 'antd';
-import { useState } from 'react';
+import { JSX, useEffect, useState } from 'react';
 
-const Datatable = ({ props, columns, dataSource }: any) => {
+export type DataTableColumn = {
+	title: string;
+	dataIndex: string;
+	sorter?: (a: any, b: any) => string | number;
+	render?: (a: any, b: any) => JSX.Element | string;
+	key?: string;
+};
+
+type DataTableParam = {
+	props: string | undefined;
+	columns: DataTableColumn[];
+	dataSource: any[];
+};
+
+function Datatable({ props, columns, dataSource }: DataTableParam) {
 	const [searchText, setSearchText] = useState('');
 	const [selectedRowKeys, setSelectedRowKeys] = useState([]);
 	const [filteredDataSource, setFilteredDataSource] = useState(dataSource);
@@ -21,6 +35,12 @@ const Datatable = ({ props, columns, dataSource }: any) => {
 		onChange: onSelectChange,
 	};
 
+	// Maintaining the members data, when optimistic event happen this data already render it correctly
+	// We can use dataSource directly but the filter / search input will not working
+	useEffect(() => {
+		setFilteredDataSource(dataSource);
+	}, [dataSource]);
+
 	return (
 		<>
 			<div className="search-set table-search-set">
@@ -37,6 +57,7 @@ const Datatable = ({ props, columns, dataSource }: any) => {
 								className="form-control form-control-sm"
 								placeholder="Search"
 								aria-controls="DataTables_Table_0"
+								value={searchText}
 							/>
 						</label>
 					</div>
@@ -69,6 +90,6 @@ const Datatable = ({ props, columns, dataSource }: any) => {
 			/>
 		</>
 	);
-};
+}
 
 export default Datatable;

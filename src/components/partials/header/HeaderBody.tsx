@@ -2,12 +2,15 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import TenantFloatingMenu from '@/components/partials/header/TenantFloatingMenu';
 
 const excludedPathnames = [routes.login, routes.register];
 
-export default function HeaderTop({ children }: { children: React.ReactNode }) {
+export default function HeaderBody({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
+
 	if (excludedPathnames.includes(pathname)) {
 		return null;
 	}
@@ -52,7 +55,7 @@ export default function HeaderTop({ children }: { children: React.ReactNode }) {
 									data-bs-toggle="dropdown"
 									data-bs-auto-close="outside"
 								>
-									<input type="text" placeholder="Search" />
+									<input type="text" placeholder="Search" id="searchInputs" />
 									<div className="search-addon">
 										<span>
 											<i className="ti ti-search"></i>
@@ -146,68 +149,9 @@ export default function HeaderTop({ children }: { children: React.ReactNode }) {
 					</li>
 					{/* <!-- /Search --> */}
 
-					{/* <!-- Select Store --> */}
-					<li className="nav-item dropdown has-arrow main-drop select-store-dropdown">
-						<a href="#" className="dropdown-toggle nav-link select-store" data-bs-toggle="dropdown">
-							<span className="user-info">
-								<span className="user-letter">
-									<Image
-										src="/assets/img/store/store-01.png"
-										alt="Store Logo"
-										className="img-fluid"
-										width={30}
-										height={30}
-									/>
-								</span>
-								<span className="user-detail">
-									<span className="user-name">Freshmart</span>
-								</span>
-							</span>
-						</a>
-						<div className="dropdown-menu dropdown-menu-right">
-							<a href="#" className="dropdown-item">
-								<Image
-									src="/assets/img/store/store-01.png"
-									alt="Store Logo"
-									className="img-fluid"
-									width={30}
-									height={30}
-								/>
-								Freshmart
-							</a>
-							<a href="#" className="dropdown-item">
-								<Image
-									src="/assets/img/store/store-02.png"
-									alt="Store Logo"
-									className="img-fluid"
-									width={30}
-									height={30}
-								/>
-								Grocery Apex
-							</a>
-							<a href="#" className="dropdown-item">
-								<Image
-									src="/assets/img/store/store-03.png"
-									alt="Store Logo"
-									className="img-fluid"
-									width={30}
-									height={30}
-								/>
-								Grocery Bevy
-							</a>
-							<a href="#" className="dropdown-item">
-								<Image
-									src="/assets/img/store/store-04.png"
-									alt="Store Logo"
-									className="img-fluid"
-									width={30}
-									height={30}
-								/>
-								Grocery Eden
-							</a>
-						</div>
-					</li>
-					{/* <!-- /Select Store --> */}
+					{/* <!-- Select Tenant --> */}
+					<TenantFloatingMenu />
+					{/* <!-- /Select Tenant --> */}
 
 					<li className="nav-item dropdown link-nav">
 						<a href="#" className="btn btn-primary btn-md d-inline-flex align-items-center" data-bs-toggle="dropdown">

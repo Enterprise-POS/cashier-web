@@ -2,25 +2,24 @@
 
 import CounterThree from '@/components/counter/counterThree';
 import Footer from '@/components/partials/footer';
-import { category } from '@/components/core/json/selectOption';
 
 import TextEditor from '@/components/texteditor/texteditor';
-import CollapesIcon from '@/components/tooltip-content/collapse';
+import CollapseIcon from '@/components/tooltip-content/collapse';
 
-import RefreshIcon from '@/components/tooltip-content/refresh';
+import { all_routes } from '@/components/core/data/all_routes';
+import AddVarientNew from '@/components/inventory/addNewVariety';
 import AddBrand from '@/components/inventory/modal/addbrand';
 import AddCategory from '@/components/inventory/modal/addcategory';
 import Addunits from '@/components/inventory/modal/addunits';
 import AddVariant from '@/components/inventory/modal/addvariant';
-import AddVarientNew from '@/components/inventory/addNewVariety';
-import { all_routes } from '@/components/core/data/all_routes';
+import RefreshIcon from '@/components/tooltip-content/refresh';
 
+import TagInput from '@/components/taginput/taginput';
 import { DatePicker } from 'antd';
-import { ArrowLeft, Calendar, Info, LifeBuoy, List, Plus, PlusCircle, X, Image } from 'react-feather';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { ArrowLeft, Calendar, Image, Info, LifeBuoy, List, Plus, PlusCircle, X } from 'react-feather';
 import Select from 'react-select';
-import TagInput from '@/components/taginput/taginput';
 
 export default function AddProductComponent() {
 	const route = all_routes;
@@ -128,7 +127,7 @@ export default function AddProductComponent() {
 						</div>
 						<ul className="table-top-head">
 							<RefreshIcon />
-							<CollapesIcon />
+							<CollapseIcon />
 							<li>
 								<div className="page-btn">
 									<Link href={route.productList} className="btn btn-secondary">
