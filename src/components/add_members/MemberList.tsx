@@ -94,7 +94,7 @@ export default function MemberList({ sub }: { sub: number }) {
 			render: (id: number, _: User) => (
 				<span
 					className={`badge  d-inline-flex align-items-center badge-xs ${
-						id === selectedTenant?.ownerUserId ? 'badge-warning' : 'badge-success'
+						id === selectedTenant?.ownerUserId ? 'badge-purple' : 'badge-success'
 					}`}
 				>
 					<i className="ti ti-point-filled me-1"></i>
@@ -221,7 +221,7 @@ export default function MemberList({ sub }: { sub: number }) {
 				</div>
 				<div className="card-body">
 					<div className="table-responsive">
-						{/* 
+						{/*
 							isComponentLoading is crucial when render the data.
 							if the data don't arrive yet. Then Table won't render
 							the data, instead empty data.

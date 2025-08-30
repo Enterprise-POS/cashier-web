@@ -160,13 +160,13 @@ export default function Register() {
 										</label>
 										<div className="pass-group">
 											<input
-												type={passwordVisibility ? 'text' : 'password'}
+												type={passwordVisibility.password ? 'text' : 'password'}
 												className="pass-input form-control"
 												name="password"
 												disabled={isFormLoading}
 											/>
 											<span
-												className={`ti toggle-password ${passwordVisibility ? 'ti-eye' : 'ti-eye-off'}`}
+												className={`ti toggle-password ${passwordVisibility.password ? 'ti-eye' : 'ti-eye-off'}`}
 												onClick={() => togglePasswordVisibility('password')}
 											></span>
 										</div>

@@ -41,10 +41,8 @@ export default function AddUserToTenantForm({ userId }: { userId: number }) {
 
 			// 3 seconds showing toast
 			// after 3 second hide from screen
-			const tenantName = formData.get('tenant-name');
 			setShowSuccessToast(true);
 			setSuccessMessage(`New member added successfully !`);
-			setTimeout(() => setShowSuccessToast(false), 5000);
 
 			// reset FormData input
 			setUserEmailInput('');
