@@ -12,4 +12,7 @@ export const serverRoutes = {
 	newTenant: `${baseURL}/${apiVersion}/tenants/new`,
 	addUser: `${baseURL}/${apiVersion}/tenants/add_user`,
 	removeUserFromTenant: `${baseURL}/${apiVersion}/tenants/remove_user`, // DELETE
+
+	// warehouse
+	getWarehouseItem: `${baseURL}/${apiVersion}/warehouses/<tenantId>`,
 };
