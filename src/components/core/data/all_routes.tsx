@@ -103,7 +103,7 @@ export const all_routes = {
 	lowStocks: '/low_stocks',
 	categoryList: '/category_list',
 	subcategories: '/sub_categories',
-	editproduct: '/edit_product',
+	editProduct: '/edit_product/<itemId>',
 	expenselist: '/expense_list',
 	expensecategory: '/expense_category',
 	calendars: '/calendar',

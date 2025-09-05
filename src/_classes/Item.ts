@@ -5,7 +5,7 @@ export class Item {
 	itemName: string;
 	stocks: number;
 	isActive: number;
-	createdAt: string;
+	createdAt: Date;
 	unit: string;
 	id: number;
 	constructor(def: ItemDef) {
@@ -17,7 +17,7 @@ export class Item {
 		this.itemName = def.item_name;
 		this.stocks = def.stocks;
 		this.isActive = def.is_active;
-		this.createdAt = def.created_at;
+		this.createdAt = new Date(def.created_at);
 		this.unit = 'Pc';
 	}
 }

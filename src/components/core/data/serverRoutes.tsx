@@ -14,5 +14,8 @@ export const serverRoutes = {
 	removeUserFromTenant: `${baseURL}/${apiVersion}/tenants/remove_user`, // DELETE
 
 	// warehouse
-	getWarehouseItem: `${baseURL}/${apiVersion}/warehouses/<tenantId>`,
+	getWarehouseItem: `${baseURL}/${apiVersion}/warehouses/<tenantId>`, // GET
+	createWarehouseItem: `${baseURL}/${apiVersion}/warehouses/create_item/<tenantId>`, // POST
+	warehouseItemFindById: `${baseURL}/${apiVersion}/warehouses/find/<tenantId>`, // POST
+	editWarehouseItem: `${baseURL}/${apiVersion}/warehouses/edit/<tenantId>`, // PUT
 };

@@ -5,28 +5,30 @@ import { HTTPResult } from '@/_interface/HTTPResult';
 import { ItemDef } from '@/_interface/ItemDef';
 import { getWarehouseItem } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
-import Table from '@/components/pagination/datatable';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
+import { Input, Table, TablePaginationConfig } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Edit, Eye, Trash2 } from 'react-feather';
 
 export default function ProductList({ limit, page }: { limit: number; page: number }) {
-	const { data, isStateLoading } = useTenant();
+	const { data, isStateLoading: isUseTenantLoading } = useTenant();
 	const [isComponentLoading, setComponentLoading] = useState(false);
 	const [isMounted, setIsMounted] = useState(false);
-
-	// Success Toast
-	const [showSuccessToast, setShowSuccessToast] = useState(false);
-	const [successMessage, setSuccessMessage] = useState('');
+	const [search, setSearch] = useState('');
+	const [pagination, setPagination] = useState<TablePaginationConfig>({
+		current: 1,
+		pageSize: 10,
+		total: 0,
+		responsive: true,
+	});
 
 	// Error Toast
 	const [errorMessage, setErrorMessage] = useState('');
 	const [showErrorToast, setShowErrorToast] = useState(false);
 
 	const [warehouseItems, setWarehouseItems] = useState<Item[]>([]);
-	const [warehouseItemCount, setWarehouseItemCount] = useState(0);
 
 	const dataSource = warehouseItems;
 	const columns = [
@@ -48,22 +50,11 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			),
 			sorter: (a: Item, b: Item) => a.itemName.length - b.itemName.length,
 		},
-
-		// {
-		// 	title: 'Category',
-		// 	dataIndex: 'category',
-		// 	sorter: (a: any, b: any) => a.category.length - b.category.length,
-		// },
-
-		// {
-		// 	title: 'Brand',
-		// 	dataIndex: 'brand',
-		// 	sorter: (a: any, b: any) => a.brand.length - b.brand.length,
-		// },
 		{
 			title: 'Created At',
 			dataIndex: 'createdAt',
-			sorter: (a: Item, b: Item) => a.createdAt.length - b.createdAt.length,
+			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
+			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
 		},
 		{
 			title: 'Unit',
@@ -92,13 +83,13 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		{
 			title: 'Action',
 			dataIndex: 'itemId',
-			render: () => (
+			render: (itemId: number) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
 						<Link className="me-2 p-2" href={routes.productdetails}>
 							<Eye className="feather-view" />
 						</Link>
-						<Link className="me-2 p-2" href={routes.editproduct}>
+						<Link className="me-2 p-2" href={routes.editProduct.replace('<itemId>', itemId.toString())}>
 							<Edit className="feather-edit" />
 						</Link>
 						<Link className="confirm-text p-2" href="#" data-bs-toggle="modal" data-bs-target="#delete-modal">
@@ -107,89 +98,123 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					</div>
 				</div>
 			),
-			sorter: (a: Item, b: Item) => a.createdAt.length - b.createdAt.length,
+			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 	];
 
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
 
-	useEffect(() => {
-		async function getData() {
-			if (isComponentLoading) return;
-			try {
-				setComponentLoading(true);
-				if (selectedTenant !== undefined) {
-					const { result, error }: HTTPResult<{ itemDefs: ItemDef[]; count: number }> = await getWarehouseItem(
-						selectedTenant.id,
-						limit,
-						page
-					);
-					if (error !== null) {
-						//
-					} else {
-						setWarehouseItems(() => result!.itemDefs.map(itemDef => new Item(itemDef)));
-						if (result!.count !== warehouseItemCount) {
-							setWarehouseItemCount(result!.count);
-						}
-					}
+	async function getData(page: number, limit: number, nameQuery: string) {
+		if (isComponentLoading) return;
+		try {
+			setComponentLoading(true);
+			if (selectedTenant !== undefined) {
+				const { result, error }: HTTPResult<{ itemDefs: ItemDef[]; count: number }> = await getWarehouseItem(
+					selectedTenant.id,
+					limit,
+					page,
+					nameQuery
+				);
+				if (error !== null) {
+					setErrorMessage(error);
+					setShowErrorToast(true);
 				} else {
-					//
+					setWarehouseItems(() => result!.itemDefs.map(itemDef => new Item(itemDef)));
+					setPagination({ current: page, pageSize: limit, total: result!.count });
 				}
-			} catch (e) {
-				const error = e as Error;
-				console.error(`[ERROR] ${error.message}`);
-			} finally {
-				setComponentLoading(false);
+			} else {
+				// Probably tenant not yet available or user not yet joined any tenant
 			}
+		} catch (e) {
+			const error = e as Error;
+			console.error(`[ERROR] ${error.message}`);
+			setErrorMessage(`Unexpected error: ${error.message}`);
+		} finally {
+			setComponentLoading(false);
 		}
+	}
 
-		getData();
-	}, [selectedTenant]);
+	useEffect(() => {
+		if (selectedTenant === undefined) return;
+		getData(pagination.current!, pagination.pageSize!, search);
+	}, [selectedTenant, search]);
 
 	/*
 			useEffect setMounted will Prevent hydration
 		*/
 	useEffect(() => setIsMounted(true), []);
-	if (!isMounted || isStateLoading || isComponentLoading)
+	if (!isMounted || isUseTenantLoading)
 		return <SectionLoading caption={`Loading ${selectedTenant?.name ?? ''} items`} />;
 
 	return (
-		<div className="card table-list-card">
-			<div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-				<div className="search-set"></div>
-				<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
-					<div className="dropdown me-2">
-						<Link
-							href="#"
-							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
-							data-bs-toggle="dropdown"
-						>
-							Product
-						</Link>
-						<ul className="dropdown-menu  dropdown-menu-end p-3">
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Lenovo IdeaPad 3
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Beats Pro{' '}
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Nike Jordan
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Apple Series 5 Watch
-								</Link>
-							</li>
-						</ul>
+		<>
+			{/* Error Toast */}
+			<div className="toast-container position-fixed bottom-0 end-0 p-3">
+				<div
+					id="liveToast"
+					className={`toast ${showErrorToast ? 'show' : ''} colored-toast bg-danger-transparent`}
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+				>
+					<div className="toast-header bg-danger text-fixed-white">
+						<strong className="me-auto">Warning</strong>
+						<button
+							type="button"
+							className="btn-close"
+							data-bs-dismiss="toast"
+							aria-label="Close"
+							onClick={() => setShowErrorToast(false)}
+						></button>
 					</div>
-					{/* <div className="dropdown me-2">
+					<div className="toast-body">{errorMessage}</div>
+				</div>
+			</div>
+
+			<div className="card table-list-card">
+				<div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+					<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+						<Input.Search
+							placeholder="Search items..."
+							allowClear
+							className="me-2 flex-grow-1"
+							onSearch={value => {
+								setSearch(value);
+								setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
+							}}
+						/>
+						<div className="dropdown me-2">
+							<Link
+								href="#"
+								className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
+								data-bs-toggle="dropdown"
+							>
+								Product
+							</Link>
+							<ul className="dropdown-menu  dropdown-menu-end p-3">
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Lenovo IdeaPad 3
+									</Link>
+								</li>
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Beats Pro{' '}
+									</Link>
+								</li>
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Nike Jordan
+									</Link>
+								</li>
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Apple Series 5 Watch
+									</Link>
+								</li>
+							</ul>
+						</div>
+						{/* <div className="dropdown me-2">
 						<Link
 							href="#"
 							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -220,38 +245,38 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							</li>
 						</ul>
 					</div> */}
-					<div className="dropdown me-2">
-						<Link
-							href="#"
-							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
-							data-bs-toggle="dropdown"
-						>
-							Category
-						</Link>
-						<ul className="dropdown-menu  dropdown-menu-end p-3">
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Computers
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Electronics
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Shoe
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Electronics
-								</Link>
-							</li>
-						</ul>
-					</div>
-					{/* <div className="dropdown me-2">
+						<div className="dropdown me-2">
+							<Link
+								href="#"
+								className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
+								data-bs-toggle="dropdown"
+							>
+								Category
+							</Link>
+							<ul className="dropdown-menu  dropdown-menu-end p-3">
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Computers
+									</Link>
+								</li>
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Electronics
+									</Link>
+								</li>
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Shoe
+									</Link>
+								</li>
+								<li>
+									<Link href="#" className="dropdown-item rounded-1">
+										Electronics
+									</Link>
+								</li>
+							</ul>
+						</div>
+						{/* <div className="dropdown me-2">
 						<Link
 							href="#"
 							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -282,7 +307,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							</li>
 						</ul>
 					</div> */}
-					{/* <div className="dropdown">
+						{/* <div className="dropdown">
 						<Link
 							href="#"
 							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -318,10 +343,10 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							</li>
 						</ul>
 					</div> */}
+					</div>
 				</div>
-			</div>
-			<div className="card-body">
-				{/* <div className="table-top">
+				<div className="card-body">
+					{/* <div className="table-top">
               <div className="search-set">
                 <div className="search-input">
                   <input
@@ -363,8 +388,8 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
                 />
               </div>
             </div> */}
-				{/* /Filter */}
-				{/* <div
+					{/* /Filter */}
+					{/* <div
               className={`card${isFilterVisible ? " visible" : ""}`}
               id="filter_inputs"
               style={{ display: isFilterVisible ? "block" : "none" }}
@@ -446,11 +471,22 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
                 </div>
               </div>
             </div> */}
-				{/* /Filter */}
-				<div className="table-responsive">
-					<Table props={dataSource.length.toString()} columns={columns} dataSource={dataSource} />
+					{/* /Filter */}
+					<div className="table-responsive">
+						<Table<Item>
+							rowKey={'itemId'}
+							columns={columns}
+							dataSource={dataSource}
+							pagination={pagination}
+							loading={{
+								spinning: isComponentLoading,
+								indicator: <SectionLoading />,
+							}}
+							onChange={newPagination => getData(newPagination.current!, newPagination.pageSize!, search)}
+						/>
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }

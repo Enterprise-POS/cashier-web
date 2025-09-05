@@ -4,6 +4,7 @@ import { getAuth } from '@/_lib/auth';
 import AddUserToTenantForm from '@/components/form/AddUserToTenantForm';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
+import Footer from '@/components/partials/footer';
 
 export const metadata: Metadata = {
 	title: 'Add User to Tenant',
@@ -28,6 +29,8 @@ export default async function Page() {
 				</div>
 				<AddUserToTenantForm userId={auth.sub} />
 			</div>
+
+			<Footer />
 		</div>
 	);
 }
