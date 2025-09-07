@@ -64,10 +64,7 @@ export async function getActiveWarehouseItem(
 	}
 
 	// 200
-	type WarehouseResponse = {
-		data: { items: ItemDef[]; count: number };
-	};
-	const warehouseResponse: WarehouseResponse = await response.json();
+	const warehouseResponse: HTTPSuccessResponse<{ items: ItemDef[]; count: number }> = await response.json();
 	const itemDefs = warehouseResponse.data.items;
 
 	return { result: { count: warehouseResponse.data.count, itemDefs }, error: null };
