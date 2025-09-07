@@ -6,7 +6,7 @@ import { Item } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { ItemDef } from '@/_interface/ItemDef';
-import { createItem, editWarehouseItem, getItemFindById } from '@/_lib/warehouse';
+import { editWarehouseItem, getItemFindById } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
@@ -60,14 +60,12 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 	useEffect(() => {
 		async function getData() {
 			if (formState.state.isFormLoading) return;
+			formState.setFormLoading(true);
+
 			try {
-				formState.setFormLoading(true);
 				// If tenant not selected then it's an error
 				if (selectedTenant === undefined) {
 					// Sometime at the first time page load, then the tenant not yet arrived
-					if (!loadingUserTenant) {
-						formState.setError({ message: 'Tenant not selected' });
-					}
 				} else {
 					const { result, error }: HTTPResult<ItemDef> = await getItemFindById(itemId, selectedTenant.id);
 					if (error !== null) {
@@ -110,7 +108,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ success: false, error: null })}
+							onClick={() => formState.setState({ success: false })}
 						></button>
 					</div>
 					<div className="toast-body">{formState.value.successMessage}</div>
@@ -133,7 +131,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ success: null, error: false })}
+							onClick={() => formState.setState({ error: false })}
 						></button>
 					</div>
 					<div className="toast-body">{formState.value.errorMessage}</div>

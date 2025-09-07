@@ -1,16 +1,18 @@
 'use client';
+import { Input, Table, TablePaginationConfig } from 'antd';
+import Link from 'next/link';
+import { startTransition, useEffect, useOptimistic, useState } from 'react';
+import { Edit, Eye, Trash2 } from 'react-feather';
+
 import { Item } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { ItemDef } from '@/_interface/ItemDef';
-import { getWarehouseItem } from '@/_lib/warehouse';
+import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
-import { Input, Table, TablePaginationConfig } from 'antd';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { Edit, Eye, Trash2 } from 'react-feather';
 
 export default function ProductList({ limit, page }: { limit: number; page: number }) {
 	const { data, isStateLoading: isUseTenantLoading } = useTenant();
@@ -24,13 +26,15 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		responsive: true,
 	});
 
-	// Error Toast
-	const [errorMessage, setErrorMessage] = useState('');
-	const [showErrorToast, setShowErrorToast] = useState(false);
-
 	const [warehouseItems, setWarehouseItems] = useState<Item[]>([]);
+	const [currentDeleteModalData, setCurrentDeleteModalData] = useState<{ itemId: number; name: string } | null>(null);
+	const [optimisticItems, optimisticDelete] = useOptimistic(warehouseItems, (currItems: Item[], itemId) => {
+		return currItems.filter(item => item.id !== itemId);
+	});
 
-	const dataSource = warehouseItems;
+	const formState = useFormState();
+
+	const dataSource = optimisticItems;
 	const columns = [
 		{
 			title: 'ID',
@@ -45,7 +49,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					{/* <Link href="#" className="avatar avatar-md me-2">
 						<img alt="" src={item.productImage} />
 					</Link> */}
-					<Link href={`/${item.itemId}`}>{text}</Link>
+					<Link href={routes.editProduct.replace('<itemId>', item.id.toString())}>{text}</Link>
 				</div>
 			),
 			sorter: (a: Item, b: Item) => a.itemName.length - b.itemName.length,
@@ -83,7 +87,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		{
 			title: 'Action',
 			dataIndex: 'itemId',
-			render: (itemId: number) => (
+			render: (itemId: number, item: Item) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
 						<Link className="me-2 p-2" href={routes.productdetails}>
@@ -92,7 +96,13 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 						<Link className="me-2 p-2" href={routes.editProduct.replace('<itemId>', itemId.toString())}>
 							<Edit className="feather-edit" />
 						</Link>
-						<Link className="confirm-text p-2" href="#" data-bs-toggle="modal" data-bs-target="#delete-modal">
+						<Link
+							className="confirm-text p-2"
+							href="#"
+							data-bs-toggle="modal"
+							data-bs-target="#delete-modal"
+							onClick={() => setCurrentDeleteModalData({ itemId, name: item.itemName })}
+						>
 							<Trash2 className="feather-trash-2" />
 						</Link>
 					</div>
@@ -109,15 +119,14 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		try {
 			setComponentLoading(true);
 			if (selectedTenant !== undefined) {
-				const { result, error }: HTTPResult<{ itemDefs: ItemDef[]; count: number }> = await getWarehouseItem(
+				const { result, error }: HTTPResult<{ itemDefs: ItemDef[]; count: number }> = await getActiveWarehouseItem(
 					selectedTenant.id,
 					limit,
 					page,
 					nameQuery
 				);
 				if (error !== null) {
-					setErrorMessage(error);
-					setShowErrorToast(true);
+					formState.setError({ message: error });
 				} else {
 					setWarehouseItems(() => result!.itemDefs.map(itemDef => new Item(itemDef)));
 					setPagination({ current: page, pageSize: limit, total: result!.count });
@@ -128,9 +137,38 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		} catch (e) {
 			const error = e as Error;
 			console.error(`[ERROR] ${error.message}`);
-			setErrorMessage(`Unexpected error: ${error.message}`);
+			formState.setError({ message: `Unexpected error: ${error.message}` });
 		} finally {
 			setComponentLoading(false);
+		}
+	}
+
+	async function handleRemoveItem(itemName: string, itemId: number, tenantId: number) {
+		try {
+			startTransition(() => optimisticDelete(itemId));
+			const { error } = await setItemActivate(itemId, tenantId, false);
+
+			// When error occurred, the optimistic will rollback the data
+			if (error !== null) {
+				console.warn(error);
+				formState.setError({ message: error });
+				setTimeout(() => formState.setState({ error: false }), 5000);
+			} else {
+				// This will make react not to render again the deleted user
+				const toBeRemoveItemId = itemId;
+				setWarehouseItems(item => item.filter(it => it.id !== toBeRemoveItemId));
+
+				// 3 seconds showing toast
+				// after 3 second hide from screen
+				formState.setSuccess({ message: `${itemName} removed` });
+				setTimeout(() => formState.setState({ success: false }), 5000);
+			}
+		} catch (err) {
+			const error = err as Error;
+			console.error(`[ERROR] ${error.message}`);
+			formState.setError({ message: `Unexpected error: ${error.message}` });
+		} finally {
+			formState.setFormLoading(false);
 		}
 	}
 
@@ -148,11 +186,28 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 
 	return (
 		<>
+			{/* Success Toast */}
+			<div className="toast-container position-fixed bottom-0 end-0 p-3">
+				<div
+					id="liveToast"
+					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast bg-success-transparent`}
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+				>
+					<div className="toast-header bg-success text-fixed-white">
+						<strong className="me-auto">Success !</strong>
+						<button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+					</div>
+					<div className="toast-body">{formState.value.successMessage}</div>
+				</div>
+			</div>
+
 			{/* Error Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
 					id="liveToast"
-					className={`toast ${showErrorToast ? 'show' : ''} colored-toast bg-danger-transparent`}
+					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast bg-danger-transparent`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -164,10 +219,10 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => setShowErrorToast(false)}
+							onClick={() => formState.setState({ error: false })}
 						></button>
 					</div>
-					<div className="toast-body">{errorMessage}</div>
+					<div className="toast-body">{formState.value.errorMessage}</div>
 				</div>
 			</div>
 
@@ -484,6 +539,51 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							}}
 							onChange={newPagination => getData(newPagination.current!, newPagination.pageSize!, search)}
 						/>
+					</div>
+				</div>
+			</div>
+
+			{/* Delete */}
+			<div className="modal fade" id="delete-modal">
+				<div className="modal-dialog modal-dialog-centered">
+					<div className="modal-content">
+						<div className="page-wrapper-new p-0">
+							<div className="p-5 px-3 text-center">
+								<span className="rounded-circle d-inline-flex p-2 bg-danger-transparent mb-2">
+									<i className="ti ti-trash fs-24 text-danger" />
+								</span>
+								<h4 className="fs-20 text-gray-9 fw-bold mb-2 mt-1">
+									Remove &apos;{currentDeleteModalData?.name}&apos;
+								</h4>
+								<p className="text-gray-6 mb-0 fs-16">
+									Are you sure you want to remove {currentDeleteModalData?.name} ? <br />
+									(Removed item will be archived into history)
+								</p>
+								<div className="modal-footer-btn mt-3 d-flex justify-content-center">
+									<button
+										type="button"
+										className="btn me-2 btn-secondary fs-13 fw-medium p-2 px-3 shadow-none"
+										data-bs-dismiss="modal"
+									>
+										Cancel
+									</button>
+									<button
+										type="button"
+										data-bs-dismiss="modal"
+										className="btn btn-primary fs-13 fw-medium p-2 px-3"
+										onClick={() =>
+											handleRemoveItem(
+												currentDeleteModalData?.name ?? '',
+												currentDeleteModalData?.itemId ?? 0,
+												data.selectedTenantId
+											)
+										}
+									>
+										Yes Remove
+									</button>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -24,10 +24,10 @@ export function useFormState() {
 		setSuccessMessage(message);
 	}
 
-	function setState({ success, error }: { success: boolean | null; error: boolean | null }) {
-		if (success !== null && error !== null) throw new Error('[DEV] wrong operation');
+	function setState({ success, error }: { success?: boolean; error?: boolean }) {
+		if (success !== undefined && error !== undefined) throw new Error('[DEV] wrong operation');
 
-		if (success !== null) {
+		if (success !== undefined) {
 			setShowSuccessToast(success);
 		} else {
 			setShowErrorToast(error!);

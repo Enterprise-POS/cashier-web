@@ -15,7 +15,9 @@ export const serverRoutes = {
 
 	// warehouse
 	getWarehouseItem: `${baseURL}/${apiVersion}/warehouses/<tenantId>`, // GET
+	getActiveWarehouseItem: `${baseURL}/${apiVersion}/warehouses/active/<tenantId>`, // GET
 	createWarehouseItem: `${baseURL}/${apiVersion}/warehouses/create_item/<tenantId>`, // POST
 	warehouseItemFindById: `${baseURL}/${apiVersion}/warehouses/find/<tenantId>`, // POST
 	editWarehouseItem: `${baseURL}/${apiVersion}/warehouses/edit/<tenantId>`, // PUT
+	warehouseSetActivate: `${baseURL}/${apiVersion}/warehouses/activate/<tenantId>`, // PUT
 };

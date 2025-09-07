@@ -13,7 +13,7 @@ import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-export async function getWarehouseItem(
+export async function getActiveWarehouseItem(
 	tenantId: number,
 	limit: number,
 	page: number,
@@ -35,7 +35,7 @@ export async function getWarehouseItem(
 		headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
 	};
 	const response = await fetch(
-		serverRoutes.getWarehouseItem.replace('<tenantId>', tenantId.toString()) + paramsString,
+		serverRoutes.getActiveWarehouseItem.replace('<tenantId>', tenantId.toString()) + paramsString,
 		requestInit
 	);
 	if (!response.ok) {
@@ -296,5 +296,67 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 		}
 
 		return { result: null, error: 'Unexpected error, ' + error };
+	}
+}
+
+export async function setItemActivate(itemId: number, tenantId: number, setInto: boolean): Promise<HTTPResult<void>> {
+	const auth = await getAuth();
+	if (auth === null) {
+		console.error('[ERROR] Fatal error user not logged in, but requesting to delete action');
+		return { result: null, error: '[ERROR] Fatal error user not logged in, but requesting to delete action' };
+	}
+
+	try {
+		type SetActivateBody = {
+			item_id: number;
+			set_into: boolean;
+		};
+		const reqBody: SetActivateBody = {
+			item_id: itemId,
+			set_into: setInto,
+		};
+
+		const userCookies = await cookies();
+
+		const requestInit: RequestInit = {
+			method: 'PUT',
+			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqBody),
+		};
+
+		const response = await fetch(
+			serverRoutes.warehouseSetActivate.replace('<tenantId>', tenantId.toString()),
+			requestInit
+		);
+
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = {
+					code: response.status,
+					status: 'error',
+					message: response.statusText,
+				};
+			}
+
+			switch (response.status) {
+				case 400:
+				case 401:
+				case 403:
+					return { result: null, error: body.message };
+				default:
+					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
+					return { result: null, error: body.message };
+			}
+		}
+
+		// ok
+		return { result: null, error: null };
+	} catch (e) {
+		const error = e as Error;
+
+		return { result: null, error: `Unexpected error: ${error.message}` };
 	}
 }
