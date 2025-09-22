@@ -20,4 +20,10 @@ export const serverRoutes = {
 	warehouseItemFindById: `${baseURL}/${apiVersion}/warehouses/find/<tenantId>`, // POST
 	editWarehouseItem: `${baseURL}/${apiVersion}/warehouses/edit/<tenantId>`, // PUT
 	warehouseSetActivate: `${baseURL}/${apiVersion}/warehouses/activate/<tenantId>`, // PUT
+
+	// category
+	getCategories: `${baseURL}/${apiVersion}/categories/<tenantId>`, // GET
+	addCategory: `${baseURL}/${apiVersion}/categories/create/<tenantId>`, // POST
+	updateCategory: `${baseURL}/${apiVersion}/categories/update/<tenantId>`, // PUT
+	deleteCategory: `${baseURL}/${apiVersion}/categories/<tenantId>`, // DELETE
 };

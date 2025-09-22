@@ -52,7 +52,7 @@ export default function AddProductForm() {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ success: false, error: null })}
+							onClick={() => formState.setState({ success: false })}
 						></button>
 					</div>
 					<div className="toast-body">{formState.value.successMessage}</div>
@@ -75,7 +75,7 @@ export default function AddProductForm() {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ success: null, error: false })}
+							onClick={() => formState.setState({ error: false })}
 						></button>
 					</div>
 					<div className="toast-body">{formState.value.errorMessage}</div>
