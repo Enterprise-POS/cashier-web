@@ -12,6 +12,7 @@ import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
+import CategoryDropdown from '@/components/product_list/CategoryDropdown';
 import { useTenant } from '@/components/provider/TenantProvider';
 
 export default function ProductList({ limit, page }: { limit: number; page: number }) {
@@ -269,68 +270,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 								</li>
 							</ul>
 						</div>
-						{/* <div className="dropdown me-2">
-						<Link
-							href="#"
-							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
-							data-bs-toggle="dropdown"
-						>
-							Created By
-						</Link>
-						<ul className="dropdown-menu  dropdown-menu-end p-3">
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									James Kirwin
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Francis Chang
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Antonio Engle
-								</Link>
-							</li>
-							<li>
-								<Link href="#" className="dropdown-item rounded-1">
-									Leo Kelly
-								</Link>
-							</li>
-						</ul>
-					</div> */}
-						<div className="dropdown me-2">
-							<Link
-								href="#"
-								className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
-								data-bs-toggle="dropdown"
-							>
-								Category
-							</Link>
-							<ul className="dropdown-menu  dropdown-menu-end p-3">
-								<li>
-									<Link href="#" className="dropdown-item rounded-1">
-										Computers
-									</Link>
-								</li>
-								<li>
-									<Link href="#" className="dropdown-item rounded-1">
-										Electronics
-									</Link>
-								</li>
-								<li>
-									<Link href="#" className="dropdown-item rounded-1">
-										Shoe
-									</Link>
-								</li>
-								<li>
-									<Link href="#" className="dropdown-item rounded-1">
-										Electronics
-									</Link>
-								</li>
-							</ul>
-						</div>
+						<CategoryDropdown />
 						{/* <div className="dropdown me-2">
 						<Link
 							href="#"

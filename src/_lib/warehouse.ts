@@ -1,5 +1,6 @@
 'use server';
 
+import { CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
@@ -26,7 +27,7 @@ export async function getActiveWarehouseItem(
 	});
 
 	if (nameQuery !== '') {
-		params.set('nameQuery', nameQuery);
+		params.set('name_query', nameQuery);
 	}
 	const paramsString = `?${params.toString()}`;
 	const userCookies = await cookies();
@@ -355,5 +356,59 @@ export async function setItemActivate(itemId: number, tenantId: number, setInto:
 		const error = e as Error;
 
 		return { result: null, error: `Unexpected error: ${error.message}` };
+	}
+}
+
+export async function findCompleteById(itemId: number, tenantId: number): Promise<HTTPResult<CategoryWithItemDef>> {
+	try {
+		const reqBody = { item_id: itemId };
+
+		const userCookies = await cookies();
+		const requestInit: RequestInit = {
+			method: 'POST',
+			credentials: 'include',
+			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqBody),
+		};
+		const response = await fetch(
+			serverRoutes.warehouseItemFindCompleteById.replace('<tenantId>', tenantId!.toString()),
+			requestInit
+		);
+
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = {
+					code: response.status,
+					status: 'error',
+					message: response.statusText,
+				};
+			}
+
+			switch (response.status) {
+				case 400:
+				case 401:
+				case 403:
+					return { result: null, error: body.message };
+				default:
+					console.log(body);
+					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
+					return { result: null, error: body.message };
+			}
+		}
+
+		// 200 OK
+		const body: HTTPSuccessResponse<{ item: CategoryWithItemDef }> = await response.json();
+		const categoryWithItemDef = body.data.item; // Complete version of item
+
+		return { result: categoryWithItemDef, error: null };
+	} catch (error) {
+		if (error instanceof Error) {
+			return { result: null, error: error.message };
+		}
+
+		return { result: null, error: 'Unexpected error, ' + error };
 	}
 }

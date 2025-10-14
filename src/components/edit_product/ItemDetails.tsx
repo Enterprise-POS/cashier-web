@@ -1,62 +1,108 @@
 'use client';
-import { FormEventHandler, useEffect, useState } from 'react';
-import { Info, LifeBuoy } from 'react-feather';
+import Link from 'next/link';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { Info, LifeBuoy, PlusCircle } from 'react-feather';
+import AsyncSelect from 'react-select/async';
 
-import { Item } from '@/_classes/Item';
+import { CategoryWithItem } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
+import { CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { HTTPResult } from '@/_interface/HTTPResult';
-import { ItemDef } from '@/_interface/ItemDef';
-import { editWarehouseItem, getItemFindById } from '@/_lib/warehouse';
+import { getCategories, registerCategory } from '@/_lib/category';
+import { editWarehouseItem, findCompleteById } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
 
 export function ItemDetails({ itemId }: { itemId: number }) {
+	const [isMounted, setIsMounted] = useState(false);
 	const { data, isStateLoading: loadingUserTenant } = useTenant();
 	const formState = useFormState();
-	const [currentItem, setCurrentItem] = useState<Item | null>(null);
+
+	// Maintain current item if it's change or not
+	const [initialItem, setInitialItem] = useState<CategoryWithItem | null>(null);
+	const [currentItem, setCurrentItem] = useState<CategoryWithItem | null>(null);
+
+	// Input
 	const [addAndReduceCounter, setAddAndReduceCounter] = useState(0);
 	const [inpItemName, setInpItemName] = useState('');
+	const [changedCategory, setChangedCategory] = useState<{ value: number; label: string }>();
+
+	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
 
 	const handleForm: FormEventHandler<HTMLFormElement> = async e => {
 		e.preventDefault();
-		if (formState.state.isFormLoading || currentItem === null) return;
+
+		const { isFormLoading } = formState.state;
+		if (isFormLoading || !currentItem || !selectedTenant) return;
 		formState.setFormLoading(true);
 
-		/*
-			Required input
-			- itemName
-			- quantity
-			- tenantId (hidden)
-		*/
 		try {
 			const formData = new FormData(e.currentTarget);
-			const { error } = await editWarehouseItem(formData);
-			if (error !== null) {
-				formState.setError({ message: error });
-			} else {
-				formState.setSuccess({ message: 'Update success' });
-				setCurrentItem(
-					(v: Item | null) =>
-						new Item({
+
+			// Run both async calls sequentially (they depend on each other)
+			const { error: categoryError } = await registerCategory(formData, initialItem?.categoryId ?? 0);
+			if (categoryError) throw new Error(categoryError);
+
+			const { error: itemError } = await editWarehouseItem(formData);
+			if (itemError) throw new Error(itemError);
+
+			// Success
+			formState.setSuccess({ message: 'Update success' });
+			setAddAndReduceCounter(0);
+			setCurrentItem(v =>
+				v
+					? new CategoryWithItem({
+							category_id: changedCategory?.value ?? 0,
+							category_name: changedCategory?.label ?? '',
 							item_name: inpItemName,
-							stocks: v!.stocks + addAndReduceCounter,
-							created_at: v!.createdAt.toString(),
-							is_active: v!.isActive,
-							item_id: v!.id,
-						})
-				);
-			}
-		} catch (e) {
-			const error = e as Error;
-			console.warn(error);
-			formState.setError({ message: error.message });
+							item_id: v.itemId,
+							stocks: v.stocks + addAndReduceCounter,
+					  })
+					: null
+			);
+		} catch (err) {
+			const message = err instanceof Error ? err.message : String(err);
+			console.warn(err);
+			formState.setError({ message });
 		} finally {
 			formState.setFormLoading(false);
 		}
 	};
 
+	const handleGetCategory = async (keyword: string): Promise<{ value: string; label: string }[]> => {
+		if (selectedTenant === undefined) return [];
+
+		try {
+			const { error, result } = await getCategories(selectedTenant.id, 1, 10, keyword);
+			if (error === null) {
+				return result!.categoryDefs.map(def => ({ value: def.id!.toString(), label: def.category_name! }));
+			} else {
+				formState.setError({ message: error });
+				return [];
+			}
+		} catch (e) {
+			const error = e as Error;
+			console.error(`[ERROR] ${error.message}`);
+			formState.setError({ message: `Unexpected error: ${error.message}` });
+			return [];
+		}
+	};
+
+	const loadCategoryOptions = (inputValue: string, callback: (options: { value: string; label: string }[]) => void) => {
+		/*
+			When user not yet complete type then
+			cancel previous request
+		*/
+		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(async () => callback(await handleGetCategory(inputValue)), 150);
+	};
+
+	/*
+		Triggered if current user tenant is change
+		also triggered at first open the page
+	*/
 	useEffect(() => {
 		async function getData() {
 			if (formState.state.isFormLoading) return;
@@ -67,12 +113,13 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 				if (selectedTenant === undefined) {
 					// Sometime at the first time page load, then the tenant not yet arrived
 				} else {
-					const { result, error }: HTTPResult<ItemDef> = await getItemFindById(itemId, selectedTenant.id);
+					const { result, error }: HTTPResult<CategoryWithItemDef> = await findCompleteById(itemId, selectedTenant.id);
 					if (error !== null) {
 						formState.setError({ message: error });
 					} else {
-						setCurrentItem(new Item(result!));
+						setCurrentItem(new CategoryWithItem(result!));
 						setInpItemName(result!.item_name);
+						setInitialItem(new CategoryWithItem(result!));
 					}
 				}
 			} catch (e) {
@@ -85,9 +132,16 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		}
 
 		getData();
+		// getAvailableCategories();
 	}, [selectedTenant]);
 
-	if (formState.state.isFormLoading || loadingUserTenant)
+	/*
+		Some component may take a time to render,
+		Otherwise it will hydration error
+	*/
+	useEffect(() => setIsMounted(true), []);
+
+	if (formState.state.isFormLoading || loadingUserTenant || !isMounted)
 		return <SectionLoading caption={`Loading ${selectedTenant?.name ?? ''} items`} />;
 
 	return (
@@ -138,6 +192,38 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 				</div>
 			</div>
 
+			{/* Add Category */}
+			<div className="modal fade" id="add-units-category">
+				<div className="modal-dialog modal-dialog-centered custom-modal-two">
+					<div className="modal-content">
+						<div className="page-wrapper-new p-0">
+							<div className="modal-header border-0 custom-modal-header">
+								<div className="page-title">
+									<h4>Add New Category</h4>
+								</div>
+								<button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+									<span aria-hidden="true">×</span>
+								</button>
+							</div>
+							<div className="modal-body custom-modal-body">
+								<div className="mb-3">
+									<label className="form-label">Name</label>
+									<input type="text" className="form-control" />
+								</div>
+							</div>
+							<div className="modal-footer">
+								<Link href="#" className="btn btn-cancel me-2" data-bs-dismiss="modal">
+									Cancel
+								</Link>
+								<Link href="#" className="btn btn-submit">
+									Submit
+								</Link>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<form className="add-product-form" onSubmit={handleForm}>
 				<input type="hidden" name="tenantId" value={selectedTenant?.id ?? 0} />
 				<input type="hidden" name="itemId" value={itemId} />
@@ -175,7 +261,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 													className="form-control"
 													name="productName"
 													onChange={e => setInpItemName(e.target.value)}
-													disabled={formState.state.isFormLoading}
 													value={inpItemName}
 												/>
 											</div>
@@ -186,6 +271,38 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 													Unit<span className="text-danger ms-1">*</span>
 												</label>
 												<input type="text" className="form-control" value="PC" disabled />
+											</div>
+										</div>
+									</div>
+									<div className="row">
+										<div className="col-sm-6 col-12">
+											<div className="mb-3">
+												<div className="add-newplus">
+													<label className="form-label">
+														Category
+														<span className="text-danger ms-1">*</span>
+													</label>
+													<Link href="#" data-bs-toggle="modal" data-bs-target="#add-units-category">
+														<PlusCircle data-feather="plus-circle" className="plus-down-add" />
+														<span>Add New</span>
+													</Link>
+												</div>
+												<AsyncSelect
+													className="react-select"
+													loadOptions={loadCategoryOptions}
+													placeholder="Choose"
+													name="categoryId"
+													isClearable
+													onChange={e => setChangedCategory({ label: e?.label ?? '', value: Number(e?.value) })}
+													defaultValue={
+														currentItem?.categoryId && currentItem?.categoryName
+															? {
+																	value: currentItem.categoryId.toString(),
+																	label: currentItem.categoryName,
+															  }
+															: null
+													}
+												/>
 											</div>
 										</div>
 									</div>
@@ -204,7 +321,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 									<div className="d-flex align-items-center justify-content-between flex-fill">
 										<h5 className="d-flex align-items-center">
 											<LifeBuoy data-feather="life-buoy" className="text-primary me-2" />
-											<span>Pricing &amp; Stocks</span>
+											<span>Pricing & Stocks</span>
 										</h5>
 									</div>
 								</div>
@@ -240,7 +357,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 																type="number"
 																className="form-control"
 																name="quantity"
-																disabled={formState.state.isFormLoading}
 																defaultValue={addAndReduceCounter}
 																onChange={e => setAddAndReduceCounter(Number(e.target.value))}
 															/>
@@ -269,22 +385,11 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 				</div>
 				<div className="col-lg-12">
 					<div className="d-flex align-items-center justify-content-end mb-4">
-						<button type="reset" className="btn btn-secondary me-2" disabled={formState.state.isFormLoading}>
+						<button type="reset" className="btn btn-secondary me-2">
 							Clear
 						</button>
-						<button
-							type="submit"
-							className="btn btn-primary"
-							disabled={formState.state.isFormLoading}
-							style={{ cursor: formState.state.isFormLoading ? 'progress' : 'pointer' }}
-						>
-							{formState.state.isFormLoading ? (
-								<div className="spinner-border spinner-border-sm me-1" role="status">
-									<span className="sr-only">Loading...</span>
-								</div>
-							) : (
-								<>Confirm</>
-							)}
+						<button type="submit" className="btn btn-primary">
+							Confirm
 						</button>
 					</div>
 				</div>

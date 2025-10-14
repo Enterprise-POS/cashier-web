@@ -89,7 +89,8 @@ export default function CategoryList() {
 				const { result, error }: HTTPResult<{ categoryDefs: CategoryDef[]; count: number }> = await getCategories(
 					selectedTenant.id,
 					page,
-					limit
+					limit,
+					''
 				);
 				if (error !== null) {
 					formState.setError({ message: error });
