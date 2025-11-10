@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft } from 'react-feather';
+import { redirect } from 'next/navigation';
+import type { AppProps } from 'next/app';
 
 import { convertTo } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
@@ -8,17 +10,12 @@ import { ItemDetails } from '@/components/edit_product/ItemDetails';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
-import { redirect } from 'next/navigation.js';
 
 export const metadata: Metadata = {
 	title: 'Edit Product',
 };
 
-type Props = {
-	params: { itemId: string };
-};
-
-export default async function Page({ params }: Props) {
+export default async function Page({ params }: { params: Promise<{ itemId: string }> }) {
 	const { itemId: p_itemId } = await params;
 	const itemId = convertTo.number(p_itemId);
 	if (itemId === null) return redirect(routes.productList);

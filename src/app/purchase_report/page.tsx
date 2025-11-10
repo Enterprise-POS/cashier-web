@@ -139,9 +139,7 @@ export default function PurchaseReportComponent() {
 					</div>
 
 					<div className="card-body">
-						<div className="table-responsive">
-							<Table columns={columns} dataSource={filteredData} />
-						</div>
+						<div className="table-responsive">{/* <Table columns={columns} dataSource={filteredData} /> */}</div>
 					</div>
 				</div>
 				{/* /product list */}

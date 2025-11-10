@@ -20,6 +20,7 @@ const HeaderKey = {
 
 const LocalStorageKey = {
 	currentSelectedTenant: 'current-selected-tenant',
+	currentSelectedStore: 'current-selected-store',
 };
 
 export const Constants = {

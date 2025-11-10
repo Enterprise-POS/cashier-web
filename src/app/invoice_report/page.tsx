@@ -7,7 +7,6 @@ import Select from 'react-select';
 
 import { invoicereportsdata } from '@/components/core/json/invoicereportdata';
 import { CustomerName, Status } from '@/components/core/json/selectOption';
-import Table from '@/components/pagination/datatable';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
@@ -221,9 +220,7 @@ export default function InvoiceReport() {
 							</ul>
 						</div>
 						<div className="card-body">
-							<div className="table-responsive">
-								<Table columns={columns} dataSource={data} />
-							</div>
+							<div className="table-responsive">{/* <Table columns={columns} dataSource={data} /> */}</div>
 						</div>
 					</div>
 					{/* /product list */}

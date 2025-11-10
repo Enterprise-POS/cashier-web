@@ -3,9 +3,7 @@
 import { expiredproduct } from '@/components/core/json/expiredproductdata';
 import { ProductName } from '@/components/core/json/selectOption';
 import CommonDeleteModal from '@/components/inventory/modal/commonDeleteModal';
-import Table from '@/components/pagination/datatable';
 import Footer from '@/components/partials/footer';
-import Loading from '@/components/partials/loading';
 import CollapesIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
 import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
@@ -170,9 +168,7 @@ export default function ExpiredProductsComponent() {
 								</div>
 							</div>
 							<div className="card-body">
-								<div className="table-responsive">
-									<Table columns={columns} dataSource={data} />
-								</div>
+								<div className="table-responsive">{/* <Table columns={columns} dataSource={data} /> */}</div>
 							</div>
 						</div>
 						{/* /product list */}

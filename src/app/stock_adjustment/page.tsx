@@ -213,7 +213,7 @@ export default function StockAdjustment() {
 						</div>
 						<div className="card-body">
 							<div className="custom-datatable-filter table-responsive">
-								<Table columns={columns} dataSource={data} />
+								{/* <Table columns={columns} dataSource={data} /> */}
 							</div>
 						</div>
 					</div>

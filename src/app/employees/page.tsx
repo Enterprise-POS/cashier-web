@@ -9,7 +9,6 @@ import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { PlusCircle } from 'react-feather';
 
 export default function Employees() {
 	const [isMounted, setIsMounted] = useState(false);
@@ -49,10 +48,10 @@ export default function Employees() {
 							<CollapseIcon />
 						</ul>
 						<div className="page-btn">
-							<Link href={routes.addemployee} className="btn btn-primary">
+							{/* <Link href={routes.addemployee} className="btn btn-primary">
 								<PlusCircle data-feather="plus-circle" className=" me-2" />
 								Add Employee
-							</Link>
+							</Link> */}
 						</div>
 					</div>
 					<div className="row">

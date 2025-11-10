@@ -162,9 +162,7 @@ export default function BrandListComponent() {
 							</div>
 						</div>
 						<div className="card-body">
-							<div className="table-responsive brand-table">
-								<Table columns={columns} dataSource={data} />
-							</div>
+							<div className="table-responsive brand-table">{/* <Table columns={columns} dataSource={data} /> */}</div>
 						</div>
 					</div>
 					{/* /product list */}

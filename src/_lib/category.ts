@@ -4,7 +4,7 @@ import { CategoryDef } from '@/_interface/CategoryDef';
 import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
-import { EditItemCategory, RegisterCategory, UnregisterCategory } from '@/_interface/RequestBody.js';
+import { EditItemCategory, RegisterCategory, UnregisterCategory } from '@/_interface/RequestBody';
 import { signOut } from '@/_lib/action';
 import { getAuth } from '@/_lib/auth';
 import { convertTo } from '@/_lib/utils';

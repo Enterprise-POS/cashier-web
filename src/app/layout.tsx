@@ -11,6 +11,7 @@ import '@/assets/scss/main.scss';
 import Header from '@/components/partials/header/header';
 import Sidebar from '@/components/partials/sidebar';
 import { TenantProvider } from '@/components/provider/TenantProvider';
+import { StoreProvider } from '@/components/provider/StoreProvider';
 
 export const metadata: Metadata = {
 	title: {
@@ -52,8 +53,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
 				<TenantProvider>
 					<Header />
-
-					{children}
+					<StoreProvider>{children}</StoreProvider>
 				</TenantProvider>
 
 				<Script src="/assets/js/jquery-3.7.1.min.js" />

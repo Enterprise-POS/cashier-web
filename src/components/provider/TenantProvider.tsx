@@ -95,9 +95,7 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 
 function useTenant(): TenantContextType {
 	const context = useContext(TenantContext);
-	if (context === undefined) {
-		throw new Error('useTenant must be used within a TenantProvider');
-	}
+	if (context === undefined) throw new Error('useTenant must be used within a TenantProvider');
 
 	return context;
 }

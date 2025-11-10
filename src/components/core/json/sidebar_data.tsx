@@ -231,10 +231,10 @@ export const SidebarData = [
 				submenuItems: [
 					{
 						label: 'Online Orders',
-						link: route.onlineorder,
+						link: route.onlineOrders,
 						showSubRoute: false,
 					},
-					{ label: 'POS Orders', link: route.posorder, showSubRoute: false },
+					{ label: 'POS Orders', link: route.posOrders, showSubRoute: false },
 				],
 			},
 			{
