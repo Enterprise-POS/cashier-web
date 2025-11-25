@@ -1,4 +1,23 @@
-import { StoreStockV2Def } from '@/_interface/StoreStockDef';
+import { StoreStockDef, StoreStockV2Def } from '@/_interface/StoreStockDef';
+
+export class StoreStock {
+	id: number;
+	stocks: number;
+	price: number;
+	itemId: number;
+	tenantId: number;
+	storeId: number;
+	createdAt: Date;
+	constructor(def: StoreStockDef) {
+		this.id = def.id;
+		this.stocks = def.stocks;
+		this.price = def.price;
+		this.itemId = def.item_id;
+		this.tenantId = def.tenant_id;
+		this.storeId = def.store_id;
+		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
+	}
+}
 
 export class StoreStockV2 {
 	id: number;
@@ -7,7 +26,9 @@ export class StoreStockV2 {
 	price: number;
 	stocks: number;
 	createdAt: Date; // Warehouse item created_at;
+	private def: StoreStockV2Def;
 	constructor(def: StoreStockV2Def) {
+		this.def = def;
 		this.id = def.id;
 		this.itemId = def.item_id;
 		this.itemName = def.item_name;
@@ -16,8 +37,7 @@ export class StoreStockV2 {
 		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 	}
 
-	setStocks(quantity: number) {
-		// Regardless it's - / +
-		this.stocks += quantity;
+	getDef(): StoreStockV2Def {
+		return this.def;
 	}
 }

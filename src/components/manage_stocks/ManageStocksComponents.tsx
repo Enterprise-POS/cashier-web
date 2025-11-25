@@ -1,20 +1,28 @@
-import { Input, Table, TablePaginationConfig } from 'antd';
+import { Input, Table, TablePaginationConfig, Tooltip } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Delete, Edit, Trash2 } from 'react-feather';
+import { AlertTriangle, Delete, Edit, Package } from 'react-feather';
 
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { HTTPResult } from '@/_interface/HTTPResult';
-import { StoreStockV2Def } from '@/_interface/StoreStockDef';
+import { StoreStockDef, StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { TransferStockRequest } from '@/_interface/TransferStock';
-import { getAllV2, transferStockToStoreStock, transferStockToWarehouse } from '@/_lib/store_stock';
+import {
+	editStoreStockInformation,
+	getAllV2,
+	transferStockToStoreStock,
+	transferStockToWarehouse,
+} from '@/_lib/store_stock';
 import { useFormState } from '@/components/hooks/useFormState';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
+import EditStoreStockInformation from '@/components/manage_stocks/EditStoreStockInformation';
 import WithdrawItemModal from '@/components/manage_stocks/WithdrawItemModal';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useStore } from '@/components/provider/StoreProvider';
+import SuccessToast from '@/components/toast/SuccessToast';
+import ErrorToast from '@/components/toast/ErrorToast';
 
 export default function ManageStocksComponents() {
 	const limit = 10;
@@ -31,6 +39,7 @@ export default function ManageStocksComponents() {
 	const [storeStocks, setStoreStocks] = useState<StoreStockV2[]>([]);
 	const [tobeEditStoreStock, setTobeEditStoreStock] = useState<StoreStockV2>();
 
+	const currentTenantId = storeCtx.getCurrentTenantId();
 	const selectedStore: Store | undefined = storeCtx.data.storeList.find(
 		store => store.id === storeCtx.data.selectedStoreId
 	);
@@ -88,12 +97,27 @@ export default function ManageStocksComponents() {
 							className="me-2 p-2"
 							href="#"
 							data-bs-toggle="modal"
-							data-bs-target="#edit-units"
+							data-bs-target="#edit-info"
 							onClick={() => setTobeEditStoreStock(storeStock)}
 						>
 							<Edit />
 						</Link>
-						<Link className="confirm-text p-2" data-bs-toggle="modal" data-bs-target="#delete-modal" href="#">
+						<Link
+							className="me-2 p-2"
+							href="#"
+							data-bs-toggle="modal"
+							data-bs-target="#edit-units"
+							onClick={() => setTobeEditStoreStock(storeStock)}
+						>
+							<Package />
+						</Link>
+						<Link
+							className="confirm-text p-2"
+							data-bs-toggle="modal"
+							data-bs-target="#delete-modal"
+							href="#"
+							onClick={() => setTobeEditStoreStock(storeStock)}
+						>
 							<Delete />
 						</Link>
 					</div>
@@ -155,14 +179,41 @@ export default function ManageStocksComponents() {
 			if (error !== null) {
 				formState.setError({ message: error });
 			} else {
-				formState.setSuccess({ message: 'Product edited successfully' });
-
 				// When the item successfully edited, then manually edit / set the reference
 				// It's guaranteed to be available otherwise the request will be fail
 				const newStocks = [...storeStocks]; // shallow clone array
 				const target = newStocks.find(i => i.itemId === transferStockRequest.itemId);
 				if (target !== undefined) {
 					target.stocks += transferStockRequest.quantity; // Mutate targeted store_stocks item
+				}
+				setStoreStocks(newStocks);
+				formState.setSuccess({ message: 'Product stock edited successfully' });
+			}
+		} catch (e) {
+			const error = e as Error;
+			console.error(`[ERROR] ${error.message}`);
+			formState.setError({ message: `Unexpected error: ${error.message}` });
+		} finally {
+			formState.setFormLoading(false);
+		}
+	}
+
+	async function handleOnEditStoreStockInformation(editedStoreStock: StoreStockDef) {
+		if (formState.state.isFormLoading) return;
+		try {
+			formState.setFormLoading(true);
+			const { error } = await editStoreStockInformation(editedStoreStock);
+			if (error !== null) {
+				formState.setError({ message: error });
+			} else {
+				formState.setSuccess({ message: 'Product information edited successfully' });
+
+				// When the item successfully edited, then manually edit / set the reference
+				// It's guaranteed to be available otherwise the request will be fail
+				const newStocks = [...storeStocks]; // shallow clone array
+				const target = newStocks.find(i => i.id === editedStoreStock.id);
+				if (target !== undefined) {
+					target.price = editedStoreStock.price; // Mutate targeted store_stocks item
 				}
 				setStoreStocks(newStocks);
 			}
@@ -177,12 +228,13 @@ export default function ManageStocksComponents() {
 
 	useEffect(() => {
 		if (selectedStore !== undefined) {
-			getStoreStock(selectedStore.id, storeCtx.getCurrentTenantId(), pagination.current!, nameQuery);
+			getStoreStock(selectedStore.id, currentTenantId, pagination.current!, nameQuery);
 		}
 
 		// If store id changed or tenant id change, store provider will be re-render
 		// Because <Table /> don't have direct to maintain selectedStore, we use this useEffect
-	}, [selectedStore, nameQuery]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [selectedStore, nameQuery, currentTenantId]);
 
 	useEffect(() => setIsMounted(true), []);
 
@@ -190,45 +242,15 @@ export default function ManageStocksComponents() {
 
 	return (
 		<>
-			{/* Success Toast */}
-			<div className="toast-container position-fixed bottom-0 end-0 p-3">
-				<div
-					id="liveToast"
-					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast bg-success-transparent`}
-					role="alert"
-					aria-live="assertive"
-					aria-atomic="true"
-				>
-					<div className="toast-header bg-success text-fixed-white">
-						<strong className="me-auto">Success !</strong>
-						<button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-					</div>
-					<div className="toast-body">{formState.value.successMessage}</div>
-				</div>
-			</div>
-
-			{/* Error Toast */}
-			<div className="toast-container position-fixed bottom-0 end-0 p-3">
-				<div
-					id="liveToast"
-					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast bg-danger-transparent`}
-					role="alert"
-					aria-live="assertive"
-					aria-atomic="true"
-				>
-					<div className="toast-header bg-danger text-fixed-white">
-						<strong className="me-auto">Warning</strong>
-						<button
-							type="button"
-							className="btn-close"
-							data-bs-dismiss="toast"
-							aria-label="Close"
-							onClick={() => formState.setState({ error: false })}
-						></button>
-					</div>
-					<div className="toast-body">{formState.value.errorMessage}</div>
-				</div>
-			</div>
+			<SuccessToast
+				isSuccess={formState.state.isSuccess}
+				onClickCloseButton={() => formState.setState({ success: false })}
+			>
+				{formState.value.successMessage}
+			</SuccessToast>
+			<ErrorToast isError={formState.state.isError} onClickCloseButton={() => formState.setState({ error: false })}>
+				{formState.value.errorMessage}
+			</ErrorToast>
 
 			{/* /product list */}
 			<div className="card table-list-card  manage-stock">
@@ -252,14 +274,30 @@ export default function ManageStocksComponents() {
 							>
 								{selectedStore?.name ?? 'Select Store'}
 							</button>
-							<ul className="dropdown-menu  dropdown-menu-end p-3">
-								{storeCtx.data.storeList.map(store => (
-									<li key={store.id} onClick={() => storeCtx.setCurrentStore(store.id)}>
-										<Link href="#" className="dropdown-item rounded-1">
-											{store.name}
-										</Link>
-									</li>
-								))}
+							<ul className="dropdown-menu dropdown-menu-end p-3">
+								{storeCtx.data.storeList.map(store =>
+									store.isActive ? (
+										<li key={store.id} onClick={() => storeCtx.setCurrentStore(store.id)}>
+											<Link href="#" className="dropdown-item rounded-1">
+												{store.name}
+											</Link>
+										</li>
+									) : (
+										<Tooltip
+											key={store.id}
+											placement="leftTop"
+											className="bg-danger-transparent"
+											title="Warning this store currently inactive."
+										>
+											<li key={store.id} onClick={() => storeCtx.setCurrentStore(store.id)}>
+												<Link href="#" className="dropdown-item rounded-1 d-flex justify-content-between">
+													{store.name}
+													<AlertTriangle width={16} height={16} />
+												</Link>
+											</li>
+										</Tooltip>
+									)
+								)}
 							</ul>
 						</div>
 					</div>
@@ -284,12 +322,17 @@ export default function ManageStocksComponents() {
 				</div>
 			</div>
 			{/* /product list */}
-			<WithdrawItemModal />
-
 			<AddNewItem
 				storeList={storeCtx.data.storeList}
 				currentSelectedStoreId={selectedStore?.id ?? 0}
 				onNewTransferItem={() => {}}
+			/>
+
+			<EditStoreStockInformation
+				tobeEditStoreStock={tobeEditStoreStock}
+				onConfirmEdit={handleOnEditStoreStockInformation}
+				storeId={selectedStore?.id ?? 0}
+				tenantId={storeCtx.getCurrentTenantId()}
 			/>
 
 			<EditStoreStock
@@ -297,6 +340,13 @@ export default function ManageStocksComponents() {
 				onConfirmEdit={handleOnConfirmEdit}
 				storeId={selectedStore?.id ?? 0}
 				tenantId={storeCtx.getCurrentTenantId()}
+			/>
+
+			<WithdrawItemModal
+				onConfirmWithdraw={handleOnConfirmEdit}
+				storeId={selectedStore?.id ?? 0}
+				tenantId={storeCtx.getCurrentTenantId()}
+				tobeWithdrawStoreStock={tobeEditStoreStock}
 			/>
 		</>
 	);

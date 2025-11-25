@@ -17,7 +17,7 @@ export function AddNewItem({
 	return (
 		<>
 			{/* Add Stock */}
-			<div className="modal fade" id="add-units">
+			<div className="modal fade" id="add-store">
 				<div className="modal-dialog modal-dialog-centered stock-adjust-modal">
 					<div className="modal-content">
 						<div className="modal-header">

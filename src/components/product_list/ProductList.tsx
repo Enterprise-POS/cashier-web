@@ -1,18 +1,21 @@
 'use client';
 import { Input, Table, TablePaginationConfig } from 'antd';
 import Link from 'next/link';
-import { startTransition, useEffect, useOptimistic, useState } from 'react';
-import { Edit, Eye, Trash2 } from 'react-feather';
+import { FormEvent, startTransition, useEffect, useOptimistic, useState } from 'react';
+import { Edit, Package, Trash2 } from 'react-feather';
 
 import { Item } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { ItemDef } from '@/_interface/ItemDef';
+import { transferStockToStoreStock } from '@/_lib/store_stock';
+import { convertTo } from '@/_lib/utils';
 import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import CategoryDropdown from '@/components/product_list/CategoryDropdown';
+import TransferItemToStoreModal from '@/components/product_list/TransferItemToStoreModal';
 import { useTenant } from '@/components/provider/TenantProvider';
 
 export default function ProductList({ limit, page }: { limit: number; page: number }) {
@@ -29,6 +32,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 
 	const [warehouseItems, setWarehouseItems] = useState<Item[]>([]);
 	const [currentDeleteModalData, setCurrentDeleteModalData] = useState<{ itemId: number; name: string } | null>(null);
+	const [currentSelectedItem, setCurrentSelectedItem] = useState<Item>();
 	const [optimisticItems, optimisticDelete] = useOptimistic(warehouseItems, (currItems: Item[], itemId) => {
 		return currItems.filter(item => item.id !== itemId);
 	});
@@ -91,11 +95,20 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			render: (itemId: number, item: Item) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
-						<Link className="me-2 p-2" href={routes.productdetails}>
+						{/* <Link className="me-2 p-2" href={routes.productdetails}>
 							<Eye className="feather-view" />
-						</Link>
+						</Link> */}
 						<Link className="me-2 p-2" href={routes.editProduct.replace('<itemId>', itemId.toString())}>
 							<Edit className="feather-edit" />
+						</Link>
+						<Link
+							className="me-2 p-2"
+							href="#"
+							data-bs-toggle="modal"
+							data-bs-target="#edit-transfer"
+							onClick={() => setCurrentSelectedItem(item)}
+						>
+							<Package />
 						</Link>
 						<Link
 							className="confirm-text p-2"
@@ -139,6 +152,47 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			const error = e as Error;
 			console.error(`[ERROR] ${error.message}`);
 			formState.setError({ message: `Unexpected error: ${error.message}` });
+		} finally {
+			setComponentLoading(false);
+		}
+	}
+
+	async function handleConfirmTransferStock(form: FormEvent<HTMLFormElement>) {
+		form.preventDefault();
+		if (isComponentLoading) return;
+		setComponentLoading(true);
+
+		try {
+			const formData = new FormData(form.currentTarget);
+			const tenantId = convertTo.number(formData.get('tenantId'));
+			const itemId = convertTo.number(formData.get('itemId'));
+			if (!tenantId || !itemId) throw new Error('The input may malformed, please restart the page');
+
+			const storeId = convertTo.number(formData.get('storeId'));
+			if (!storeId) throw new Error('Please select the target store');
+
+			const quantity = convertTo.number(formData.get('quantity'));
+			if (!quantity) throw new Error('Please check the quantity transfer');
+
+			const { error } = await transferStockToStoreStock({ itemId, tenantId, storeId, quantity });
+			if (error !== null) {
+				formState.setError({ message: error });
+			} else {
+				const copyOfWarehouseItems = [...warehouseItems]; // shallow copy
+				copyOfWarehouseItems.map(item => {
+					if (item.id === itemId) {
+						item.stocks -= quantity;
+					}
+					return item;
+				});
+
+				setWarehouseItems(copyOfWarehouseItems);
+				formState.setSuccess({ message: `Transfer stock success` });
+			}
+		} catch (err) {
+			const error = err as Error;
+			console.error(`[ERROR] ${error.message}`);
+			formState.setError({ message: error.message });
 		} finally {
 			setComponentLoading(false);
 		}
@@ -527,6 +581,12 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					</div>
 				</div>
 			</div>
+
+			<TransferItemToStoreModal
+				onConfirmTransferStock={handleConfirmTransferStock}
+				currentSelectedItem={currentSelectedItem}
+				tenantId={data.selectedTenantId}
+			/>
 		</>
 	);
 }

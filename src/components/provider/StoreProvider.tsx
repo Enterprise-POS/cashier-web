@@ -22,6 +22,8 @@ type StoreContextType = {
 	// setStoreState: (state: SetStateAction<StoreProviderState>) => void; // internal use
 
 	getCurrentTenantId: () => number;
+
+	setStoreList: (stores: Store[]) => void;
 };
 
 const initialState: StoreProviderState = {
@@ -73,6 +75,12 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 		return tenantCtx.selectedTenantId;
 	}
 
+	// The function called at
+	// - store_list -> component while handling onSetStoreActivate or onEditStore
+	function setStoreList(stores: Store[]) {
+		setStoreState(val => ({ ...val, storeList: stores }));
+	}
+
 	// When this page first open then this effect will run to fetch immediately user tenant
 	// Will not re fetch when the user logout and login again.
 	// The refetch for this case handled by HeaderFloatingMenu.tsx,
@@ -92,7 +100,9 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 	}, [tenantCtx.selectedTenantId]); // When the selected tenant change then the store will definitely different
 
 	return (
-		<StoreContext.Provider value={{ data, isStateLoading, refetchGetStores, setCurrentStore, getCurrentTenantId }}>
+		<StoreContext.Provider
+			value={{ data, isStateLoading, refetchGetStores, setCurrentStore, getCurrentTenantId, setStoreList }}
+		>
 			{children}
 		</StoreContext.Provider>
 	);

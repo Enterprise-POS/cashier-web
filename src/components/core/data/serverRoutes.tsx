@@ -33,9 +33,13 @@ export const serverRoutes = {
 
 	// store
 	getStores: `${baseURL}/${apiVersion}/stores/<tenantId>`, // GET
+	storeSetActivate: `${baseURL}/${apiVersion}/stores/set_activate/<tenantId>`, // PUT
+	editStore: `${baseURL}/${apiVersion}/stores/<tenantId>`, // PUT
+	createStore: `${baseURL}/${apiVersion}/stores/<tenantId>`, // POST
 
 	// store_stock
 	storeStocksGetAllV2: `${baseURL}/${apiVersion}/store_stocks/v2/<tenantId>`, // GET
 	transferStockToStoreStock: `${baseURL}/${apiVersion}/store_stocks/transfer_to_store_stock/<tenantId>`, // PUT
 	transferStockToWarehouse: `${baseURL}/${apiVersion}/store_stocks/transfer_to_warehouse/<tenantId>`, // PUT
+	editStoreStockInformation: `${baseURL}/${apiVersion}/store_stocks/edit/<tenantId>`, // PUT
 };
