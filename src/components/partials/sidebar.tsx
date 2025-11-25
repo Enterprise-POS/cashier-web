@@ -7,7 +7,6 @@ import { useState } from 'react';
 
 import { signOut } from '@/_lib/action';
 import { all_routes as routes } from '@/components/core/data/all_routes';
-import { Globe, Layers, Table } from 'react-feather';
 
 const excludedPathnames = [routes.login, routes.register];
 
@@ -316,13 +315,13 @@ export default function Sidebar() {
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.expiredProducts} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.expiredProducts}>
 										<i className="ti ti-progress-alert fs-16 me-2"></i>
 										<span>Expired Products</span>
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.lowStocks} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.lowStocks}>
 										<i className="ti ti-trending-up-2 fs-16 me-2"></i>
 										<span>Low Stocks</span>
 									</Link>
@@ -340,7 +339,7 @@ export default function Sidebar() {
 									</Link>
 								</li> */}
 								<li>
-									<Link href={routes.brandList} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.brandList}>
 										<i className="ti ti-triangles fs-16 me-2"></i>
 										<span>Brands</span>
 									</Link>
@@ -381,25 +380,19 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Stock</h6>
 							<ul>
 								<li>
-									<Link href={routes.storelist}>
-										<Table />
-										<span>Store List</span>
-									</Link>
-								</li>
-								<li>
 									<Link href={routes.manageStocks}>
-										<Layers />
+										<i className="ti ti-stack-3 fs-16 me-2"></i>
 										<span>Manage Stocks</span>
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.stockAdjustment} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.stockAdjustment}>
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
 										<span>Stock Adjustment</span>
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.stockTransfer} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.stockTransfer}>
 										<i className="ti ti-stack-pop fs-16 me-2"></i>
 										<span>Stock Transfer</span>
 									</Link>
@@ -417,14 +410,10 @@ export default function Sidebar() {
 									</Link>
 									<ul>
 										<li>
-											<Link href={routes.onlineOrders} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
-												Online Orders
-											</Link>
+											<Link href={routes.onlineOrders}>Online Orders</Link>
 										</li>
 										<li>
-											<Link href={routes.posOrders} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
-												POS Orders
-											</Link>
+											<Link href={routes.posOrders}>POS Orders</Link>
 										</li>
 									</ul>
 								</li>
@@ -476,7 +465,7 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Promo</h6>
 							<ul>
 								<li>
-									<Link href={routes.coupons} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.coupons}>
 										<i className="ti ti-ticket fs-16 me-2"></i>
 										<span>Coupons</span>
 									</Link>
@@ -602,7 +591,7 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Peoples</h6>
 							<ul>
 								<li>
-									<Link href={routes.customers} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.customers}>
 										<i className="ti ti-users-group fs-16 me-2"></i>
 										<span>Customers</span>
 									</Link>
@@ -637,7 +626,7 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">HRM</h6>
 							<ul>
 								<li>
-									<Link href={routes.employees} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.employees}>
 										<i className="ti ti-user fs-16 me-2"></i>
 										<span>Employees</span>
 									</Link>
@@ -726,11 +715,7 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Reports</h6>
 							<ul>
 								<li className="submenu">
-									<a
-										// className={pathname == routes.salesReport || pathname === routes.bestSeller ? 'subdrop' : ''}
-										className={'bg-body-tertiary'}
-										style={{ cursor: 'not-allowed' }}
-									>
+									<a className={pathname == routes.salesReport || pathname === routes.bestSeller ? 'subdrop' : ''}>
 										<i className="ti ti-chart-bar fs-16 me-2"></i>
 										<span>Sales Report</span>
 										<span className="menu-arrow"></span>
@@ -739,29 +724,19 @@ export default function Sidebar() {
 										style={pathname == routes.salesReport || pathname === routes.bestSeller ? { display: 'block' } : {}}
 									>
 										<li>
-											<Link
-												href={routes.salesReport}
-												// className={routes.salesReport === pathname ? 'active' : ''}
-												className="bg-body-tertiary"
-												style={{ cursor: 'not-allowed' }}
-											>
+											<Link href={routes.salesReport} className={routes.salesReport === pathname ? 'active' : ''}>
 												Sales Report
 											</Link>
 										</li>
 										<li>
-											<Link
-												href={routes.bestSeller}
-												className="bg-body-tertiary"
-												style={{ cursor: 'not-allowed' }}
-												// className={routes.bestSeller === pathname ? 'active' : ''}
-											>
+											<Link href={routes.bestSeller} className={routes.bestSeller === pathname ? 'active' : ''}>
 												Best Seller
 											</Link>
 										</li>
 									</ul>
 								</li>
 								<li>
-									<Link href={routes.purchaseReport} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.purchaseReport}>
 										<i className="ti ti-chart-pie-2 fs-16 me-2"></i>
 										<span>Purchase report</span>
 									</Link>
@@ -785,7 +760,7 @@ export default function Sidebar() {
 									</ul>
 								</li> */}
 								<li>
-									<Link href={routes.invoiceReport} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.invoiceReport}>
 										<i className="ti ti-businessplan fs-16 me-2"></i>
 										<span>Invoice Report</span>
 									</Link>
@@ -845,7 +820,7 @@ export default function Sidebar() {
 									</Link>
 								</li> */}
 								<li>
-									<Link href={routes.incomeReport} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.incomeReport}>
 										<i className="ti ti-chart-ppf fs-16 me-2"></i>
 										<span>Income Report</span>
 									</Link>
@@ -857,13 +832,13 @@ export default function Sidebar() {
 									</Link>
 								</li> */}
 								<li>
-									<Link href={routes.profitAndLoss} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.profitAndLoss}>
 										<i className="ti ti-chart-donut fs-16 me-2"></i>
 										<span>Profit & Loss</span>
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.annualReport} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.annualReport}>
 										<i className="ti ti-report-search fs-16 me-2"></i>
 										<span>Annual Report</span>
 									</Link>
@@ -942,7 +917,7 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">User Management</h6>
 							<ul>
 								<li>
-									<Link href={routes.users} className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
+									<Link href={routes.users}>
 										<i className="ti ti-shield-up fs-16 me-2"></i>
 										<span>Users</span>
 									</Link>
@@ -1144,8 +1119,8 @@ export default function Sidebar() {
 									</ul>
 								</li>
 								<li className="submenu">
-									<Link href="#" className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
-										<Globe />
+									<Link href="#">
+										<i className="ti ti-world fs-16 me-2"></i>
 										<span>Website Settings</span>
 										<span className="menu-arrow"></span>
 									</Link>
@@ -1154,9 +1129,7 @@ export default function Sidebar() {
 											<Link href="system-settings.html">System Settings</Link>
 										</li> */}
 										<li>
-											<Link href="company-settings.html" className="bg-body-tertiary" style={{ cursor: 'not-allowed' }}>
-												Company Settings
-											</Link>
+											<Link href="company-settings.html">Company Settings </Link>
 										</li>
 										{/* <li>
 											<Link href="localization-settings.html">Localization</Link>
@@ -1174,13 +1147,7 @@ export default function Sidebar() {
 											<Link href="social-authentication.html">Social Authentication</Link>
 										</li> */}
 										<li>
-											<Link
-												href={routes.languageSettings}
-												className="bg-body-tertiary"
-												style={{ cursor: 'not-allowed' }}
-											>
-												Language
-											</Link>
+											<Link href={routes.languageSettings}>Language</Link>
 										</li>
 									</ul>
 								</li>

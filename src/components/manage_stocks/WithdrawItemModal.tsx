@@ -1,21 +1,10 @@
 'use client';
 import Link from 'next/link';
+
+import React from 'react';
 import { Delete } from 'react-feather';
 
-import { StoreStockV2 } from '@/_classes/StoreStock';
-import { TransferStockRequest } from '@/_interface/TransferStock';
-
-const WithdrawItemModal = ({
-	storeId,
-	tenantId,
-	tobeWithdrawStoreStock,
-	onConfirmWithdraw,
-}: {
-	storeId: number;
-	tenantId: number;
-	tobeWithdrawStoreStock?: StoreStockV2;
-	onConfirmWithdraw: (v: TransferStockRequest) => void;
-}) => {
+const WithdrawItemModal = () => {
 	return (
 		<>
 			{/* delete modal */}
@@ -29,8 +18,8 @@ const WithdrawItemModal = ({
 								</span>
 								<h4 className="fs-20 fw-bold mb-2 mt-1">Withdraw Item</h4>
 								<p className="mb-0 fs-16">
-									Are you sure you want to empty {tobeWithdrawStoreStock?.itemName ?? 'unselected'} stock. Emptying
-									stock will be transfer all leftover stock into warehouse.
+									Are you sure you want to empty the stock. Emptying stock will be transfer all leftover stock into
+									warehouse.
 								</p>
 								<div className="modal-footer-btn mt-3 d-flex justify-content-center">
 									<button
@@ -40,21 +29,7 @@ const WithdrawItemModal = ({
 									>
 										Cancel
 									</button>
-									<Link
-										href="#"
-										data-bs-dismiss="modal"
-										className="btn btn-primary fs-13 fw-medium p-2 px-3"
-										onClick={() => {
-											if (tobeWithdrawStoreStock === undefined) return;
-											onConfirmWithdraw({
-												// Withdrawing items means zero store stock, so just give all the leftover minus
-												quantity: -tobeWithdrawStoreStock.stocks,
-												storeId: storeId,
-												tenantId: tenantId,
-												itemId: tobeWithdrawStoreStock.itemId,
-											});
-										}}
-									>
+									<Link href="#" data-bs-dismiss="modal" className="btn btn-primary fs-13 fw-medium p-2 px-3">
 										Confirm
 									</Link>
 								</div>
