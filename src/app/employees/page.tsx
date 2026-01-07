@@ -49,7 +49,7 @@ export default function Employees() {
 							<CollapseIcon />
 						</ul>
 						<div className="page-btn">
-							<Link href={routes.addemployee} className="btn btn-primary">
+							<Link href={routes.employees} className="btn btn-primary">
 								<PlusCircle data-feather="plus-circle" className=" me-2" />
 								Add Employee
 							</Link>

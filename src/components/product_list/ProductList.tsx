@@ -7,7 +7,7 @@ import { Edit, Eye, Trash2 } from 'react-feather';
 import { Item } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
 import { HTTPResult } from '@/_interface/HTTPResult';
-import { ItemDef } from '@/_interface/ItemDef';
+import { ItemDef, StockType } from '@/_interface/ItemDef';
 import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useFormState } from '@/components/hooks/useFormState';
@@ -70,6 +70,13 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			title: 'Stocks',
 			dataIndex: 'stocks',
 			sorter: (a: Item, b: Item) => a.stocks - b.stocks,
+			render: (stocks: number) => <p className="text-center">{stocks}</p>,
+		},
+		{
+			title: 'T/U',
+			dataIndex: 'stockType',
+			sorter: (a: Item, b: Item) => a.stockType.length - b.stockType.length,
+			render: (stockType: StockType) => <p className="text-center">{stockType.at(0)}</p>,
 		},
 
 		// {

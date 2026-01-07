@@ -1,5 +1,5 @@
 import { CategoryWithItemDef } from '@/_interface/CategoryDef';
-import { ItemDef } from '@/_interface/ItemDef';
+import { ItemDef, StockType } from '@/_interface/ItemDef';
 
 export class Item {
 	itemId: number;
@@ -8,6 +8,7 @@ export class Item {
 	isActive: number;
 	createdAt: Date;
 	unit: string;
+	stockType: StockType;
 	id: number;
 	constructor(def: ItemDef) {
 		// Although this is the same properties
@@ -18,6 +19,7 @@ export class Item {
 		this.itemName = def.item_name;
 		this.stocks = def.stocks;
 		this.isActive = def.is_active;
+		this.stockType = def.stock_type;
 		this.createdAt = new Date(def.created_at);
 		this.unit = 'Pc';
 	}
@@ -33,6 +35,7 @@ export class CategoryWithItem extends Item {
 			stocks: def.stocks,
 			created_at: '',
 			is_active: 0,
+			stock_type: def.stock_type,
 		});
 		this.categoryId = def.category_id;
 		this.categoryName = def.category_name;
