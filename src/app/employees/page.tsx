@@ -5,6 +5,7 @@ import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
 import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
+import { PlusCircle } from 'react-feather';
 
 import Image from 'next/image';
 import Link from 'next/link';
@@ -48,10 +49,10 @@ export default function Employees() {
 							<CollapseIcon />
 						</ul>
 						<div className="page-btn">
-							{/* <Link href={routes.addemployee} className="btn btn-primary">
+							<Link href={routes.employees} className="btn btn-primary">
 								<PlusCircle data-feather="plus-circle" className=" me-2" />
 								Add Employee
-							</Link> */}
+							</Link>
 						</div>
 					</div>
 					<div className="row">
