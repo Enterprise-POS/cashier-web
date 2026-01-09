@@ -380,6 +380,12 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Stock</h6>
 							<ul>
 								<li>
+									<Link href={routes.storeList}>
+										<i className="ti ti-home fs-16 me-2"></i>
+										<span>Store List</span>
+									</Link>
+								</li>
+								<li>
 									<Link href={routes.manageStocks}>
 										<i className="ti ti-stack-3 fs-16 me-2"></i>
 										<span>Manage Stocks</span>
@@ -391,12 +397,6 @@ export default function Sidebar() {
 										<span>Edit Stock Info</span>
 									</Link>
 								</li>
-								{/* <li>
-									<Link href={routes.stockTransfer}>
-										<i className="ti ti-stack-pop fs-16 me-2"></i>
-										<span>Stock Transfer</span>
-									</Link>
-								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">

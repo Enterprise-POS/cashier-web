@@ -149,7 +149,7 @@ export const all_routes = {
 	holidays: '/holidays',
 	customers: '/customers',
 	suppliers: '/suppliers',
-	storelist: '/store_list',
+	storeList: '/store_list',
 	manageStocks: '/manage_stocks',
 	editStockInfo: '/edit_stock_info',
 	stockTransfer: '/stock_transfer',

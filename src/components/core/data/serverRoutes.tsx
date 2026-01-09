@@ -33,6 +33,8 @@ export const serverRoutes = {
 
 	// store
 	getStores: `${baseURL}/${apiVersion}/stores/<tenantId>`, // GET
+	createNewStore: `${baseURL}/${apiVersion}/stores/<tenantId>`, // POST
+	setStoreActivate: `${baseURL}/${apiVersion}/stores/set_activate/<tenantId>`, // PUT
 
 	// store_stock
 	storeStocksGetAllV2: `${baseURL}/${apiVersion}/store_stocks/v2/<tenantId>`, // GET
