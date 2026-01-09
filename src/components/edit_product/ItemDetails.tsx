@@ -2,12 +2,14 @@
 import Link from 'next/link';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
 import { Info, LifeBuoy, PlusCircle } from 'react-feather';
+import Select from 'react-select';
 import AsyncSelect from 'react-select/async';
 
 import { CategoryWithItem } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
 import { CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { HTTPResult } from '@/_interface/HTTPResult';
+import { StockType } from '@/_interface/ItemDef';
 import { getCategories, registerCategory } from '@/_lib/category';
 import { editWarehouseItem, findCompleteById } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
@@ -27,6 +29,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 	const [addAndReduceCounter, setAddAndReduceCounter] = useState(0);
 	const [inpItemName, setInpItemName] = useState('');
 	const [changedCategory, setChangedCategory] = useState<{ value: number; label: string }>();
+	const [changedStockType, setChangedStockType] = useState<{ value: string; label: string }>();
 
 	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
@@ -59,6 +62,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 							item_name: inpItemName,
 							item_id: v.itemId,
 							stocks: v.stocks + addAndReduceCounter,
+							stock_type: v.stockType,
 					  })
 					: null
 			);
@@ -144,6 +148,15 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 	if (formState.state.isFormLoading || loadingUserTenant || !isMounted)
 		return <SectionLoading caption={`Loading ${selectedTenant?.name ?? ''} items`} />;
 
+	const formName = {
+		tenantId: 'tenantId',
+		itemId: 'itemId',
+		productName: 'productName',
+		quantity: 'quantity',
+		stockType: 'stockType',
+		categoryId: 'categoryId',
+	};
+
 	return (
 		<>
 			{/* Success Toast */}
@@ -225,8 +238,8 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 			</div>
 
 			<form className="add-product-form" onSubmit={handleForm}>
-				<input type="hidden" name="tenantId" value={selectedTenant?.id ?? 0} />
-				<input type="hidden" name="itemId" value={itemId} />
+				<input type="hidden" name={formName.tenantId} value={selectedTenant?.id ?? 0} />
+				<input type="hidden" name={formName.itemId} value={itemId} />
 				<div className="add-product">
 					<div className="accordions-items-seperate" id="accordionSpacingExample">
 						<div className="accordion-item border mb-4">
@@ -259,7 +272,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 												<input
 													type="text"
 													className="form-control"
-													name="productName"
+													name={formName.productName}
 													onChange={e => setInpItemName(e.target.value)}
 													value={inpItemName}
 												/>
@@ -291,8 +304,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 													className="react-select"
 													loadOptions={loadCategoryOptions}
 													placeholder="Choose"
-													name="categoryId"
-													isClearable
+													name={formName.categoryId}
 													onChange={e => setChangedCategory({ label: e?.label ?? '', value: Number(e?.value) })}
 													defaultValue={
 														currentItem?.categoryId && currentItem?.categoryName
@@ -302,6 +314,29 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 															  }
 															: null
 													}
+												/>
+											</div>
+										</div>
+										<div className="col-sm-6 col-12">
+											<div className="mb-3">
+												<label className="form-label">
+													StockType
+													<span className="text-danger ms-1">*</span>
+												</label>
+												<Select
+													name={formName.stockType}
+													classNamePrefix="react-select"
+													onChange={e => setChangedStockType({ label: e?.label ?? '', value: e?.value ?? '' })}
+													options={[
+														{ label: '(U) Unlimited', value: StockType.UNLIMITED },
+														{ label: '(T) Tracked', value: StockType.TRACKED },
+													]}
+													defaultValue={
+														currentItem && currentItem.stockType === StockType.UNLIMITED
+															? { label: '(U) Unlimited', value: StockType.UNLIMITED }
+															: { label: '(T) Tracked', value: StockType.TRACKED }
+													}
+													value={changedStockType}
 												/>
 											</div>
 										</div>
@@ -343,7 +378,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 															<input
 																type="number"
 																className="form-control"
-																name="quantity"
 																disabled
 																placeholder="0"
 																defaultValue={currentItem?.stocks ?? '0'}
@@ -356,7 +390,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 															<input
 																type="number"
 																className="form-control"
-																name="quantity"
+																name={formName.quantity}
 																defaultValue={addAndReduceCounter}
 																onChange={e => setAddAndReduceCounter(Number(e.target.value))}
 															/>
@@ -368,7 +402,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 															<input
 																type="number"
 																className="form-control"
-																name="quantity"
 																disabled
 																value={(currentItem?.stocks ?? 0) + addAndReduceCounter}
 															/>

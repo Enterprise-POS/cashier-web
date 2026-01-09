@@ -1,5 +1,5 @@
 'use client';
-import { Input, Table, TablePaginationConfig } from 'antd';
+import { Input, Table, TablePaginationConfig, Tooltip } from 'antd';
 import Link from 'next/link';
 import { startTransition, useEffect, useOptimistic, useState } from 'react';
 import { Edit, Eye, Trash2 } from 'react-feather';
@@ -45,21 +45,12 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		{
 			title: 'Product',
 			dataIndex: 'itemName',
-			render: (text: string, item: Item) => (
-				<div className="d-flex align-items-center">
-					{/* <Link href="#" className="avatar avatar-md me-2">
-						<img alt="" src={item.productImage} />
-					</Link> */}
-					<Link href={routes.editProduct.replace('<itemId>', item.id.toString())}>{text}</Link>
-				</div>
+			render: (itemName: string, item: Item) => (
+				<Tooltip title={itemName}>
+					<Link href={routes.editProduct.replace('<itemId>', item.id.toString())}>{itemName}</Link>
+				</Tooltip>
 			),
 			sorter: (a: Item, b: Item) => a.itemName.length - b.itemName.length,
-		},
-		{
-			title: 'Created At',
-			dataIndex: 'createdAt',
-			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
 		},
 		{
 			title: 'Unit',
@@ -70,13 +61,34 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			title: 'Stocks',
 			dataIndex: 'stocks',
 			sorter: (a: Item, b: Item) => a.stocks - b.stocks,
-			render: (stocks: number) => <p className="text-center">{stocks}</p>,
+			render: (stocks: number) => stocks,
 		},
 		{
 			title: 'T/U',
 			dataIndex: 'stockType',
 			sorter: (a: Item, b: Item) => a.stockType.length - b.stockType.length,
-			render: (stockType: StockType) => <p className="text-center">{stockType.at(0)}</p>,
+			render: (stockType: StockType) => (
+				<Tooltip
+					title={
+						<>
+							<div>
+								<b>T</b> = Tracked / mandatory stock type
+							</div>
+							<div>
+								<b>U</b> = Unlimited supply stock type
+							</div>
+						</>
+					}
+				>
+					{stockType.at(0)}
+				</Tooltip>
+			),
+		},
+		{
+			title: 'Created At',
+			dataIndex: 'createdAt',
+			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
+			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
 		},
 
 		// {
@@ -98,9 +110,9 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			render: (itemId: number, item: Item) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
-						<Link className="me-2 p-2" href={routes.productdetails}>
+						{/* <Link className="me-2 p-2" href={routes.productdetails}>
 							<Eye className="feather-view" />
-						</Link>
+						</Link> */}
 						<Link className="me-2 p-2" href={routes.editProduct.replace('<itemId>', itemId.toString())}>
 							<Edit className="feather-edit" />
 						</Link>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export function useFormState() {
 	const [isFormLoading, setFormLoading] = useState(false);
@@ -12,16 +12,33 @@ export function useFormState() {
 	const [errorMessage, setErrorMessage] = useState('');
 	const [showErrorToast, setShowErrorToast] = useState(false);
 
+	// Timeout ref
+	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
+
 	function setError({ message }: { message: string }) {
 		setShowErrorToast(true);
 		setShowSuccessToast(false);
 		setErrorMessage(message);
+
+		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(async () => {
+			setShowErrorToast(false);
+			setShowSuccessToast(false);
+			setErrorMessage('');
+		}, 10000); // 10s
 	}
 
 	function setSuccess({ message }: { message: string }) {
 		setShowErrorToast(false);
 		setShowSuccessToast(true);
 		setSuccessMessage(message);
+
+		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(async () => {
+			setShowErrorToast(false);
+			setShowSuccessToast(false);
+			setSuccessMessage('');
+		}, 10000); // 10s
 	}
 
 	function setState({ success, error }: { success?: boolean; error?: boolean }) {

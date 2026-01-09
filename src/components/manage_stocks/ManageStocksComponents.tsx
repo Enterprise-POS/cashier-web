@@ -1,14 +1,16 @@
 import { Input, Table, TablePaginationConfig } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { Delete, Edit, Trash2 } from 'react-feather';
+import { Delete, Edit } from 'react-feather';
 
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { HTTPResult } from '@/_interface/HTTPResult';
+import { StockType } from '@/_interface/ItemDef';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { TransferStockRequest } from '@/_interface/TransferStock';
 import { getAllV2, transferStockToStoreStock, transferStockToWarehouse } from '@/_lib/store_stock';
+import { closeBootstrapModal } from '@/_lib/utils';
 import { useFormState } from '@/components/hooks/useFormState';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
@@ -47,19 +49,6 @@ export default function ManageStocksComponents() {
 			dataIndex: 'itemName',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
 		},
-		// {
-		// 	title: 'Product',
-		// 	dataIndex: 'Product',
-		// 	render: (text: any, record: any) => (
-		// 		<span className="userimgname">
-		// 			<Link href="#" className="product-img">
-		// 				<img alt="img" src={record.Product.Image} />
-		// 			</Link>
-		// 			<Link href="#">{record.Product.Name}</Link>
-		// 		</span>
-		// 	),
-		// 	sorter: (a: any, b: any) => a.Product.Name.length - b.Product.Name.length,
-		// },
 
 		{
 			title: 'Price',
@@ -72,7 +61,13 @@ export default function ManageStocksComponents() {
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.stocks - b.stocks,
 		},
 		{
-			title: 'Item Created At',
+			title: 'T/U',
+			dataIndex: 'stockType',
+			sorter: (a: StoreStockV2, b: StoreStockV2) => a.stockType.length - b.stockType.length,
+			render: (stockType: StockType) => <p className="text-center">{stockType.at(0)}</p>,
+		},
+		{
+			title: 'Created At',
 			dataIndex: 'createdAt',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
 			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
@@ -85,15 +80,15 @@ export default function ManageStocksComponents() {
 					<div className="edit-delete-action">
 						<div className="input-block add-lists"></div>
 						<Link
-							className="me-2 p-2"
 							href="#"
+							className="me-2 p-2"
 							data-bs-toggle="modal"
 							data-bs-target="#edit-units"
-							onClick={() => setTobeEditStoreStock(storeStock)}
+							onClick={() => (formState.state.isFormLoading ? null : setTobeEditStoreStock(storeStock))}
 						>
 							<Edit />
 						</Link>
-						<Link className="confirm-text p-2" data-bs-toggle="modal" data-bs-target="#delete-modal" href="#">
+						<Link href="#" className="confirm-text p-2" data-bs-toggle="modal" data-bs-target="#delete-modal">
 							<Delete />
 						</Link>
 					</div>
@@ -175,6 +170,26 @@ export default function ManageStocksComponents() {
 		}
 	}
 
+	async function handleTransferItem(transferStockRequest: TransferStockRequest, itemName: string) {
+		if (formState.state.isFormLoading) return;
+		formState.setFormLoading(true);
+		const { error } = await transferStockToStoreStock(transferStockRequest);
+		if (error !== null) {
+			formState.setError({ message: error });
+		} else {
+			setNameQuery('');
+			await getStoreStock(selectedStore!.id, storeCtx.getCurrentTenantId(), 1, '');
+			formState.setSuccess({ message: `${itemName} successfully added to ${selectedStore!.name}` });
+			closeBootstrapModal('#add-units [data-bs-dismiss="modal"]');
+		}
+		formState.setFormLoading(false);
+	}
+
+	function handleInputSearch(value: string) {
+		setNameQuery(value);
+		setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
+	}
+
 	useEffect(() => {
 		if (selectedStore !== undefined) {
 			getStoreStock(selectedStore.id, storeCtx.getCurrentTenantId(), pagination.current!, nameQuery);
@@ -194,7 +209,7 @@ export default function ManageStocksComponents() {
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
 					id="liveToast"
-					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast bg-success-transparent`}
+					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -238,10 +253,7 @@ export default function ManageStocksComponents() {
 							placeholder="Search items..."
 							allowClear
 							className="focus-ring"
-							onSearch={value => {
-								setNameQuery(value);
-								setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
-							}}
+							onSearch={value => handleInputSearch(value)}
 						/>
 					</div>
 					<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
@@ -289,7 +301,8 @@ export default function ManageStocksComponents() {
 			<AddNewItem
 				storeList={storeCtx.data.storeList}
 				currentSelectedStoreId={selectedStore?.id ?? 0}
-				onNewTransferItem={() => {}}
+				onNewTransferItem={handleTransferItem}
+				loading={formState.state.isFormLoading}
 			/>
 
 			<EditStoreStock

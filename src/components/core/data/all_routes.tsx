@@ -151,7 +151,7 @@ export const all_routes = {
 	suppliers: '/suppliers',
 	storelist: '/store_list',
 	manageStocks: '/manage_stocks',
-	stockAdjustment: '/stock_adjustment',
+	editStockInfo: '/edit_stock_info',
 	stockTransfer: '/stock_transfer',
 	salesReport: '/reports/sales_report',
 	purchaseReport: '/purchase_report',

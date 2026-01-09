@@ -1,3 +1,4 @@
+import { StockType } from '@/_interface/ItemDef';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 
 export class StoreStockV2 {
@@ -7,12 +8,14 @@ export class StoreStockV2 {
 	price: number;
 	stocks: number;
 	createdAt: Date; // Warehouse item created_at;
+	stockType: StockType;
 	constructor(def: StoreStockV2Def) {
 		this.id = def.id;
 		this.itemId = def.item_id;
 		this.itemName = def.item_name;
 		this.price = def.price;
 		this.stocks = def.stocks;
+		this.stockType = def.stock_type;
 		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 	}
 

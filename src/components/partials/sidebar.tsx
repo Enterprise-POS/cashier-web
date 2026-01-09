@@ -314,18 +314,18 @@ export default function Sidebar() {
 										<span>Create Product</span>
 									</Link>
 								</li>
-								<li>
+								{/* <li>
 									<Link href={routes.expiredProducts}>
 										<i className="ti ti-progress-alert fs-16 me-2"></i>
 										<span>Expired Products</span>
 									</Link>
-								</li>
-								<li>
+								</li> */}
+								{/* <li>
 									<Link href={routes.lowStocks}>
 										<i className="ti ti-trending-up-2 fs-16 me-2"></i>
 										<span>Low Stocks</span>
 									</Link>
-								</li>
+								</li> */}
 								<li>
 									<Link href={routes.categoryList}>
 										<i className="ti ti-list-details fs-16 me-2"></i>
@@ -338,12 +338,12 @@ export default function Sidebar() {
 										<span>Sub Category</span>
 									</Link>
 								</li> */}
-								<li>
+								{/* <li>
 									<Link href={routes.brandList}>
 										<i className="ti ti-triangles fs-16 me-2"></i>
 										<span>Brands</span>
 									</Link>
-								</li>
+								</li> */}
 								{/* <li>
 									<Link href="units.html">
 										<i className="ti ti-brand-unity fs-16 me-2"></i>
@@ -386,17 +386,17 @@ export default function Sidebar() {
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.stockAdjustment}>
+									<Link href={routes.editStockInfo}>
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
-										<span>Stock Adjustment</span>
+										<span>Edit Stock Info</span>
 									</Link>
 								</li>
-								<li>
+								{/* <li>
 									<Link href={routes.stockTransfer}>
 										<i className="ti ti-stack-pop fs-16 me-2"></i>
 										<span>Stock Transfer</span>
 									</Link>
-								</li>
+								</li> */}
 							</ul>
 						</li>
 						<li className="submenu-open">

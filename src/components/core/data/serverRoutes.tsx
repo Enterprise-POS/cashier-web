@@ -38,4 +38,5 @@ export const serverRoutes = {
 	storeStocksGetAllV2: `${baseURL}/${apiVersion}/store_stocks/v2/<tenantId>`, // GET
 	transferStockToStoreStock: `${baseURL}/${apiVersion}/store_stocks/transfer_to_store_stock/<tenantId>`, // PUT
 	transferStockToWarehouse: `${baseURL}/${apiVersion}/store_stocks/transfer_to_warehouse/<tenantId>`, // PUT
+	editStoreStock: `${baseURL}/${apiVersion}/store_stocks/edit/<tenantId>`,
 };
