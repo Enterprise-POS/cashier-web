@@ -112,10 +112,11 @@ export default function ManageStocksComponents() {
 			);
 			if (error !== null) {
 				// A special condition that maybe user not yet transfer any warehouse items
-				if (error.includes('[ERROR] no stock found')) {
+				if (error.includes('[ERROR] no stock found') || error.includes('Fatal error: no stock found ')) {
 					setStoreStocks([]);
 					setPagination({ ...pagination, current: 1, total: 0 });
 				} else {
+					setStoreStocks([]);
 					formState.setError({ message: error });
 				}
 			} else {

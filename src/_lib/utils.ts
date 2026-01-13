@@ -12,3 +12,11 @@ export function closeBootstrapModal(selector: string) {
 		(closeButton as HTMLElement).click();
 	}
 }
+
+export function setStringPrefix(val: string | number, prefix: string): string {
+	return val.toString().padStart(val.toString().length + 1, prefix);
+}
+
+export function toEpochInSeconds(epochInMs: number): number {
+	return Math.round(epochInMs / 1000);
+}
