@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { signOut } from '@/_lib/action';
@@ -147,14 +147,14 @@ export default function Sidebar() {
 									</Link>
 									<ul>
 										<li className="active">
-											<Link href={routes.index}>Admin Dashboard</Link>
+											<Link href={routes.index}>Home Dashboard</Link>
 										</li>
-										<li>
+										{/* <li>
 											<Link href="#">Admin Dashboard 2</Link>
 										</li>
 										<li>
 											<Link href="#">Sales Dashboard</Link>
-										</li>
+										</li> */}
 									</ul>
 								</li>
 								{/* <li className="submenu">
@@ -399,7 +399,7 @@ export default function Sidebar() {
 								</li>
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Sales</h6>
 							<ul>
 								<li className="submenu">
@@ -417,25 +417,25 @@ export default function Sidebar() {
 										</li>
 									</ul>
 								</li>
-								{/* <li>
+								<li>
 									<Link href="invoice.html">
 										<i className="ti ti-file-invoice fs-16 me-2"></i>
 										<span>Invoices</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="sales-returns.html">
 										<i className="ti ti-receipt-refund fs-16 me-2"></i>
 										<span>Sales Return</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="quotation-list.html">
 										<i className="ti ti-files fs-16 me-2"></i>
 										<span>Quotation</span>
 									</Link>
-								</li> */}
-								{/* <li className="submenu">
+								</li>
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-device-laptop fs-16 me-2"></i>
 										<span>POS</span>
@@ -458,9 +458,9 @@ export default function Sidebar() {
 											<Link href="pos-5.html">POS 5</Link>
 										</li>
 									</ul>
-								</li> */}
+								</li>
 							</ul>
-						</li>
+						</li> */}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Promo</h6>
 							<ul>
@@ -626,10 +626,10 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">HRM</h6>
 							<ul>
 								<li>
-									<Link href={routes.employees}>
+									{/* <Link href={routes.employees}>
 										<i className="ti ti-user fs-16 me-2"></i>
 										<span>Employees</span>
-									</Link>
+									</Link> */}
 								</li>
 								<li>
 									<Link href={routes.tenantMembers}>

@@ -100,7 +100,6 @@ export default function ManageStocksComponents() {
 
 	async function getStoreStock(storeId: number, tenantId: number, page: number, search: string) {
 		if (formState.state.isFormLoading) return;
-
 		try {
 			formState.setFormLoading(true);
 			const { result, error }: HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }> = await getAllV2(

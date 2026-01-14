@@ -1,8 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft } from 'react-feather';
 import { redirect } from 'next/navigation';
-import type { AppProps } from 'next/app';
+import { ArrowLeft } from 'react-feather';
 
 import { convertTo } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';

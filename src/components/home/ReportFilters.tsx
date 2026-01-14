@@ -1,28 +1,18 @@
-import type { DatePickerProps, GetProps } from 'antd';
 import { DatePicker } from 'antd';
-import dayjs, { Dayjs } from 'dayjs';
-import { useState } from 'react';
-
-type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 const { RangePicker } = DatePicker;
 
+import { convertTo } from '@/_lib/utils';
 import SelectVariety from '@/components/inventory/selectVariety';
-import { useStore } from '@/components/provider/StoreProvider';
+import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
 export default function ReportFilters() {
-	const todayStart = dayjs().startOf('day');
-	const todayEnd = dayjs().endOf('day');
-
-	const storeCtx = useStore();
-	const stores: { value: string; label: string }[] = storeCtx.data.storeList.map(s => ({
-		value: String(s.id),
-		label: s.name,
-	}));
-
-	const [dateRange, setDateRange] = useState<[Dayjs, Dayjs]>([todayStart, todayEnd]);
-	const onOk = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
-		console.log('onOk: ', value);
-	};
+	const dashboardCtx = useHomeDashboard();
+	const stores = dashboardCtx.stores;
+	const dateRange = dashboardCtx.data.dateRanges;
+	const onOk = dashboardCtx.onDateRangeOk;
+	const onSetDateRange = dashboardCtx.onSetDateRange;
+	const onClickGenerateReport = dashboardCtx.onClickGenerateReport;
+	const onChangeSelectedStore = dashboardCtx.onChangeSelectedStore;
 
 	return (
 		<div className="card border-0">
@@ -39,9 +29,9 @@ export default function ReportFilters() {
 												value={dateRange}
 												showTime={{ format: 'HH:mm' }}
 												format="YYYY-MM-DD HH:mm"
-												onChange={(value, _) => {
-													if (value) {
-														setDateRange(value as [Dayjs, Dayjs]);
+												onChange={(dates, dateString) => {
+													if (dates) {
+														onSetDateRange([dates[0], dates[1]], dateString);
 													}
 												}}
 												onOk={onOk}
@@ -53,7 +43,10 @@ export default function ReportFilters() {
 								<div className="col-md-4">
 									<div className="mb-3">
 										<label className="form-label">Store</label>
-										<SelectVariety options={stores} />
+										<SelectVariety
+											onChange={newValue => onChangeSelectedStore(newValue.value)}
+											options={[...stores, { value: '0', label: 'Unselect' }]}
+										/>
 									</div>
 								</div>
 								{/* <div className="col-md-4">
@@ -66,7 +59,7 @@ export default function ReportFilters() {
 						</div>
 						<div className="col-lg-2">
 							<div className="mb-3">
-								<button className="btn btn-primary w-100" type="submit">
+								<button className="btn btn-primary w-100" type="button" onClick={onClickGenerateReport}>
 									Generate Report
 								</button>
 							</div>

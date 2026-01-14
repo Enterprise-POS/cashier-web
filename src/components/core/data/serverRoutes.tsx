@@ -45,4 +45,5 @@ export const serverRoutes = {
 	// order_item
 	orderItemSalesReport: `${baseURL}/${apiVersion}/order_items/sales_report/<tenantId>`, // POST
 	orderItemGetSearch: `${baseURL}/${apiVersion}/order_items/search/<tenantId>`, // POST
+	orderItemFindById: `${baseURL}/${apiVersion}/order_items/details/<tenantId>`, // GET
 };

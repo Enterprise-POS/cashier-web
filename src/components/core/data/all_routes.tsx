@@ -249,6 +249,7 @@ export const all_routes = {
 	packagelist: '/packages',
 	domain: '/domain',
 	purchasetransaction: '/purchase_transaction',
+	salesReportDetail: '/sales_report_detail',
 	emailreply: '/email_replay',
 	todolist: '/todo_list',
 	projects: '/projects',

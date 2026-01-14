@@ -16,7 +16,7 @@ export class ReportResult {
 		this.sumTransactions = def.sum_transactions;
 	}
 
-	getNetSales() {
+	getChanges() {
 		return this.sumPurchasedPrice - this.sumTotalAmount;
 	}
 }
