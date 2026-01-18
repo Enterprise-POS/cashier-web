@@ -162,9 +162,7 @@ export default function BestSellerComponent() {
 							</div>
 							<div className="card-body">
 								<div className="table-responsive">
-									<div className="table-responsive">
-										<Table columns={columns} dataSource={data} />
-									</div>
+									<div className="table-responsive">{/* <Table columns={columns} dataSource={data} /> */}</div>
 								</div>
 							</div>
 						</div>

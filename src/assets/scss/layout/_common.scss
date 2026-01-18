@@ -720,7 +720,7 @@ td {
             color: $gray-900;
             opacity: 1;
         }
-        
+
     } */
 	.display-btn {
 		color: $white;
@@ -1231,4 +1231,8 @@ $cyan: #06aed4;
 svg.feather {
 	width: 16px;
 	height: 16px;
+}
+
+.vh-75 {
+	height: 75vh;
 }

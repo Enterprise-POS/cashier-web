@@ -162,9 +162,7 @@ export default function UsersComponent() {
 						</div>
 
 						<div className="card-body">
-							<div className="table-responsive">
-								<Table columns={columns} dataSource={dataSource} />
-							</div>
+							<div className="table-responsive">{/* <Table columns={columns} dataSource={dataSource} /> */}</div>
 						</div>
 					</div>
 					{/* /product list */}

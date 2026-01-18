@@ -148,6 +148,10 @@ ul .btn-primary:not(:disabled):not(.disabled):active:focus, ul .btn-primary:not(
 .bg-success {
   background-color: #3EB780 !important;
 }
+.bg-success-light07 {
+  background-color: #3EB780 !important;
+	filter: brightness(0.7)
+}
 
 .bg-warning {
   background-color: #FFCA18 !important;

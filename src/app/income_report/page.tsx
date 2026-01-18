@@ -151,9 +151,7 @@ export default function IncomeReport() {
 						</ul>
 					</div>
 					<div className="card-body">
-						<div className="table-responsive">
-							<Table columns={columns} dataSource={data} />
-						</div>
+						<div className="table-responsive">{/* <Table columns={columns} dataSource={data} /> */}</div>
 					</div>
 				</div>
 				{/* /product list */}

@@ -11,7 +11,7 @@ import { useTenant } from '@/components/provider/TenantProvider';
 
 export default function HeaderFloatingMenu({ name, sub }: { name: string; sub: number }) {
 	const router = useRouter();
-	const { refetchGetTenants } = useTenant();
+	const { refetchGetTenants, setCurrentTenant } = useTenant();
 	const [whileSigningOut, setWhileSigningOut] = useState(false);
 
 	// Maintaining correct current tenant
@@ -28,6 +28,8 @@ export default function HeaderFloatingMenu({ name, sub }: { name: string; sub: n
 			setWhileSigningOut(false);
 			throw new Error(error);
 		} else {
+			// Reset cached tenant
+			setCurrentTenant(0);
 			router.push('/login');
 			router.refresh();
 		}

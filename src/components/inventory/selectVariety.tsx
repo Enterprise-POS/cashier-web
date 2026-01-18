@@ -1,10 +1,17 @@
 'use client';
 
-import Select from 'react-select';
+import Select, { ActionMeta, OnChangeValue, SingleValue } from 'react-select';
 
-export default function SelectVariety({ options }: { options: any }) {
+export default function SelectVariety({
+	options,
+	onChange,
+}: {
+	options: any;
+	onChange: (newValue: any, actionMeta: any) => void;
+}) {
 	return (
 		<Select
+			onChange={onChange}
 			classNamePrefix="react-select"
 			options={options}
 			placeholder="Choose"

@@ -1,5 +1,5 @@
 'use client';
-import RefreshIcon from '@/core/common/tooltip-content/refresh';
+// import RefreshIcon from '@/core/common/tooltip-content/refresh';
 import React from 'react';
 import Select from 'react-select';
 import Link from 'next/link';
@@ -20,14 +20,14 @@ export default function GeneralSettingsComponent() {
 							</div>
 						</div>
 						<ul className="table-top-head">
-							<RefreshIcon />
+							{/* <RefreshIcon /> */}
 							<CollapseIcon />
 						</ul>
 					</div>
 					<div className="row">
 						<div className="col-xl-12">
 							<div className="settings-wrapper d-flex">
-								<SettingsSideBar />
+								{/* <SettingsSideBar /> */}
 								<div className="card flex-fill mb-0">
 									<div className="card-header">
 										<h4 className="fs-18 fw-bold">Profile</h4>

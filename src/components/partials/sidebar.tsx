@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useParams, usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { signOut } from '@/_lib/action';
@@ -147,14 +147,14 @@ export default function Sidebar() {
 									</Link>
 									<ul>
 										<li className="active">
-											<Link href={routes.index}>Admin Dashboard</Link>
+											<Link href={routes.index}>Home Dashboard</Link>
 										</li>
-										<li>
+										{/* <li>
 											<Link href="#">Admin Dashboard 2</Link>
 										</li>
 										<li>
 											<Link href="#">Sales Dashboard</Link>
-										</li>
+										</li> */}
 									</ul>
 								</li>
 								{/* <li className="submenu">
@@ -314,18 +314,18 @@ export default function Sidebar() {
 										<span>Create Product</span>
 									</Link>
 								</li>
-								<li>
+								{/* <li>
 									<Link href={routes.expiredProducts}>
 										<i className="ti ti-progress-alert fs-16 me-2"></i>
 										<span>Expired Products</span>
 									</Link>
-								</li>
-								<li>
+								</li> */}
+								{/* <li>
 									<Link href={routes.lowStocks}>
 										<i className="ti ti-trending-up-2 fs-16 me-2"></i>
 										<span>Low Stocks</span>
 									</Link>
-								</li>
+								</li> */}
 								<li>
 									<Link href={routes.categoryList}>
 										<i className="ti ti-list-details fs-16 me-2"></i>
@@ -338,12 +338,12 @@ export default function Sidebar() {
 										<span>Sub Category</span>
 									</Link>
 								</li> */}
-								<li>
+								{/* <li>
 									<Link href={routes.brandList}>
 										<i className="ti ti-triangles fs-16 me-2"></i>
 										<span>Brands</span>
 									</Link>
-								</li>
+								</li> */}
 								{/* <li>
 									<Link href="units.html">
 										<i className="ti ti-brand-unity fs-16 me-2"></i>
@@ -380,26 +380,26 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Stock</h6>
 							<ul>
 								<li>
+									<Link href={routes.storeList}>
+										<i className="ti ti-home fs-16 me-2"></i>
+										<span>Store List</span>
+									</Link>
+								</li>
+								<li>
 									<Link href={routes.manageStocks}>
 										<i className="ti ti-stack-3 fs-16 me-2"></i>
 										<span>Manage Stocks</span>
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.stockAdjustment}>
+									<Link href={routes.editStockInfo}>
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
-										<span>Stock Adjustment</span>
-									</Link>
-								</li>
-								<li>
-									<Link href={routes.stockTransfer}>
-										<i className="ti ti-stack-pop fs-16 me-2"></i>
-										<span>Stock Transfer</span>
+										<span>Edit Stock Info</span>
 									</Link>
 								</li>
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Sales</h6>
 							<ul>
 								<li className="submenu">
@@ -417,25 +417,25 @@ export default function Sidebar() {
 										</li>
 									</ul>
 								</li>
-								{/* <li>
+								<li>
 									<Link href="invoice.html">
 										<i className="ti ti-file-invoice fs-16 me-2"></i>
 										<span>Invoices</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="sales-returns.html">
 										<i className="ti ti-receipt-refund fs-16 me-2"></i>
 										<span>Sales Return</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="quotation-list.html">
 										<i className="ti ti-files fs-16 me-2"></i>
 										<span>Quotation</span>
 									</Link>
-								</li> */}
-								{/* <li className="submenu">
+								</li>
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-device-laptop fs-16 me-2"></i>
 										<span>POS</span>
@@ -458,9 +458,9 @@ export default function Sidebar() {
 											<Link href="pos-5.html">POS 5</Link>
 										</li>
 									</ul>
-								</li> */}
+								</li>
 							</ul>
-						</li>
+						</li> */}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Promo</h6>
 							<ul>
@@ -626,10 +626,10 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">HRM</h6>
 							<ul>
 								<li>
-									<Link href={routes.employees}>
+									{/* <Link href={routes.employees}>
 										<i className="ti ti-user fs-16 me-2"></i>
 										<span>Employees</span>
-									</Link>
+									</Link> */}
 								</li>
 								<li>
 									<Link href={routes.tenantMembers}>

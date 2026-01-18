@@ -3,7 +3,6 @@
 import { CouponData } from '@/components/core/json/coupons';
 import AddCoupons from '@/components/inventory/modal/AddCoupons';
 import EditCoupons from '@/components/inventory/modal/EditCoupons';
-import Table from '@/components/pagination/datatable';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
@@ -201,9 +200,7 @@ export default function Coupons() {
 						</div>
 
 						<div className="card-body">
-							<div className="table-responsive">
-								<Table columns={columns} dataSource={dataSource} />
-							</div>
+							<div className="table-responsive">{/* <Table columns={columns} dataSource={dataSource} /> */}</div>
 						</div>
 					</div>
 					{/* /product list */}

@@ -295,9 +295,7 @@ export default function LowStockComponent() {
 										</div>
 									</div>
 									<div className="card-body">
-										<div className="table-responsive">
-											<Table columns={columns} dataSource={data} />
-										</div>
+										<div className="table-responsive">{/* <Table columns={columns} dataSource={data} /> */}</div>
 									</div>
 								</div>
 								{/* /product list */}
@@ -471,9 +469,7 @@ export default function LowStockComponent() {
 										</div>
 									</div>
 									<div className="card-body">
-										<div className="table-responsive">
-											<Table columns={columns} dataSource={data} />
-										</div>
+										<div className="table-responsive">{/* <Table columns={columns} dataSource={data} /> */}</div>
 									</div>
 								</div>
 								{/* /product list */}

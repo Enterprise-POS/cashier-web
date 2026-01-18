@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-	title: 'Enterprise POS - Manage Stock',
+	title: 'Store List',
 };
 
 export default function Layout({

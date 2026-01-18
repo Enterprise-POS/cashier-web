@@ -1,14 +1,14 @@
 'use client';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import Select from 'react-select';
 
-import { all_routes, all_routes as routes } from '@/components/core/data/all_routes';
+import { all_routes } from '@/components/core/data/all_routes';
 import Footer from '@/components/partials/footer';
 import SettingsSideBar from '@/components/setting_sidebar/SettingSidebar';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
-import Image from 'next/image.js';
 
 export default function LanguageSettings() {
 	const [isMounted, setIsMounted] = useState(false);

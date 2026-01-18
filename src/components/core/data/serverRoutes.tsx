@@ -30,4 +30,20 @@ export const serverRoutes = {
 	registerCategory: `${baseURL}/${apiVersion}/categories/register/<tenantId>`, // DELETE
 	unregisterCategory: `${baseURL}/${apiVersion}/categories/unregister/<tenantId>`, // DELETE
 	editItemCategory: `${baseURL}/${apiVersion}/categories/edit_item_category/<tenantId>`, // PUT
+
+	// store
+	getStores: `${baseURL}/${apiVersion}/stores/<tenantId>`, // GET
+	createNewStore: `${baseURL}/${apiVersion}/stores/<tenantId>`, // POST
+	setStoreActivate: `${baseURL}/${apiVersion}/stores/set_activate/<tenantId>`, // PUT
+
+	// store_stock
+	storeStocksGetAllV2: `${baseURL}/${apiVersion}/store_stocks/v2/<tenantId>`, // GET
+	transferStockToStoreStock: `${baseURL}/${apiVersion}/store_stocks/transfer_to_store_stock/<tenantId>`, // PUT
+	transferStockToWarehouse: `${baseURL}/${apiVersion}/store_stocks/transfer_to_warehouse/<tenantId>`, // PUT
+	editStoreStock: `${baseURL}/${apiVersion}/store_stocks/edit/<tenantId>`, // PUT
+
+	// order_item
+	orderItemSalesReport: `${baseURL}/${apiVersion}/order_items/sales_report/<tenantId>`, // POST
+	orderItemGetSearch: `${baseURL}/${apiVersion}/order_items/search/<tenantId>`, // POST
+	orderItemFindById: `${baseURL}/${apiVersion}/order_items/details/<tenantId>`, // GET
 };

@@ -1,3 +1,5 @@
+import { StockType } from '@/_interface/ItemDef';
+
 export interface CategoryDef {
 	id?: number;
 	category_name: string;
@@ -11,4 +13,5 @@ export interface CategoryWithItemDef {
 	item_id: number;
 	item_name: string;
 	stocks: number;
+	stock_type: StockType;
 }

@@ -21,7 +21,6 @@ export async function getActiveWarehouseItem(
 	nameQuery: string
 ): Promise<HTTPResult<{ itemDefs: ItemDef[]; count: number }>> {
 	const params = new URLSearchParams({
-		tenantId: tenantId.toString(),
 		limit: limit.toString(),
 		page: page.toString(),
 	});
@@ -220,6 +219,7 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 	const itemId: FormDataEntryValue | null = formData.get('itemId');
 	const itemName: FormDataEntryValue | null = formData.get('productName');
 	const quantity: FormDataEntryValue | null = formData.get('quantity');
+	const stockType: FormDataEntryValue | null = formData.get('stockType');
 
 	const convertedTenantId = convertTo.number(tenantId);
 	if (convertedTenantId === null) {
@@ -235,6 +235,13 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 		return { result: null, error: 'Please check input product name' };
 	}
 
+	if (typeof stockType !== 'string' || (stockType !== 'TRACKED' && stockType !== 'UNLIMITED')) {
+		return {
+			result: null,
+			error: 'Invalid stock type. Must be TRACKED or UNLIMITED',
+		};
+	}
+
 	// 0 is allowed value
 	const convertedQuantity = convertTo.number(quantity);
 	if (convertedQuantity === null) {
@@ -247,6 +254,7 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 			item: {
 				item_id: convertedItemId,
 				item_name: itemName.toString(),
+				stock_type: stockType.toString(),
 			},
 		};
 

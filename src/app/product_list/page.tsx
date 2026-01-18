@@ -3,6 +3,7 @@ import { Download } from 'react-feather';
 
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import Brand from '@/components/inventory/brand';
+import Footer from '@/components/partials/footer';
 import ProductList from '@/components/product_list/ProductList';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
@@ -11,7 +12,7 @@ import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 export default async function ProductListComponent({
 	searchParams,
 }: {
-	searchParams: { [key: string]: string | undefined };
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
 	const param = await searchParams;
 	const limit = Number(param.limit) || 10; // By default it's 10 warehouse items per page
@@ -48,6 +49,7 @@ export default async function ProductListComponent({
 				<ProductList limit={limit} page={page} />
 				<Brand />
 			</div>
+			<Footer />
 		</div>
 	);
 }

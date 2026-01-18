@@ -5,7 +5,7 @@ import { JSX, useEffect, useState } from 'react';
 export type DataTableColumn = {
 	title: string;
 	dataIndex: string;
-	sorter?: (a: any, b: any) => string | number;
+	sorter?: (a: any, b: any) => number;
 	render?: (a: any, b: any) => JSX.Element | string;
 	key?: string;
 };

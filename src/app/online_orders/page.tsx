@@ -293,7 +293,7 @@ export default function OnlineOrdersComponent() {
 						</div>
 						<div className="card-body">
 							<div className="custom-datatable-filter table-responsive">
-								<Table columns={columns} dataSource={dataSource} />
+								{/* <Table columns={columns} dataSource={dataSource} /> */}
 							</div>
 						</div>
 					</div>

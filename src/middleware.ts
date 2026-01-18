@@ -1,7 +1,7 @@
 import { jwtVerify } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-import { all_routes as routes } from './components/core/data/all_routes';
-import { Constants } from './components/core/data/constant';
+import { all_routes as routes } from '@/components/core/data/all_routes';
+import { Constants } from '@/components/core/data/constant';
 
 const publicRoute = [routes.login, routes.register];
 const protectedFromSignedInUser = [routes.login, routes.register];
@@ -39,7 +39,7 @@ export async function middleware(request: NextRequest) {
 		// Clone the request and attach custom header
 		const requestHeaders = new Headers(request.headers);
 		requestHeaders.set(Constants.HeaderKey.xEnterprisePayload, JSON.stringify(payload));
-		requestHeaders.set(Constants.HeaderKey.xEnterprisePayloadToken, token)
+		requestHeaders.set(Constants.HeaderKey.xEnterprisePayloadToken, token);
 
 		// Anything beyond could go through
 		return NextResponse.next({ request: { headers: requestHeaders } });
