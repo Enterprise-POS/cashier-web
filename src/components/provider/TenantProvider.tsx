@@ -2,7 +2,7 @@
 
 import { Tenant } from '@/_classes/Tenant';
 import { getTenantWithUser } from '@/_lib/action';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Constants } from '@/components/core/data/constant';
 
 export type TenantProviderState = {
@@ -30,6 +30,7 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 function TenantProvider({ children }: { children: React.ReactNode }) {
 	const [data, setTenantState] = useState<TenantProviderState>(initialState);
 	const [isStateLoading, setIsLoading] = useState(false);
+	const isFetchingRef = useRef(false); // Track fetch status immediately
 
 	function setCurrentTenant(id: number) {
 		if (id === 0) {
@@ -41,25 +42,30 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 	}
 
 	async function refetchGetTenants() {
+		if (isFetchingRef.current) return;
+		isFetchingRef.current = true; // Set immediately
 		setIsLoading(true);
 
-		const { result: tenantDefs, error } = await getTenantWithUser();
-		if (error !== null) {
-			if (error.includes('[LOGIN]')) {
-				setTenantState(val => ({ ...val, tenantList: [] }));
-				setIsLoading(false);
-				return;
-			} else {
-				console.warn(error);
-				setTenantState(val => ({ ...val, tenantList: [] }));
-				setIsLoading(false);
-				return;
-			}
-		}
+		try {
+			const { result: tenantDefs, error } = await getTenantWithUser();
 
-		const tenants = tenantDefs!.map(tenantDef => new Tenant(tenantDef));
-		setTenantState(val => ({ ...val, tenantList: tenants }));
-		setIsLoading(false);
+			if (error !== null) {
+				if (error.includes('[LOGIN]')) {
+					setTenantState(val => ({ ...val, tenantList: [] }));
+					return;
+				} else {
+					console.warn(error);
+					setTenantState(val => ({ ...val, tenantList: [] }));
+					return;
+				}
+			}
+
+			const tenants = tenantDefs!.map(tenantDef => new Tenant(tenantDef));
+			setTenantState(val => ({ ...val, tenantList: tenants }));
+		} finally {
+			setIsLoading(false);
+			isFetchingRef.current = false;
+		}
 	}
 
 	// When this page first open then this effect will run to fetch immediately user tenant
