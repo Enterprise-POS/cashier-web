@@ -47,7 +47,7 @@ export default function OverviewCards() {
 						<div className="ms-2">
 							<p className="fw-medium mb-1">Change</p>
 							<div>
-								<h3>{reportResult !== undefined ? setStringPrefix(reportResult.getChanges(), '￥') : ''}</h3>
+								<h3>{reportResult !== undefined ? setStringPrefix(reportResult.getChanges(), '￥') : '-'}</h3>
 							</div>
 						</div>
 					</div>

@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { GetSalesReport } from '@/_classes/HomeDashboardEvent';
 
 export default function SalesReport() {
-	const { data, selectedTenantId, isStateLoading, onEvent } = useHomeDashboard();
+	const { data, selectedTenantId, isStateLoading, onEvent, isError } = useHomeDashboard();
 	const pagination = data.pagination;
 	const dataSource = data.orderItems;
 
@@ -105,6 +105,29 @@ export default function SalesReport() {
 						onChange={newPagination => onEvent(new GetSalesReport(newPagination.current!, newPagination.pageSize!))}
 						dataSource={dataSource}
 					/>
+				</div>
+			</div>
+
+			{/* Error Toast */}
+			<div className="toast-container position-fixed bottom-0 end-0 p-3">
+				<div
+					id="liveToast"
+					className={`toast ${isError ? 'show' : ''} colored-toast bg-danger`}
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+				>
+					<div className="toast-header bg-danger text-fixed-white">
+						<strong className="me-auto">Warning</strong>
+						<button
+							type="button"
+							className="btn-close"
+							data-bs-dismiss="toast"
+							aria-label="Close"
+							onClick={() => {}}
+						></button>
+					</div>
+					<div className="toast-body">Something wrong while get report :( Please try again later</div>
 				</div>
 			</div>
 		</div>
