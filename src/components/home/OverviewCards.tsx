@@ -1,3 +1,4 @@
+'use client';
 import { setStringPrefix } from '@/_lib/utils';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 

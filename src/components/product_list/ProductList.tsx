@@ -2,7 +2,7 @@
 import { Input, Table, TablePaginationConfig, Tooltip } from 'antd';
 import Link from 'next/link';
 import { startTransition, useEffect, useOptimistic, useState } from 'react';
-import { Edit, Eye, Trash2 } from 'react-feather';
+import { Edit, Trash2 } from 'react-feather';
 
 import { Item } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
@@ -143,7 +143,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					selectedTenant.id,
 					limit,
 					page,
-					nameQuery
+					nameQuery,
 				);
 				if (error !== null) {
 					formState.setError({ message: error });
@@ -534,7 +534,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 											handleRemoveItem(
 												currentDeleteModalData?.name ?? '',
 												currentDeleteModalData?.itemId ?? 0,
-												data.selectedTenantId
+												data.selectedTenantId,
 											)
 										}
 									>

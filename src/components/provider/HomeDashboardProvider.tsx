@@ -12,6 +12,14 @@ import { orderItemGetSearch, orderItemSalesReport } from '@/_lib/order_item';
 import { useFormState } from '@/components/hooks/useFormState';
 import { useStore } from '@/components/provider/StoreProvider';
 import { convertTo } from '@/_lib/utils';
+import {
+	GetSalesReport,
+	HomeDashboardEvent,
+	OnChangeSelectedStore,
+	OnClickGenerateReport,
+	OnDateRangeOk,
+	OnSetDateRange,
+} from '@/_classes/HomeDashboardEvent';
 
 const todayStart = dayjs().startOf('day');
 const todayEnd = dayjs().endOf('day');
@@ -34,11 +42,7 @@ type HomeDashboardContextType = {
 	isError: boolean;
 	selectedTenantId: number;
 	stores: { value: string; label: string }[];
-	onDateRangeOk: (value: DatePickerProps['value'] | RangePickerProps['value']) => void;
-	onSetDateRange: (value: [dayjs.Dayjs | null, dayjs.Dayjs | null], dateString: [string, string]) => void;
-	getSalesReport: (page: number, limit: number) => void;
-	onClickGenerateReport: () => void;
-	onChangeSelectedStore: (storeId: string) => void;
+	onEvent: (event: HomeDashboardEvent) => void;
 };
 
 const initialState: HomeDashboardState = {
@@ -69,15 +73,8 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 
 	const [homeDashboardState, setHomeDashboardState] = useState<HomeDashboardState>(initialState);
 	const formState = useFormState();
-	const onDateRangeOk = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
-		//console.log('onOk: ', value);
-	};
-	const onSetDateRange = (value: [dayjs.Dayjs | null, dayjs.Dayjs | null], dateString: [string, string]) => {
-		//console.log(value, dateString);
-		setHomeDashboardState(v => ({ ...v, dateRanges: value }));
-	};
 
-	async function _getSummaryInit() {
+	async function _getSummaryInit(page: number, limit: number) {
 		if (formState.state.isFormLoading) return;
 		formState.setFormLoading(true);
 		const dateFilter: DateFilter = {
@@ -90,8 +87,9 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 			// Fetch both in parallel
 			const [salesResult, orderItemsResult] = await Promise.all([
 				orderItemSalesReport(storeCtx.getCurrentTenantId(), homeDashboardState.selectedStoreId, dateFilter),
-				orderItemGetSearch(storeCtx.getCurrentTenantId(), homeDashboardState.selectedStoreId, 20, 1, dateFilter),
+				orderItemGetSearch(storeCtx.getCurrentTenantId(), homeDashboardState.selectedStoreId, limit, page, dateFilter),
 			]);
+
 			// Check for errors
 			const error = salesResult.error || orderItemsResult.error;
 			if (error) {
@@ -101,9 +99,13 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 			} else {
 				setHomeDashboardState(v => ({
 					...v,
-					pagination: initialState.pagination,
+					pagination: {
+						current: page,
+						pageSize: limit,
+						total: orderItemsResult.result!.total_count,
+					},
 					reportResult: new ReportResult(salesResult.result!),
-					orderItems: orderItemsResult.result!.map(def => new OrderItem(def)),
+					orderItems: orderItemsResult.result!.defs.map(def => new OrderItem(def)),
 				}));
 				formState.setSuccess({ message: 'ok' });
 			}
@@ -115,54 +117,90 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 		}
 	}
 
-	async function getSalesReport(page: number, limit: number) {
-		if (formState.state.isFormLoading) return;
-		formState.setFormLoading(true);
-		const dateFilter: DateFilter = {
-			column: 'created_at' as const,
-			start_date: homeDashboardState.dateRanges[0]?.unix() ?? null,
-			end_date: homeDashboardState.dateRanges[1]?.unix() ?? null,
-		};
-
-		try {
-			// Fetch both in parallel
-			const { result, error } = await orderItemGetSearch(storeCtx.getCurrentTenantId(), 0, limit, page, dateFilter);
-			// Check for errors
-			if (error) {
-				setHomeDashboardState(initialState);
-				formState.setError({ message: error });
-				return;
-			} else {
-				setHomeDashboardState(v => ({
-					...v,
-					orderItems: result!.map(def => new OrderItem(def)),
-				}));
-				formState.setSuccess({ message: 'ok' });
-			}
-		} catch (err: unknown) {
-			const error = err as Error;
-			formState.setError({ message: error.message });
-		} finally {
-			formState.setFormLoading(false);
+	async function onEvent(event: HomeDashboardEvent) {
+		if (event instanceof OnDateRangeOk) {
+			const value = event.value;
+			return;
 		}
-	}
 
-	async function onClickGenerateReport() {
-		await _getSummaryInit();
-		setHomeDashboardState(v => ({ ...v, pagination: initialState.pagination }));
-	}
+		if (event instanceof OnSetDateRange) {
+			const value = event.value;
+			const dateString = event.dateString;
 
-	async function onChangeSelectedStore(storeId: string) {
-		const value = convertTo.number(storeId);
-		if (value === null) return;
+			//console.log(value, dateString);
+			setHomeDashboardState(v => ({ ...v, dateRanges: value }));
+			return;
+		}
 
-		setHomeDashboardState(v => ({ ...v, selectedStoreId: value }));
+		if (event instanceof GetSalesReport) {
+			const page = event.page;
+			const limit = event.limit;
+
+			if (formState.state.isFormLoading) return;
+			formState.setFormLoading(true);
+			const dateFilter: DateFilter = {
+				column: 'created_at' as const,
+				start_date: homeDashboardState.dateRanges[0]?.unix() ?? null,
+				end_date: homeDashboardState.dateRanges[1]?.unix() ?? null,
+			};
+
+			try {
+				// Fetch both in parallel
+				const { result, error } = await orderItemGetSearch(
+					storeCtx.getCurrentTenantId(),
+					homeDashboardState.selectedStoreId,
+					limit,
+					page,
+					dateFilter,
+				);
+
+				// Check for errors
+				if (error) {
+					setHomeDashboardState(initialState);
+					formState.setError({ message: error });
+					return;
+				} else {
+					setHomeDashboardState(v => ({
+						...v,
+						pagination: {
+							current: page,
+							pageSize: limit,
+							total: result!.total_count,
+						},
+						orderItems: result!.defs.map(def => new OrderItem(def)),
+					}));
+					formState.setSuccess({ message: 'ok' });
+				}
+			} catch (err: unknown) {
+				const error = err as Error;
+				formState.setError({ message: error.message });
+			} finally {
+				formState.setFormLoading(false);
+			}
+			return;
+		}
+
+		if (event instanceof OnClickGenerateReport) {
+			// When user click generate report it will reset the pagination
+			setHomeDashboardState(v => ({ ...v, pagination: initialState.pagination }));
+			await _getSummaryInit(1, 20);
+			return;
+		}
+
+		if (event instanceof OnChangeSelectedStore) {
+			const value = convertTo.number(event.storeId);
+			if (value === null) return;
+			setHomeDashboardState(v => ({ ...v, selectedStoreId: value }));
+			return;
+		}
+
+		throw new Error('Unexpected user input');
 	}
 
 	useEffect(() => {
 		// If selected tenant is 0, we know tenant ctx is not ready
 		if (storeCtx.getCurrentTenantId() === 0) return;
-		_getSummaryInit();
+		_getSummaryInit(1, 20);
 	}, [storeCtx.getCurrentTenantId()]);
 
 	return (
@@ -173,11 +211,7 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 				isError: formState.state.isError,
 				selectedTenantId: storeCtx.getCurrentTenantId(),
 				stores,
-				onDateRangeOk,
-				onSetDateRange,
-				getSalesReport,
-				onChangeSelectedStore,
-				onClickGenerateReport,
+				onEvent,
 			}}
 		>
 			{children}

@@ -1,18 +1,23 @@
+'use client';
+import { Table, Tooltip } from 'antd';
 import Link from 'next/link';
+import { Eye } from 'react-feather';
+import dayjs from 'dayjs';
 
 import { OrderItem } from '@/_classes/OrderItem';
-import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
-import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 import { all_routes as routes } from '@/components/core/data/all_routes';
-
-import { Table, Tooltip } from 'antd';
-import { Eye } from 'react-feather';
+import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
+import { useState, useEffect } from 'react';
+import { GetSalesReport } from '@/_classes/HomeDashboardEvent';
 
 export default function SalesReport() {
-	const { data, getSalesReport, selectedTenantId } = useHomeDashboard();
+	const { data, selectedTenantId, isStateLoading, onEvent } = useHomeDashboard();
 	const pagination = data.pagination;
 	const dataSource = data.orderItems;
-	const currentSelectedTenantId = selectedTenantId;
+
+	const [isMounted, setIsMounted] = useState(false);
+	useEffect(() => setIsMounted(true), []);
+	if (!isMounted) return null;
 
 	const columns = [
 		{
@@ -45,7 +50,7 @@ export default function SalesReport() {
 			title: 'Date',
 			dataIndex: 'createdAt',
 			sorter: (a: OrderItem, b: OrderItem) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (id: number, orderItem: OrderItem) => orderItem.createdAt.toLocaleString(navigator.language),
+			render: (id: number, orderItem: OrderItem) => dayjs(orderItem.createdAt).format('ddd D MMM, YYYY - h:mm A'),
 		},
 		{
 			title: 'Action',
@@ -53,7 +58,7 @@ export default function SalesReport() {
 			render: (id: number) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
-						<Tooltip title={`See transactions detail. (${id})`} placement="bottom">
+						<Tooltip title={`See transactions detail (${id})`} placement="left">
 							<Link className="me-2 p-2" href={routes.salesReportDetail + `/${id}?tenant_id=${selectedTenantId}`}>
 								<Eye />
 							</Link>
@@ -94,9 +99,10 @@ export default function SalesReport() {
 				<div className="table-responsive">
 					<Table<OrderItem>
 						rowKey={'id'}
+						loading={isStateLoading}
 						pagination={pagination}
 						columns={columns}
-						onChange={newPagination => getSalesReport(newPagination.current!, newPagination.pageSize!)}
+						onChange={newPagination => onEvent(new GetSalesReport(newPagination.current!, newPagination.pageSize!))}
 						dataSource={dataSource}
 					/>
 				</div>

@@ -101,7 +101,7 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 									{setStringPrefix(orderItem.purchasedPrice - orderItem.totalAmount, '￥')}
 								</p>
 							</div>
-							<p className="fs-12">Amount in Words : Dollar Five thousand Seven Seventy Five</p>
+							{/* <p className="fs-12">Amount in Words : Dollar Five thousand Seven Seventy Five</p> */}
 						</div>
 					</div>
 					<div className="row align-items-center border-bottom mb-3">
