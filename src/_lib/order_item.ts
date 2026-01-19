@@ -14,7 +14,7 @@ import { PurchasedItemDef } from '@/_interface/PurchasedItemDef.js';
 export async function orderItemSalesReport(
 	tenantId: number,
 	storeId: number | null,
-	dateFilter: DateFilter | null
+	dateFilter: DateFilter | null,
 ): Promise<HTTPResult<ReportResultDef>> {
 	try {
 		const userCookies = await cookies();
@@ -78,8 +78,8 @@ export async function orderItemGetSearch(
 	storeId: number,
 	limit: number,
 	page: number,
-	dateFilter: DateFilter | null
-): Promise<HTTPResult<OrderItemDef[]>> {
+	dateFilter: DateFilter | null,
+): Promise<HTTPResult<{ defs: OrderItemDef[]; total_count: number }>> {
 	try {
 		const userCookies = await cookies();
 
@@ -125,10 +125,11 @@ export async function orderItemGetSearch(
 		}
 
 		// 200 Ok
-		const successResponse: HTTPSuccessResponse<{ order_items: OrderItemDef[] }> = await response.json();
+		const successResponse: HTTPSuccessResponse<{ order_items: OrderItemDef[]; total_count: number }> =
+			await response.json();
 		const orderItemDefs = successResponse.data.order_items;
 
-		return { result: orderItemDefs, error: null };
+		return { result: { defs: orderItemDefs, total_count: successResponse.data.total_count }, error: null };
 	} catch (error) {
 		if (error instanceof Error) {
 			console.error(error);
@@ -147,7 +148,7 @@ export type OrderItemFindByIdReturnType = {
 };
 export async function orderItemFindById(
 	id: number,
-	tenantId: number
+	tenantId: number,
 ): Promise<HTTPResult<OrderItemFindByIdReturnType>> {
 	const params = new URLSearchParams({
 		order_item_id: id.toString(),

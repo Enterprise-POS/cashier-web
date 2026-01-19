@@ -1,16 +1,19 @@
 'use client';
 
-import Select, { ActionMeta, OnChangeValue, SingleValue } from 'react-select';
+import Select from 'react-select';
 
 export default function SelectVariety({
 	options,
+	disabled = false,
 	onChange,
 }: {
 	options: any;
+	disabled: boolean;
 	onChange: (newValue: any, actionMeta: any) => void;
 }) {
 	return (
 		<Select
+			isDisabled={disabled}
 			onChange={onChange}
 			classNamePrefix="react-select"
 			options={options}
@@ -28,8 +31,8 @@ export default function SelectVariety({
 					backgroundColor: isSelected
 						? '#fe9f43' // orange when selected
 						: isFocused
-						? '#fe9f43' // also orange when hovered
-						: 'white',
+							? '#fe9f43' // also orange when hovered
+							: 'white',
 					color: isSelected || isFocused ? 'white' : '#333',
 					cursor: isDisabled ? 'not-allowed' : 'default',
 				}),

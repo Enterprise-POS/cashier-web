@@ -1,7 +1,14 @@
-import { DatePicker } from 'antd';
+'use client';
+import { ConfigProvider, DatePicker } from 'antd';
+import { useEffect, useState } from 'react';
 const { RangePicker } = DatePicker;
 
-import { convertTo } from '@/_lib/utils';
+import {
+	OnChangeSelectedStore,
+	OnClickGenerateReport,
+	OnDateRangeOk,
+	OnSetDateRange,
+} from '@/_classes/HomeDashboardEvent';
 import SelectVariety from '@/components/inventory/selectVariety';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
@@ -9,10 +16,15 @@ export default function ReportFilters() {
 	const dashboardCtx = useHomeDashboard();
 	const stores = dashboardCtx.stores;
 	const dateRange = dashboardCtx.data.dateRanges;
-	const onOk = dashboardCtx.onDateRangeOk;
-	const onSetDateRange = dashboardCtx.onSetDateRange;
-	const onClickGenerateReport = dashboardCtx.onClickGenerateReport;
-	const onChangeSelectedStore = dashboardCtx.onChangeSelectedStore;
+	const isStateLoading = dashboardCtx.isStateLoading;
+	const onEvent = dashboardCtx.onEvent;
+
+	// Because we use Date object from backend, we need to prevent hydration
+	// by checking if the the component already mounted or not
+	const [isMounted, setIsMounted] = useState(false);
+
+	useEffect(() => setIsMounted(true), []);
+	if (!isMounted) return null;
 
 	return (
 		<div className="card border-0">
@@ -25,18 +37,21 @@ export default function ReportFilters() {
 									<div className="mb-3 d-flex flex-column">
 										<label className="form-label">Choose Date&nbsp;</label>
 										<div style={{ height: '38px' }}>
-											<RangePicker
-												value={dateRange}
-												showTime={{ format: 'HH:mm' }}
-												format="YYYY-MM-DD HH:mm"
-												onChange={(dates, dateString) => {
-													if (dates) {
-														onSetDateRange([dates[0], dates[1]], dateString);
-													}
-												}}
-												onOk={onOk}
-												className="h-100"
-											/>
+											<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
+												<RangePicker
+													value={dateRange}
+													showTime={{ format: 'HH:mm' }} // Will allow user to select date with hours and minute
+													format="YYYY-MM-DD HH:mm"
+													onChange={(dates, dateString) => {
+														if (dates) {
+															onEvent(new OnSetDateRange([dates[0], dates[1]], dateString));
+														}
+													}}
+													disabled={isStateLoading}
+													onOk={v => onEvent(new OnDateRangeOk(v))}
+													className="h-100"
+												/>
+											</ConfigProvider>
 										</div>
 									</div>
 								</div>
@@ -44,7 +59,8 @@ export default function ReportFilters() {
 									<div className="mb-3">
 										<label className="form-label">Store</label>
 										<SelectVariety
-											onChange={newValue => onChangeSelectedStore(newValue.value)}
+											disabled={isStateLoading}
+											onChange={newValue => onEvent(new OnChangeSelectedStore(newValue.value))}
 											options={[...stores, { value: '0', label: 'Unselect' }]}
 										/>
 									</div>
@@ -59,8 +75,13 @@ export default function ReportFilters() {
 						</div>
 						<div className="col-lg-2">
 							<div className="mb-3">
-								<button className="btn btn-primary w-100" type="button" onClick={onClickGenerateReport}>
-									Generate Report
+								<button
+									className="btn btn-primary w-100"
+									type="button"
+									disabled={isStateLoading}
+									onClick={() => onEvent(new OnClickGenerateReport())}
+								>
+									{isStateLoading ? 'Generating...' : 'Generate Report'}
 								</button>
 							</div>
 						</div>
