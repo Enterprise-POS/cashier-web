@@ -11,7 +11,7 @@ import { StockType } from '@/_interface/ItemDef';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { editStoreStock, getAllV2 } from '@/_lib/store_stock';
 import { closeBootstrapModal, convertTo } from '@/_lib/utils';
-import EditAdjustment from '@/components/edit_stock_info/EditAdjustment';
+import EditAdjustment from '@/components/edit_store_products/EditAdjustment';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useStore } from '@/components/provider/StoreProvider';
@@ -36,10 +36,10 @@ export default function EditStockInfoComponent() {
 	const [tobeEditStoreStock, setTobeEditStoreStock] = useState<StoreStockV2>();
 
 	const selectedTenant: Tenant | undefined = tenantCtx.data.tenantList.find(
-		tenant => tenant.id === tenantCtx.data.selectedTenantId
+		tenant => tenant.id === tenantCtx.data.selectedTenantId,
 	);
 	const selectedStore: Store | undefined = storeCtx.data.storeList.find(
-		store => store.id === storeCtx.data.selectedStoreId
+		store => store.id === storeCtx.data.selectedStoreId,
 	);
 
 	useEffect(() => setIsMounted(true), []);
@@ -117,7 +117,7 @@ export default function EditStockInfoComponent() {
 				tenantId,
 				pagination.current!,
 				limit,
-				search
+				search,
 			);
 			if (error !== null) {
 				// A special condition that maybe user not yet transfer any warehouse items
@@ -176,9 +176,9 @@ export default function EditStockInfoComponent() {
 										stocks: storeStock.stocks,
 										price: convertedPrice,
 										created_at: storeStock.createdAt.toString(),
-								  })
-								: storeStock
-						)
+									})
+								: storeStock,
+						),
 					);
 					formState.setSuccess({ message: 'Edited successfully' });
 					closeBootstrapModal('#edit-units [data-bs-dismiss="modal"]');

@@ -8,10 +8,10 @@ import { OrderItem } from '@/_classes/OrderItem';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 import { useState, useEffect } from 'react';
-import { GetSalesReport } from '@/_classes/HomeDashboardEvent';
+import { GetSalesReport, OnClickErrorToastCloseButton } from '@/_classes/HomeDashboardEvent';
 
 export default function SalesReport() {
-	const { data, selectedTenantId, isStateLoading, onEvent, isError } = useHomeDashboard();
+	const { data, selectedTenantId, isStateLoading, onEvent, isError, errorMessage } = useHomeDashboard();
 	const pagination = data.pagination;
 	const dataSource = data.orderItems;
 
@@ -112,7 +112,7 @@ export default function SalesReport() {
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
 					id="liveToast"
-					className={`toast ${isError ? 'show' : ''} colored-toast bg-danger`}
+					className={`toast ${isError ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -124,10 +124,16 @@ export default function SalesReport() {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => {}}
+							onClick={() => {
+								onEvent(new OnClickErrorToastCloseButton());
+							}}
 						></button>
 					</div>
-					<div className="toast-body">Something wrong while get report :( Please try again later</div>
+					<div className="toast-body">
+						{isError && errorMessage.length > 0
+							? errorMessage
+							: 'Something wrong while get report :( Please try again later'}
+					</div>
 				</div>
 			</div>
 		</div>

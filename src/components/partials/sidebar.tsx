@@ -392,9 +392,9 @@ export default function Sidebar() {
 									</Link>
 								</li>
 								<li>
-									<Link href={routes.editStockInfo}>
+									<Link href={routes.editStoreProducts}>
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
-										<span>Edit Stock Info</span>
+										<span>Edit Store Products</span>
 									</Link>
 								</li>
 							</ul>
@@ -461,7 +461,7 @@ export default function Sidebar() {
 								</li>
 							</ul>
 						</li> */}
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Promo</h6>
 							<ul>
 								<li>
@@ -470,13 +470,13 @@ export default function Sidebar() {
 										<span>Coupons</span>
 									</Link>
 								</li>
-								{/* <li>
+								<li>
 									<Link href="gift-cards.html">
 										<i className="ti ti-cards fs-16 me-2"></i>
 										<span>Gift Cards</span>
 									</Link>
-								</li> */}
-								{/* <li className="submenu">
+								</li>
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-file-percent fs-16 me-2"></i>
 										<span>Discount</span>
@@ -490,9 +490,9 @@ export default function Sidebar() {
 											<Link href="discount.html">Discount</Link>
 										</li>
 									</ul>
-								</li> */}
+								</li>
 							</ul>
-						</li>
+						</li> */}
 						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Purchases</h6>
 							<ul>
@@ -587,7 +587,7 @@ export default function Sidebar() {
 								</li>
 							</ul>
 						</li> */}
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Peoples</h6>
 							<ul>
 								<li>
@@ -596,32 +596,32 @@ export default function Sidebar() {
 										<span>Customers</span>
 									</Link>
 								</li>
-								{/* <li>
+								<li>
 									<Link href="billers.html">
 										<i className="ti ti-user-up fs-16 me-2"></i>
 										<span>Billers</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="suppliers.html">
 										<i className="ti ti-user-dollar fs-16 me-2"></i>
 										<span>Suppliers</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="store-list.html">
 										<i className="ti ti-home-bolt fs-16 me-2"></i>
 										<span>Stores</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="warehouse.html">
 										<i className="ti ti-archive fs-16 me-2"></i>
 										<span>Warehouses</span>
 									</Link>
-								</li> */}
+								</li>
 							</ul>
-						</li>
+						</li> */}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">HRM</h6>
 							<ul>
@@ -711,7 +711,7 @@ export default function Sidebar() {
 								</li> */}
 							</ul>
 						</li>
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Reports</h6>
 							<ul>
 								<li className="submenu">
@@ -741,7 +741,7 @@ export default function Sidebar() {
 										<span>Purchase report</span>
 									</Link>
 								</li>
-								{/* <li className="submenu">
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-triangle-inverted fs-16 me-2"></i>
 										<span>Inventory Report</span>
@@ -758,14 +758,14 @@ export default function Sidebar() {
 											<Link href="sold-stock.html">Sold Stock</Link>
 										</li>
 									</ul>
-								</li> */}
+								</li>
 								<li>
 									<Link href={routes.invoiceReport}>
 										<i className="ti ti-businessplan fs-16 me-2"></i>
 										<span>Invoice Report</span>
 									</Link>
 								</li>
-								{/* <li className="submenu">
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-user-star fs-16 me-2"></i>
 										<span>Supplier Report</span>
@@ -779,8 +779,8 @@ export default function Sidebar() {
 											<Link href="supplier-due-report.html">Supplier Due Report</Link>
 										</li>
 									</ul>
-								</li> */}
-								{/* <li className="submenu">
+								</li>
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-report fs-16 me-2"></i>
 										<span>Customer Report</span>
@@ -794,8 +794,8 @@ export default function Sidebar() {
 											<Link href="customer-due-report.html">Customer Due Report</Link>
 										</li>
 									</ul>
-								</li> */}
-								{/* <li className="submenu">
+								</li>
+								<li className="submenu">
 									<Link href="#">
 										<i className="ti ti-report-analytics fs-16 me-2"></i>
 										<span>Product Report</span>
@@ -812,25 +812,25 @@ export default function Sidebar() {
 											<Link href="product-quantity-alert.html">Product Quantity Alert</Link>
 										</li>
 									</ul>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="expense-report.html">
 										<i className="ti ti-file-vector fs-16 me-2"></i>
 										<span>Expense Report</span>
 									</Link>
-								</li> */}
+								</li>
 								<li>
 									<Link href={routes.incomeReport}>
 										<i className="ti ti-chart-ppf fs-16 me-2"></i>
 										<span>Income Report</span>
 									</Link>
 								</li>
-								{/* <li>
+								<li>
 									<Link href="tax-reports.html">
 										<i className="ti ti-chart-dots-2 fs-16 me-2"></i>
 										<span>Tax Report</span>
 									</Link>
-								</li> */}
+								</li>
 								<li>
 									<Link href={routes.profitAndLoss}>
 										<i className="ti ti-chart-donut fs-16 me-2"></i>
@@ -844,7 +844,7 @@ export default function Sidebar() {
 									</Link>
 								</li>
 							</ul>
-						</li>
+						</li> */}
 						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Content (CMS)</h6>
 							<ul>
@@ -913,7 +913,7 @@ export default function Sidebar() {
 								</li>
 							</ul>
 						</li> */}
-						<li className="submenu-open">
+						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">User Management</h6>
 							<ul>
 								<li>
@@ -922,20 +922,20 @@ export default function Sidebar() {
 										<span>Users</span>
 									</Link>
 								</li>
-								{/* <li>
+								<li>
 									<Link href="roles-permissions.html">
 										<i className="ti ti-jump-rope fs-16 me-2"></i>
 										<span>Roles & Permissions</span>
 									</Link>
-								</li> */}
-								{/* <li>
+								</li>
+								<li>
 									<Link href="delete-account.html">
 										<i className="ti ti-trash-x fs-16 me-2"></i>
 										<span>Delete Account Request</span>
 									</Link>
-								</li> */}
+								</li>
 							</ul>
-						</li>
+						</li> */}
 						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Pages</h6>
 							<ul>
@@ -1097,7 +1097,7 @@ export default function Sidebar() {
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Settings</h6>
 							<ul>
-								<li className="submenu">
+								{/* <li className="submenu">
 									<Link href="#">
 										<i className="ti ti-settings fs-16 me-2"></i>
 										<span>General Settings</span>
@@ -1107,31 +1107,31 @@ export default function Sidebar() {
 										<li>
 											<Link href={routes.profileSettings}>Profile</Link>
 										</li>
-										{/* <li>
+										<li>
 											<Link href="security-settings.html">Security</Link>
-										</li> */}
-										{/* <li>
+										</li>
+										<li>
 											<Link href="notification.html">Notifications</Link>
-										</li> */}
-										{/* <li>
+										</li>
+										<li>
 											<Link href="connected-apps.html">Connected Apps</Link>
-										</li> */}
+										</li>
 									</ul>
-								</li>
-								<li className="submenu">
+								</li> */}
+								{/* <li className="submenu">
 									<Link href="#">
 										<i className="ti ti-world fs-16 me-2"></i>
 										<span>Website Settings</span>
 										<span className="menu-arrow"></span>
 									</Link>
 									<ul>
-										{/* <li>
+										<li>
 											<Link href="system-settings.html">System Settings</Link>
-										</li> */}
+										</li>
 										<li>
 											<Link href="company-settings.html">Company Settings </Link>
 										</li>
-										{/* <li>
+										<li>
 											<Link href="localization-settings.html">Localization</Link>
 										</li>
 										<li>
@@ -1145,12 +1145,12 @@ export default function Sidebar() {
 										</li>
 										<li>
 											<Link href="social-authentication.html">Social Authentication</Link>
-										</li> */}
+										</li>
 										<li>
 											<Link href={routes.languageSettings}>Language</Link>
 										</li>
 									</ul>
-								</li>
+								</li> */}
 								{/* <li className="submenu">
 									<Link href="#">
 										<i className="ti ti-device-mobile fs-16 me-2"></i> <span>App Settings</span>

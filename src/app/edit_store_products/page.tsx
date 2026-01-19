@@ -1,6 +1,6 @@
 'use client';
 
-import EditStockInfoComponent from '@/components/edit_stock_info/EditStockInfoComponent';
+import EditStockInfoComponent from '@/components/edit_store_products/EditStockInfoComponent';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';

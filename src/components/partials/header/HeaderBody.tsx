@@ -1,7 +1,10 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { Layout } from 'react-feather';
 
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import TenantFloatingMenu from '@/components/partials/header/TenantFloatingMenu';
@@ -10,10 +13,57 @@ const excludedPathnames = [routes.login, routes.register];
 
 export default function HeaderBody({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
+	const [searchInput, setSearchInput] = useState('');
+	const searchInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		function isInputFocused() {
+			const activeElement = document.activeElement;
+			return (
+				activeElement?.tagName === 'INPUT' ||
+				activeElement?.tagName === 'TEXTAREA' ||
+				activeElement?.getAttribute('contenteditable') === 'true'
+			);
+		}
+
+		function handleKeyDown(event: KeyboardEvent) {
+			// Listen for '/' key like GitHub/Discord
+			if (event.key === '/' && !isInputFocused()) {
+				event.preventDefault(); // Prevent '/' from being typed
+				searchInputRef.current?.focus();
+
+				const dropdownToggle = document.getElementById('dropdownMenuClickable');
+				if (dropdownToggle) {
+					dropdownToggle.click(); // Simulate click to open dropdown
+				}
+			}
+		}
+
+		// Add event listener
+		window.addEventListener('keydown', handleKeyDown);
+
+		// Cleanup
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown);
+		};
+	}, []);
 
 	if (excludedPathnames.includes(pathname)) {
 		return null;
 	}
+
+	const pageList = [
+		['Home', routes.index],
+		['Add Product', routes.addProduct],
+		['Category', routes.categoryList],
+		['Store List', routes.storeList],
+		['New Tenant', routes.newTenant],
+		['Manage Stocks', routes.manageStocks],
+		['Edit Store Products', routes.editStoreProducts],
+		['Tenant Members', routes.tenantMembers],
+	];
+
+	const searchedPages = searchInput !== '' ? pageList.filter(page => page[0].includes(searchInput)) : pageList;
 
 	return (
 		<div className="header">
@@ -55,7 +105,14 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 									data-bs-toggle="dropdown"
 									data-bs-auto-close="outside"
 								>
-									<input type="text" placeholder="Search" id="searchInputs" />
+									<input
+										ref={searchInputRef}
+										type="text"
+										placeholder="Search"
+										id="searchInputs"
+										value={searchInput}
+										onChange={e => setSearchInput(e.target.value)}
+									/>
 									<div className="search-addon">
 										<span>
 											<i className="ti ti-search"></i>
@@ -63,12 +120,12 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 									</div>
 									<span className="input-group-text">
 										<kbd className="d-flex align-items-center">
-											<Image src="/assets/img/icons/command.svg" alt="img" className="me-1" width={10} height={10} />K
+											<Image src="/assets/img/icons/command.svg" alt="img" className="me-1" width={10} height={10} />/
 										</kbd>
 									</span>
 								</div>
 								<div className="dropdown-menu search-dropdown" aria-labelledby="dropdownMenuClickable">
-									<div className="search-info">
+									{/* <div className="search-info">
 										<h6>
 											<span>
 												<i data-feather="search" className="feather-16"></i>
@@ -86,8 +143,8 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 												<a href="#">Applications</a>
 											</li>
 										</ul>
-									</div>
-									<div className="search-info">
+									</div> */}
+									{/* <div className="search-info">
 										<h6>
 											<span>
 												<i data-feather="help-circle" className="feather-16"></i>
@@ -96,40 +153,21 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 										</h6>
 										<p>How to Change Product Volume from 0 to 200 on Inventory management</p>
 										<p>Change Product Name</p>
-									</div>
+									</div> */}
 									<div className="search-info">
 										<h6>
 											<span>
-												<i data-feather="user" className="feather-16"></i>
+												<Layout data-feather="user" className="feather-16"></Layout>
 											</span>
-											Customers
+											Pages
 										</h6>
 										<ul className="customers">
-											<li>
-												<a href="#">
-													Aron Varu
-													<Image
-														src="/assets/img/profiles/avator1.jpg"
-														alt="Img"
-														className="img-fluid"
-														width={30}
-														height={30}
-													/>
-												</a>
-											</li>
-											<li>
-												<a href="#">
-													Jonita
-													<Image
-														src="/assets/img/profiles/avatar-01.jpg"
-														alt="Img"
-														className="img-fluid"
-														width={30}
-														height={30}
-													/>
-												</a>
-											</li>
-											<li>
+											{searchedPages.map(page => (
+												<li key={page[1]}>
+													<Link href={page[1]}>{page[0]}</Link>
+												</li>
+											))}
+											{/* <li>
 												<a href="#">
 													Aaron
 													<Image
@@ -140,7 +178,7 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 														height={30}
 													/>
 												</a>
-											</li>
+											</li> */}
 										</ul>
 									</div>
 								</div>
@@ -176,7 +214,7 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 									</a>
 								</div>
 								<div className="col-md-2">
-									<a href={routes.categoryList} className="link-item">
+									<a href={routes.manageStocks} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-shopping-bag"></i>
 										</span>
@@ -216,11 +254,11 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 									</a>
 								</div> */}
 								<div className="col-md-2">
-									<a href={routes.users} className="link-item">
+									<a href={routes.tenantMembers} className="link-item">
 										<span className="link-icon">
 											<i className="ti ti-user"></i>
 										</span>
-										<p>Users</p>
+										<p>Members</p>
 									</a>
 								</div>
 								<div className="col-md-2">
@@ -259,14 +297,14 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 						</div>
 					</li>
 
-					<li className="nav-item pos-nav">
+					{/* <li className="nav-item pos-nav">
 						<a href="pos.html" className="btn btn-dark btn-md d-inline-flex align-items-center">
 							<i className="ti ti-device-laptop me-1"></i>POS
 						</a>
-					</li>
+					</li> */}
 
 					{/* <!-- Flag --> */}
-					<li className="nav-item dropdown has-arrow flag-nav nav-item-box">
+					{/* <li className="nav-item dropdown has-arrow flag-nav nav-item-box">
 						<a className="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">
 							<i className="ti ti-language"></i>
 						</a>
@@ -284,7 +322,7 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 								Indonesia
 							</a>
 						</div>
-					</li>
+					</li> */}
 					{/* <!-- /Flag --> */}
 
 					<li className="nav-item nav-item-box">
@@ -390,11 +428,11 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 					</li> */}
 					{/* <!-- /Notifications --> */}
 
-					<li className="nav-item nav-item-box">
+					{/* <li className="nav-item nav-item-box">
 						<a href="general-settings.html">
 							<i className="ti ti-settings"></i>
 						</a>
-					</li>
+					</li> */}
 					<li className="nav-item dropdown has-arrow main-drop profile-nav">
 						<a href="#" className="nav-link userset" data-bs-toggle="dropdown">
 							<span className="user-info p-0">

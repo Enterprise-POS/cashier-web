@@ -183,10 +183,10 @@ export default function Login() {
 											</Link>
 										</h4>
 									</div>
-									<div className="form-setlogin or-text">
+									{/* <div className="form-setlogin or-text">
 										<h4>OR</h4>
-									</div>
-									<div className="mt-2">
+									</div> */}
+									{/* <div className="mt-2">
 										<div className="d-flex align-items-center justify-content-center flex-wrap">
 											<div className="text-center me-2 flex-fill">
 												<Link
@@ -231,7 +231,7 @@ export default function Login() {
 												</Link>
 											</div>
 										</div>
-									</div>
+									</div> */}
 									<div className="my-4 d-flex justify-content-center align-items-center copyright-text">
 										<p>Copyright © {new Date().getFullYear().toString()} Enterprise POS</p>
 									</div>

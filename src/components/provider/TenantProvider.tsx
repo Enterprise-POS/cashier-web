@@ -4,6 +4,7 @@ import { Tenant } from '@/_classes/Tenant';
 import { getTenantWithUser } from '@/_lib/action';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Constants } from '@/components/core/data/constant';
+import { convertTo } from '@/_lib/utils';
 
 export type TenantProviderState = {
 	selectedTenantId: number;
@@ -62,6 +63,20 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 
 			const tenants = tenantDefs!.map(tenantDef => new Tenant(tenantDef));
 			setTenantState(val => ({ ...val, tenantList: tenants }));
+
+			// Get cached tenant
+			const localTenantId: string | null = localStorage.getItem(Constants.LocalStorageKey.currentSelectedTenant);
+			const cachedCurrentTenantId: number | null = convertTo.number(localTenantId);
+
+			// Check if user cached is a valid tenant, otherwise don't select any tenant then reset cache
+			if (cachedCurrentTenantId !== null) {
+				const doesExistTenant: Tenant | undefined = tenants.find(tenant => tenant.id === cachedCurrentTenantId);
+				if (doesExistTenant !== undefined) {
+					setCurrentTenant(doesExistTenant.id);
+				} else {
+					setCurrentTenant(0);
+				}
+			}
 		} finally {
 			setIsLoading(false);
 			isFetchingRef.current = false;
@@ -73,23 +88,7 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 	// The refetch for this case handled by HeaderFloatingMenu.tsx,
 	// will trigger refetchGetTenant when user cookie 'sub' change
 	useEffect(() => {
-		// Get cached tenant
-		const cachedCurrentTenantId: string | null = localStorage.getItem(Constants.LocalStorageKey.currentSelectedTenant);
-		const num = Number(cachedCurrentTenantId);
-		const cachedCurrentTenant: number = isNaN(num) ? 0 : num;
-		if (cachedCurrentTenant !== 0) {
-			setCurrentTenant(Number(cachedCurrentTenant));
-		}
-
-		// if (cachedCurrentTenant === null) return;
-
 		refetchGetTenants();
-		/*
-		async function doAction() {
-			// ... fetch()
-		}
-		doAction();
-		 */
 	}, []);
 
 	return (
