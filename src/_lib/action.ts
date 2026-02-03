@@ -214,7 +214,7 @@ export async function getTenantWithUser(): Promise<HTTPResult<TenantDef[]>> {
 		const error = e as Error;
 		console.error(error);
 		console.error(`Unknown error while get tenant with ID: ${auth.sub}`);
-		return { result: null, error: `Unknown error while get tenant with ID: ${auth.sub}` };
+		return { result: null, error: `[SERVER ERROR] Unknown error while get tenant with ID: ${auth.sub}` };
 	}
 }
 

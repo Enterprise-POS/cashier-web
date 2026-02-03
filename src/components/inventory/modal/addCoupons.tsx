@@ -1,11 +1,12 @@
 'use client';
-import TextEditor from '@/components/texteditor/texteditor';
 
 import { DatePicker } from 'antd';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Calendar } from 'react-feather';
 import Select from 'react-select';
+
+import TextEditor from '@/components/texteditor/texteditor';
 
 const AddCoupons = () => {
 	const price = [
