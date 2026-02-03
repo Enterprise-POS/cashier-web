@@ -1,38 +1,38 @@
 {
-	"name": "enterprise-pos",
-	"version": "0.1.0",
-	"author": {
-		"name": "Aaron Fabian Saputra",
-		"email": "aaronfabian78@gmail.com"
-	},
-	"private": true,
-	"scripts": {
-		"dev": "next dev",
-		"build": "next build",
-		"start": "next start",
-		"lint": "next lint"
-	},
-	"dependencies": {
-		"@types/prop-types": "^15.7.15",
-		"antd": "^5.26.5",
-		"jose": "^6.0.12",
-		"next": "15.4.2",
-		"prop-types": "^15.8.1",
-		"react": "^19.2.1",
-		"react-dom": "^19.2.1",
-		"react-feather": "^2.0.10",
-		"react-perfect-scrollbar": "^1.5.8",
-		"react-select": "^5.10.2",
-		"react-simple-wysiwyg": "^3.4.0"
-	},
-	"devDependencies": {
-		"@eslint/eslintrc": "^3",
-		"@types/node": "^20",
-		"@types/react": "^19",
-		"@types/react-dom": "^19",
-		"eslint": "^9",
-		"eslint-config-next": "15.4.2",
-		"sass": "^1.89.2",
-		"typescript": "^5"
-	}
+  "name": "enterprise-pos",
+  "version": "0.1.0",
+  "author": {
+    "name": "Aaron Fabian Saputra",
+    "email": "aaronfabian78@gmail.com"
+  },
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@types/prop-types": "^15.7.15",
+    "antd": "^5.26.5",
+    "jose": "^6.0.12",
+    "next": "15.4.10",
+    "prop-types": "^15.8.1",
+    "react": "^19.2.1",
+    "react-dom": "^19.2.1",
+    "react-feather": "^2.0.10",
+    "react-perfect-scrollbar": "^1.5.8",
+    "react-select": "^5.10.2",
+    "react-simple-wysiwyg": "^3.4.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.2",
+    "sass": "^1.89.2",
+    "typescript": "^5"
+  }
 }
