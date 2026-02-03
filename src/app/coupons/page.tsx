@@ -1,15 +1,15 @@
 'use client';
 
-import { CouponData } from '@/components/core/json/coupons';
-import AddCoupons from '@/components/inventory/modal/AddCoupons';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
 import EditCoupons from '@/components/inventory/modal/EditCoupons';
 import Footer from '@/components/partials/footer';
+import { CouponData } from '@/components/core/json/coupons';
+import AddCoupons from '@/components/inventory/modal/AddCoupons';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
 import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
-
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
 
 export default function Coupons() {
 	const dataSource = CouponData;
