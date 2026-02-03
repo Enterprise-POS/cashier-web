@@ -38,11 +38,11 @@ COPY --from=builder /app/public ./public
 #     adduser --system --uid 1001 nextjs && \
 #     chown -R nextjs:nodejs /app
 
-USER nextjs
+# USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
