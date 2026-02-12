@@ -49,9 +49,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 			</head>
 			<body className={`${nunito.variable} ${nunito.variable} antialiased main-wrapper`} data-layout="default">
-				<Sidebar />
-
 				<TenantProvider>
+					<Sidebar />
 					<Header />
 					<StoreProvider>{children}</StoreProvider>
 				</TenantProvider>

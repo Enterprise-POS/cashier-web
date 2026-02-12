@@ -3,10 +3,11 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { signOut } from '@/_lib/action';
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import TenantFloatingMenu from './header/TenantFloatingMenu';
 
 const excludedPathnames = [routes.login, routes.register];
 
@@ -16,7 +17,14 @@ export default function Sidebar() {
 	const pathname = usePathname();
 
 	const [whileSigningOut, setWhileSigningOut] = useState(false);
+	const [isSp, setIsSp] = useState(false);
 
+	useEffect(() => {
+		const check = () => setIsSp(window.innerWidth <= 574);
+		check();
+		window.addEventListener('resize', check);
+		return () => window.removeEventListener('resize', check);
+	}, []);
 	async function handleSignOut() {
 		if (whileSigningOut) return;
 		setWhileSigningOut(true);
@@ -136,6 +144,7 @@ export default function Sidebar() {
 			<div className="sidebar-inner slimscroll">
 				<div id="sidebar-menu" className="sidebar-menu">
 					<ul>
+						{isSp ? <TenantFloatingMenu /> : null}
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Main</h6>
 							<ul>

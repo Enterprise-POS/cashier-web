@@ -79,7 +79,7 @@ export default function Login() {
 										{/* <Image src="/favicon.png" alt="Img" width={150} height={45} /> */}
 									</Link>
 									<div className="login-userheading">
-										<h3>Sign In</h3>
+										<h3>Login</h3>
 										<h4 className="fs-16">Access the Enterprise POS panel using your email and passcode.</h4>
 									</div>
 									{isShowError && (
@@ -142,6 +142,7 @@ export default function Login() {
 											<input
 												type={isPasswordVisible ? 'text' : 'password'}
 												className="pass-input form-control"
+												autoComplete="off"
 												name="password"
 												disabled={isFormLoading}
 											/>
@@ -161,17 +162,18 @@ export default function Login() {
 														Remember me
 													</label> */}
 												</div>
-												<div className="text-end">
+												{/* NOT YET IMPLEMENTED */}
+												{/* <div className="text-end">
 													<Link className="text-orange fs-16 fw-medium" href={routes.forgotPassword}>
 														Forgot Password?
 													</Link>
-												</div>
+												</div> */}
 											</div>
 										</div>
 									</div>
 									<div className="form-login">
 										<button type="submit" className="btn btn-primary w-100" disabled={isFormLoading}>
-											{isFormLoading ? 'Signing in...' : 'Sign In'}
+											{isFormLoading ? 'Logging in...' : 'Login'}
 										</button>
 									</div>
 									<div className="signinform">
@@ -183,9 +185,9 @@ export default function Login() {
 											</Link>
 										</h4>
 									</div>
-									{/* <div className="form-setlogin or-text">
+									{/* <div className="fo`rm-setlogin or-text">
 										<h4>OR</h4>
-									</div> */}
+									</div>` */}
 									{/* <div className="mt-2">
 										<div className="d-flex align-items-center justify-content-center flex-wrap">
 											<div className="text-center me-2 flex-fill">
@@ -237,6 +239,11 @@ export default function Login() {
 									</div>
 								</div>
 							</form>
+						</div>
+						<div className="col-lg-6 p-0">
+							<div className="login-img">
+								<Image src="assets/img/authentication/authentication-01.svg" alt="img" width={300} height={300} />
+							</div>
 						</div>
 					</div>
 				</div>
