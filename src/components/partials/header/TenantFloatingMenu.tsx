@@ -18,7 +18,7 @@ export default function TenantFloatingMenu() {
 			{!isStateLoading && selectedTenant ? (
 				<a href="#" className="dropdown-toggle nav-link select-store" data-bs-toggle="dropdown" key={selectedTenant.id}>
 					<span className="user-info">
-						<span className="user-letter">
+						{/* <span className="user-letter">
 							<Image
 								src="/assets/img/store/store-01.png"
 								alt={`${selectedTenant.name} image`}
@@ -26,7 +26,7 @@ export default function TenantFloatingMenu() {
 								width={30}
 								height={30}
 							/>
-						</span>
+						</span> */}
 						<span className="user-detail">
 							<span className="user-name">{selectedTenant.name}</span>
 						</span>
@@ -35,7 +35,7 @@ export default function TenantFloatingMenu() {
 			) : (
 				<a href="#" className="dropdown-toggle nav-link select-store" data-bs-toggle="dropdown">
 					<span className="user-info">
-						<span className="user-letter">
+						{/* <span className="user-letter">
 							<Image
 								src="/assets/img/store/store-01.png"
 								alt="Store Logo"
@@ -43,7 +43,7 @@ export default function TenantFloatingMenu() {
 								width={30}
 								height={30}
 							/>
-						</span>
+						</span> */}
 						<span className="user-detail">
 							<span className="user-name">No Tenant</span>
 						</span>
@@ -55,13 +55,13 @@ export default function TenantFloatingMenu() {
 					data.tenantList.map(tenant => (
 						// setCurrentTenant by closure it using tenant.id
 						<Link href="#" className="dropdown-item" key={tenant.id} onClick={() => setCurrentTenant(tenant.id)}>
-							<Image
+							{/* <Image
 								src="/assets/img/store/store-01.png"
 								alt="Store Logo"
 								className="img-fluid"
 								width={30}
 								height={30}
-							/>
+							/> */}
 							{tenant.name}
 						</Link>
 					))}
