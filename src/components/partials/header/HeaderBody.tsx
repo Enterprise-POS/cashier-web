@@ -70,15 +70,15 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 			<div className="main-header">
 				{/* <!-- Logo --> */}
 				<div className="header-left active">
-					<a href="index.html" className="logo logo-normal">
-						<Image src="/assets/img/logo.svg" alt="Img" width={30} height={30} />
+					<a href={routes.index} className="logo logo-normal">
+						<Image src="/assets/img/enterprise-pos.png" alt="Img" width={30} height={30} style={{ scale: '0.3' }} />
 					</a>
-					<a href="index.html" className="logo logo-white">
+					{/* <a href="index.html" className="logo logo-white">
 						<Image src="/assets/img/logo-white.svg" alt="Img" width={30} height={30} />
 					</a>
 					<a href="index.html" className="logo-small">
 						<Image src="/assets/img/logo-small.png" alt="Img" width={30} height={30} />
-					</a>
+					</a> */}
 				</div>
 				{/* <!-- /Logo --> */}
 
