@@ -2,6 +2,7 @@
 
 import { emailAndPasswordSignUpAction } from '@/_lib/action';
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -39,7 +40,7 @@ export default function Register() {
 
 			if (error.includes('duplicate key value violates unique constraint "user_email_key"')) {
 				setErrorMessage(
-					'The email you entered is already associated with another account. Please use a different email address.'
+					'The email you entered is already associated with another account. Please use a different email address.',
 				);
 				setShowError(true);
 			} else {
@@ -84,7 +85,7 @@ export default function Register() {
 										<img src="assets/img/logo-white.png" alt="Img" />
 									</Link> */}
 									<div className="login-userheading">
-										<h3>Sign up</h3>
+										<h3>Register</h3>
 										<h4>Create New Enterprise POS Account</h4>
 									</div>
 
@@ -163,6 +164,7 @@ export default function Register() {
 												type={passwordVisibility.password ? 'text' : 'password'}
 												className="pass-input form-control"
 												name="password"
+												autoComplete="off"
 												disabled={isFormLoading}
 											/>
 											<span
@@ -180,6 +182,7 @@ export default function Register() {
 												type={passwordVisibility.confirmPassword ? 'text' : 'password'}
 												className="pass-input form-control"
 												name="password2"
+												autoComplete="off"
 												disabled={isFormLoading}
 											/>
 											<span
@@ -207,17 +210,19 @@ export default function Register() {
 									</div>
 									<div className="form-login">
 										<button type="submit" className="btn btn-login" disabled={isFormLoading}>
-											{isFormLoading ? 'Signing up...' : 'Sign Up'}
+											{isFormLoading ? 'Registering...' : 'Confirm Register'}
 										</button>
 									</div>
 									<div className="signinform">
 										<h4>
 											Already have an account ?{' '}
 											<Link href={routes.login} className="hover-a">
-												Sign In Instead
+												Login Instead
 											</Link>
 										</h4>
 									</div>
+									{/* NOT YET IMPLEMENTED */}
+									{/*
 									<div className="form-setlogin or-text">
 										<h4>OR</h4>
 									</div>
@@ -248,12 +253,17 @@ export default function Register() {
 												</Link>
 											</div>
 										</div>
-									</div>
+									</div> */}
 									<div className="my-4 d-flex justify-content-center align-items-center copyright-text">
 										<p>Copyright © {new Date().getFullYear().toString()} Enterprise POS</p>
 									</div>
 								</div>
 							</form>
+						</div>
+						<div className="col-lg-6 p-0">
+							<div className="login-img">
+								<Image src="assets/img/authentication/authentication-02.svg" alt="img" width={300} height={300} />
+							</div>
 						</div>
 					</div>
 				</div>

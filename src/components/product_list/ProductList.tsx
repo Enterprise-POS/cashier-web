@@ -12,7 +12,6 @@ import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
-import CategoryDropdown from '@/components/product_list/CategoryDropdown';
 import { useTenant } from '@/components/provider/TenantProvider';
 
 export default function ProductList({ limit, page }: { limit: number; page: number }) {
@@ -258,7 +257,8 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 								setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
 							}}
 						/>
-						<div className="dropdown me-2">
+						{/* NOT YET IMPLEMENTED: sort by category */}
+						{/* <div className="dropdown me-2">
 							<Link
 								href="#"
 								className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -289,7 +289,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 								</li>
 							</ul>
 						</div>
-						<CategoryDropdown />
+						<CategoryDropdown /> */}
 						{/* <div className="dropdown me-2">
 						<Link
 							href="#"

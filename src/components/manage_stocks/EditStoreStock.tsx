@@ -56,21 +56,21 @@ export function EditStoreStock({
 															<th>ID</th>
 															<th>Price</th>
 															<th>Qty</th>
-															<th className="no-sort" />
+															{/* <th className="no-sort" /> */}
 														</tr>
 													</thead>
 													<tbody>
 														<tr>
 															<td>
 																<div className="d-flex align-items-center">
-																	<Link href="#" className="avatar avatar-md">
+																	{/* <Link href="#" className="avatar avatar-md">
 																		<Image
 																			src="/assets/img/products/stock-img-02.png"
 																			alt="product"
 																			width={60}
 																			height={60}
 																		/>
-																	</Link>
+																	</Link> */}
 																	<Link href="#" className="ms-2">
 																		{tobeEditStoreStock?.itemName ?? 'unselected'}
 																	</Link>
@@ -104,13 +104,14 @@ export function EditStoreStock({
 																	</span>
 																</div>
 															</td>
-															<td>
+															{/* NOT YET IMPLEMENTED: delete item */}
+															{/* <td>
 																<div className="d-flex align-items-center justify-content-between edit-delete-action">
 																	<Link className="d-flex align-items-center border rounded p-2" href="#">
 																		<Trash2 />
 																	</Link>
 																</div>
-															</td>
+															</td> */}
 														</tr>
 													</tbody>
 												</table>
