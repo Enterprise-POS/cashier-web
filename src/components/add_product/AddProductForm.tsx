@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useRef } from 'react';
 import { Info, LifeBuoy } from 'react-feather';
 
 import { Tenant } from '@/_classes/Tenant';
@@ -12,6 +12,7 @@ export default function AddProductForm() {
 	const formState = useFormState();
 	const { data } = useTenant();
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
+	const formRef = useRef<HTMLFormElement>(null);
 
 	const handleForm: FormEventHandler<HTMLFormElement> = async e => {
 		e.preventDefault();
@@ -31,6 +32,12 @@ export default function AddProductForm() {
 			console.warn(error);
 		} finally {
 			formState.setFormLoading(false);
+		}
+	};
+
+	const handleClear = () => {
+		if (formRef.current) {
+			formRef.current.reset();
 		}
 	};
 
@@ -82,7 +89,7 @@ export default function AddProductForm() {
 				</div>
 			</div>
 
-			<form className="add-product-form" onSubmit={handleForm}>
+			<form className="add-product-form" onSubmit={handleForm} ref={formRef}>
 				<input type="hidden" name="tenantId" value={selectedTenant?.id ?? 0} />
 				<div className="add-product">
 					<div className="accordions-items-seperate" id="accordionSpacingExample">
@@ -236,13 +243,25 @@ export default function AddProductForm() {
 										>
 											<div className="single-product">
 												<div className="row">
-													<div className="col-lg-4 col-sm-6 col-12">
+													<div className="col-sm-6 col-12">
 														<div className="mb-3">
 															<label className="form-label">Quantity (0 or empty is allowed)</label>
 															<input
 																type="number"
 																className="form-control"
 																name="stocks"
+																disabled={formState.state.isFormLoading}
+																placeholder="0"
+															/>
+														</div>
+													</div>
+													<div className="col-sm-6 col-12">
+														<div className="mb-3">
+															<label className="form-label">Base Price</label>
+															<input
+																type="number"
+																className="form-control"
+																name="basePrice"
 																disabled={formState.state.isFormLoading}
 																placeholder="0"
 															/>
@@ -509,7 +528,12 @@ export default function AddProductForm() {
 				</div>
 				<div className="col-lg-12">
 					<div className="d-flex align-items-center justify-content-end mb-4">
-						<button type="button" className="btn btn-secondary me-2" disabled={formState.state.isFormLoading}>
+						<button
+							type="button"
+							className="btn btn-secondary me-2"
+							disabled={formState.state.isFormLoading}
+							onClick={handleClear}
+						>
 							Clear
 						</button>
 						<button

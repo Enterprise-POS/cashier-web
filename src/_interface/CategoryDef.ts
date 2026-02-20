@@ -14,4 +14,5 @@ export interface CategoryWithItemDef {
 	item_name: string;
 	stocks: number;
 	stock_type: StockType;
+	base_price: number;
 }

@@ -74,6 +74,7 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 	const tenantId: FormDataEntryValue | null = formData.get('tenantId');
 	const itemName: FormDataEntryValue | null = formData.get('productName');
 	const stocks: FormDataEntryValue | null = formData.get('stocks');
+	const basePrice: FormDataEntryValue | null = formData.get('basePrice');
 
 	if (convertTo.number(tenantId) === null) {
 		return { result: null, error: 'Something wrong while submitting. Form malfunction' };
@@ -87,6 +88,12 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 	const convertedQuantity = convertTo.number(stocks);
 	if (convertedQuantity === null) {
 		return { result: null, error: 'Please Check input for stocks' };
+	}
+
+	// 0 is allowed value for base price
+	const convertedBasePrice = convertTo.number(basePrice);
+	if (convertedBasePrice === null) {
+		return { result: null, error: 'Please Check input for base price' };
 	}
 
 	const auth = await getAuth();
@@ -105,6 +112,7 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 				{
 					item_name: itemName,
 					stocks: convertedQuantity,
+					base_price: convertedBasePrice,
 				},
 			],
 		};
@@ -220,6 +228,7 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 	const itemName: FormDataEntryValue | null = formData.get('productName');
 	const quantity: FormDataEntryValue | null = formData.get('quantity');
 	const stockType: FormDataEntryValue | null = formData.get('stockType');
+	const basePrice: FormDataEntryValue | null = formData.get('basePrice');
 
 	const convertedTenantId = convertTo.number(tenantId);
 	if (convertedTenantId === null) {
@@ -248,6 +257,12 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 		return { result: null, error: 'Please Check input for stocks' };
 	}
 
+	// 0 is allowed value for base price
+	const convertedBasePrice = convertTo.number(basePrice);
+	if (convertedBasePrice === null) {
+		return { result: null, error: 'Please Check input for base price' };
+	}
+
 	try {
 		const reqBody = {
 			quantity: convertedQuantity,
@@ -255,6 +270,7 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 				item_id: convertedItemId,
 				item_name: itemName.toString(),
 				stock_type: stockType.toString(),
+				base_price: convertedBasePrice,
 			},
 		};
 

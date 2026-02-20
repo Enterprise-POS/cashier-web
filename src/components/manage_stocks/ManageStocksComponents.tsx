@@ -54,6 +54,12 @@ export default function ManageStocksComponents() {
 			title: 'Price',
 			dataIndex: 'price',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.price - b.price,
+			render: (price: number) =>
+				new Intl.NumberFormat('id-ID', {
+					style: 'currency',
+					currency: 'IDR',
+					minimumFractionDigits: 0,
+				}).format(price),
 		},
 		{
 			title: 'Stocks',
@@ -70,7 +76,7 @@ export default function ManageStocksComponents() {
 			title: 'Created At',
 			dataIndex: 'createdAt',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
 		{
 			title: 'Action',

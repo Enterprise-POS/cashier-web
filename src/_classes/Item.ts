@@ -9,6 +9,7 @@ export class Item {
 	createdAt: Date;
 	unit: string;
 	stockType: StockType;
+	basePrice: number;
 	id: number;
 	constructor(def: ItemDef) {
 		// Although this is the same properties
@@ -20,6 +21,7 @@ export class Item {
 		this.stocks = def.stocks;
 		this.isActive = def.is_active;
 		this.stockType = def.stock_type;
+		this.basePrice = def.base_price;
 		this.createdAt = new Date(def.created_at);
 		this.unit = 'Pc';
 	}
@@ -36,6 +38,7 @@ export class CategoryWithItem extends Item {
 			created_at: '',
 			is_active: 0,
 			stock_type: def.stock_type,
+			base_price: def.base_price,
 		});
 		this.categoryId = def.category_id;
 		this.categoryName = def.category_name;
