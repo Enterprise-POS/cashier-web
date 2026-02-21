@@ -65,8 +65,8 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 							stocks: v.stocks + addAndReduceCounter,
 							stock_type: v.stockType,
 							base_price: inpBasePrice,
-					  })
-					: null
+						})
+					: null,
 			);
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
@@ -322,7 +322,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 															? {
 																	value: currentItem.categoryId.toString(),
 																	label: currentItem.categoryName,
-															  }
+																}
 															: null
 													}
 												/>
@@ -403,6 +403,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 																className="form-control"
 																name={formName.quantity}
 																value={addAndReduceCounter}
+																onFocus={e => e.target.select()}
 																onChange={e => setAddAndReduceCounter(Number(e.target.value))}
 															/>
 														</div>
@@ -430,6 +431,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 																value={inpBasePrice}
 																onChange={e => setInpBasePrice(Number(e.target.value))}
 																placeholder="0"
+																onFocus={e => e.target.select()}
 															/>
 														</div>
 													</div>
