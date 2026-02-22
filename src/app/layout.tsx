@@ -19,9 +19,9 @@ export const metadata: Metadata = {
 		default: 'Enterprise POS - Inventory Management & Admin Dashboard',
 	},
 	description:
-		'Enterprise POS is a powerful Bootstrap-based Inventory Management Admin Template designed for businesses, offering seamless invoicing, project tracking, and estimates.',
+		'Enterprise POS is a powerful Management Admin Apps designed for businesses, offering seamless invoicing, project tracking, and estimates.',
 	keywords:
-		'inventory management, admin dashboard, bootstrap template, invoicing, estimates, business management, responsive admin, POS system',
+		'inventory management, admin dashboard, invoicing, estimates, business management, responsive admin, POS system',
 	authors: [{ name: 'Aaron Fabian Saputra' }],
 	icons: {
 		apple: '/assets/favicon.png', // Optional: for Apple devices (place in `public/`)
