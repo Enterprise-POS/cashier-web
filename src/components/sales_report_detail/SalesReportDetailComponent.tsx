@@ -60,10 +60,10 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 											</td>
 											<td className="text-gray-9 fw-medium text-end">{purchasedItem.quantity}</td>
 											<td className="text-gray-9 fw-medium text-end">
-												{setStringPrefix(purchasedItem.purchasedPrice, '￥')}
+												{setStringPrefix(purchasedItem.storePriceSnapshot, '￥')}
 											</td>
 											<td className="text-gray-9 fw-medium text-end">
-												{setStringPrefix(purchasedItem.purchasedPrice * purchasedItem.quantity, '￥')}
+												{setStringPrefix(purchasedItem.storePriceSnapshot * purchasedItem.quantity, '￥')}
 											</td>
 											<td className="text-gray-9 fw-medium text-end">
 												{setStringPrefix(purchasedItem.discountAmount, '￥')}

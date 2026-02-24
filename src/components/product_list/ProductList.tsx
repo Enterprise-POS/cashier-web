@@ -63,6 +63,17 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			render: (stocks: number) => stocks,
 		},
 		{
+			title: 'Base Price',
+			dataIndex: 'basePrice',
+			sorter: (a: Item, b: Item) => a.basePrice - b.basePrice,
+			render: (basePrice: number) =>
+				new Intl.NumberFormat('id-ID', {
+					style: 'currency',
+					currency: 'IDR',
+					minimumFractionDigits: 0,
+				}).format(basePrice),
+		},
+		{
 			title: 'T/U',
 			dataIndex: 'stockType',
 			sorter: (a: Item, b: Item) => a.stockType.length - b.stockType.length,
@@ -87,7 +98,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			title: 'Created At',
 			dataIndex: 'createdAt',
 			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
 
 		// {

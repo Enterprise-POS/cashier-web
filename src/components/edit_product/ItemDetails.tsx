@@ -28,6 +28,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 	// Input
 	const [addAndReduceCounter, setAddAndReduceCounter] = useState(0);
 	const [inpItemName, setInpItemName] = useState('');
+	const [inpBasePrice, setInpBasePrice] = useState(0);
 	const [changedCategory, setChangedCategory] = useState<{ value: number; label: string }>();
 	const [changedStockType, setChangedStockType] = useState<{ value: string; label: string }>();
 
@@ -63,8 +64,9 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 							item_id: v.itemId,
 							stocks: v.stocks + addAndReduceCounter,
 							stock_type: v.stockType,
-					  })
-					: null
+							base_price: inpBasePrice,
+						})
+					: null,
 			);
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
@@ -103,6 +105,13 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		timeoutRef.current = setTimeout(async () => callback(await handleGetCategory(inputValue)), 150);
 	};
 
+	const handleClear = () => {
+		// Reset base price to initial value
+		setInpBasePrice(initialItem?.basePrice ?? 0);
+		// Reset add/reduce counter to 0 (so "After edit" shows current quantity)
+		setAddAndReduceCounter(0);
+	};
+
 	/*
 		Triggered if current user tenant is change
 		also triggered at first open the page
@@ -123,6 +132,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 					} else {
 						setCurrentItem(new CategoryWithItem(result!));
 						setInpItemName(result!.item_name);
+						setInpBasePrice(result!.base_price);
 						setInitialItem(new CategoryWithItem(result!));
 					}
 				}
@@ -155,6 +165,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		quantity: 'quantity',
 		stockType: 'stockType',
 		categoryId: 'categoryId',
+		basePrice: 'basePrice',
 	};
 
 	return (
@@ -311,7 +322,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 															? {
 																	value: currentItem.categoryId.toString(),
 																	label: currentItem.categoryName,
-															  }
+																}
 															: null
 													}
 												/>
@@ -391,7 +402,8 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 																type="number"
 																className="form-control"
 																name={formName.quantity}
-																defaultValue={addAndReduceCounter}
+																value={addAndReduceCounter}
+																onFocus={e => e.target.select()}
 																onChange={e => setAddAndReduceCounter(Number(e.target.value))}
 															/>
 														</div>
@@ -408,6 +420,22 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 														</div>
 													</div>
 												</div>
+												<div className="row">
+													<div className="col-lg-4 col-sm-6 col-12">
+														<div className="mb-3">
+															<label className="form-label">Base Price</label>
+															<input
+																type="number"
+																className="form-control"
+																name={formName.basePrice}
+																value={inpBasePrice}
+																onChange={e => setInpBasePrice(Number(e.target.value))}
+																placeholder="0"
+																onFocus={e => e.target.select()}
+															/>
+														</div>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -418,7 +446,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 				</div>
 				<div className="col-lg-12">
 					<div className="d-flex align-items-center justify-content-end mb-4">
-						<button type="reset" className="btn btn-secondary me-2">
+						<button type="button" className="btn btn-secondary me-2" onClick={handleClear}>
 							Clear
 						</button>
 						<button type="submit" className="btn btn-primary">
