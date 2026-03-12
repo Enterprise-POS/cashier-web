@@ -2,7 +2,7 @@
 
 import { Input, Table, TablePaginationConfig } from 'antd';
 import Link from 'next/link';
-import { useEffect, useOptimistic, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
 
 import { Category } from '@/_classes/Category';
@@ -90,7 +90,7 @@ export default function CategoryList() {
 					selectedTenant.id,
 					page,
 					limit,
-					''
+					'',
 				);
 				if (error !== null) {
 					formState.setError({ message: error });

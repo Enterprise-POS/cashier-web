@@ -11,9 +11,9 @@ import { useState, useEffect } from 'react';
 import { GetSalesReport, OnClickErrorToastCloseButton } from '@/_classes/HomeDashboardEvent';
 
 export default function SalesReport() {
-	const { data, selectedTenantId, isStateLoading, onEvent, isError, errorMessage } = useHomeDashboard();
-	const pagination = data.pagination;
-	const dataSource = data.orderItems;
+	const { state, orderItems, isLoading, onEvent, isError, errorMessage, selectedTenantId } = useHomeDashboard();
+	const pagination = state.pagination;
+	const dataSource = orderItems;
 
 	const [isMounted, setIsMounted] = useState(false);
 	useEffect(() => setIsMounted(true), []);
@@ -95,17 +95,15 @@ export default function SalesReport() {
 				</ul>
 			</div>
 
-			<div className="card-body">
-				<div className="table-responsive">
-					<Table<OrderItem>
-						rowKey={'id'}
-						loading={isStateLoading}
-						pagination={pagination}
-						columns={columns}
-						onChange={newPagination => onEvent(new GetSalesReport(newPagination.current!, newPagination.pageSize!))}
-						dataSource={dataSource}
-					/>
-				</div>
+			<div className="table-responsive">
+				<Table<OrderItem>
+					rowKey={'id'}
+					loading={isLoading}
+					pagination={pagination}
+					columns={columns}
+					onChange={newPagination => onEvent(new GetSalesReport(newPagination.current!, newPagination.pageSize!))}
+					dataSource={dataSource}
+				/>
 			</div>
 
 			{/* Error Toast */}

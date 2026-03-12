@@ -12,6 +12,7 @@ import Header from '@/components/partials/header/header';
 import Sidebar from '@/components/partials/sidebar';
 import { TenantProvider } from '@/components/provider/TenantProvider';
 import { StoreProvider } from '@/components/provider/StoreProvider';
+import { QueryProvider } from '@/components/provider/QueryProvider';
 
 export const metadata: Metadata = {
 	title: {
@@ -49,11 +50,13 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 			</head>
 			<body className={`${nunito.variable} ${nunito.variable} antialiased main-wrapper`} data-layout="default">
-				<TenantProvider>
-					<Sidebar />
-					<Header />
-					<StoreProvider>{children}</StoreProvider>
-				</TenantProvider>
+				<QueryProvider>
+					<TenantProvider>
+						<Sidebar />
+						<Header />
+						<StoreProvider>{children}</StoreProvider>
+					</TenantProvider>
+				</QueryProvider>
 
 				<Script src="/assets/js/jquery-3.7.1.min.js" />
 

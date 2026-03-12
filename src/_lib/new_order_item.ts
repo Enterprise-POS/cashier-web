@@ -1,15 +1,11 @@
-'use server';
-
-import { cookies } from 'next/headers';
-
 import { DateFilter } from '@/_interface/DateFilter';
 import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
+import { OrderItemDef } from '@/_interface/OrderItemDef';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
-import { serverRoutes } from '@/components/core/data/serverRoutes';
-import { OrderItemDef } from '@/_interface/OrderItemDef.js';
-import { PurchasedItemDef } from '@/_interface/PurchasedItemDef.js';
+import { OrderItemFindByIdReturnType } from '@/_lib/order_item';
+import { server_routes } from '@/components/core/data/server_routes';
 
 export async function orderItemSalesReport(
 	tenantId: number,
@@ -17,8 +13,6 @@ export async function orderItemSalesReport(
 	dateFilter: DateFilter | null,
 ): Promise<HTTPResult<ReportResultDef>> {
 	try {
-		const userCookies = await cookies();
-
 		const reqBody = {
 			// tenant_id: tenantId, // Provided with url params
 			store_id: storeId,
@@ -28,11 +22,11 @@ export async function orderItemSalesReport(
 		const requestInit: RequestInit = {
 			method: 'POST',
 			credentials: 'include',
-			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(reqBody),
 		};
 
-		const targetURL = serverRoutes.orderItemSalesReport.replace('<tenantId>', tenantId.toString());
+		const targetURL = server_routes.orderItemSalesReport.replace('<tenantId>', tenantId.toString());
 		const response = await fetch(targetURL, requestInit);
 		if (!response.ok) {
 			let body: ErrorResponse;
@@ -80,8 +74,6 @@ export async function orderItemGetSearch(
 	dateFilter: DateFilter | null,
 ): Promise<HTTPResult<{ defs: OrderItemDef[]; total_count: number }>> {
 	try {
-		const userCookies = await cookies();
-
 		const reqBody = {
 			tenant_id: tenantId,
 			store_id: storeId,
@@ -94,11 +86,11 @@ export async function orderItemGetSearch(
 		const requestInit: RequestInit = {
 			method: 'POST',
 			credentials: 'include',
-			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(reqBody),
 		};
 
-		const targetURL = serverRoutes.orderItemGetSearch.replace('<tenantId>', tenantId.toString());
+		const targetURL = server_routes.orderItemGetSearch.replace('<tenantId>', tenantId.toString());
 		const response = await fetch(targetURL, requestInit);
 		if (!response.ok) {
 			let body: ErrorResponse;
@@ -140,11 +132,6 @@ export async function orderItemGetSearch(
 	}
 }
 
-export type OrderItemFindByIdReturnType = {
-	order_item: OrderItemDef;
-	purchased_item_list: PurchasedItemDef[];
-	requested_order_item_id: number;
-};
 export async function orderItemFindById(
 	id: number,
 	tenantId: number,
@@ -155,14 +142,12 @@ export async function orderItemFindById(
 	const paramsString = `?${params.toString()}`;
 
 	try {
-		const userCookies = await cookies();
-
 		const requestInit: RequestInit = {
 			credentials: 'include',
-			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json' },
 		};
 
-		const targetURL = `${serverRoutes.orderItemFindById.replace('<tenantId>', tenantId.toString())}${paramsString}`;
+		const targetURL = `${server_routes.orderItemFindById.replace('<tenantId>', tenantId.toString())}${paramsString}`;
 		const response = await fetch(targetURL, requestInit);
 		if (!response.ok) {
 			let body: ErrorResponse;

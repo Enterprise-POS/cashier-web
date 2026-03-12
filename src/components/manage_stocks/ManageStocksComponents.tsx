@@ -1,43 +1,66 @@
-import { Input, Table, TablePaginationConfig } from 'antd';
+import { useQueryClient } from '@tanstack/react-query';
+import { Input, Table } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Delete, Edit } from 'react-feather';
 
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
-import { HTTPResult } from '@/_interface/HTTPResult';
 import { StockType } from '@/_interface/ItemDef';
-import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { TransferStockRequest } from '@/_interface/TransferStock';
-import { getAllV2, transferStockToStoreStock, transferStockToWarehouse } from '@/_lib/store_stock';
+import { transferStockToStoreStock, transferStockToWarehouse } from '@/_lib/store_stock';
 import { closeBootstrapModal } from '@/_lib/utils';
-import { useFormState } from '@/components/hooks/useFormState';
+import { useManageStocksQuery } from '@/components/hooks/useManageStocksQuery';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
+import { SelectCategory } from '@/components/manage_stocks/SelectCategory';
 import WithdrawItemModal from '@/components/manage_stocks/WithdrawItemModal';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useStore } from '@/components/provider/StoreProvider';
+import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
 export default function ManageStocksComponents() {
-	const limit = 10;
 	const storeCtx = useStore();
-	const formState = useFormState();
-	const [pagination, setPagination] = useState<TablePaginationConfig>({
-		current: 1, // By default when user open is 1
-		pageSize: limit,
-		total: 0,
-		responsive: true,
-	});
-	const [nameQuery, setNameQuery] = useState('');
+	const queryClient = useQueryClient();
 	const [isMounted, setIsMounted] = useState(false);
-	const [storeStocks, setStoreStocks] = useState<StoreStockV2[]>([]);
 	const [tobeEditStoreStock, setTobeEditStoreStock] = useState<StoreStockV2>();
+	const [isSelectCategoryModalOpen, setCategoryModal] = useState(false);
 
+	// Only subscribe to what this component needs — no unnecessary re-renders
+	// Read value
+	const pagination = useManageStocksStore(s => s.pagination);
+	const nameQuery = useManageStocksStore(s => s.nameQuery);
+	const isLoading = useManageStocksStore(s => s.isLoading);
+	const isError = useManageStocksStore(s => s.isError);
+	const isSuccess = useManageStocksStore(s => s.isSuccess);
+	const errorMessage = useManageStocksStore(s => s.errorMessage);
+	const successMessage = useManageStocksStore(s => s.successMessage);
+	const selectedCategory = useManageStocksStore(s => s.selectedCategory);
+	const isAscending = useManageStocksStore(s => s.ascending);
+
+	// Action
+	const setSelectedCategory = useManageStocksStore(s => s.setSelectedCategory);
+	const setAscending = useManageStocksStore(s => s.setAscending);
+	const setPagination = useManageStocksStore(s => s.setPagination);
+	const setNameQuery = useManageStocksStore(s => s.setNameQuery);
+	const setLoading = useManageStocksStore(s => s.setLoading);
+	const setError = useManageStocksStore(s => s.setError);
+	const setSuccess = useManageStocksStore(s => s.setSuccess);
+	const clearError = useManageStocksStore(s => s.clearError);
+	const clearSuccess = useManageStocksStore(s => s.clearSuccess);
+	const resetFilters = useManageStocksStore(s => s.resetFilters);
+	const applyFilters = useManageStocksStore(s => s.applyFilters);
+
+	const currentTenantId = storeCtx.getCurrentTenantId();
 	const selectedStore: Store | undefined = storeCtx.data.storeList.find(
-		store => store.id === storeCtx.data.selectedStoreId
+		store => store.id === storeCtx.data.selectedStoreId,
 	);
 
-	const dataSource = storeStocks;
+	// TanStack handles fetching — auto-refetches when queryKey changes
+	const { data, isFetching } = useManageStocksQuery();
+	const storeStocks = data?.storeStocks ?? [];
+	const total = data?.total ?? 0;
+
 	const columns = [
 		{
 			title: 'ID',
@@ -49,7 +72,6 @@ export default function ManageStocksComponents() {
 			dataIndex: 'itemName',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
 		},
-
 		{
 			title: 'Price',
 			dataIndex: 'price',
@@ -60,6 +82,12 @@ export default function ManageStocksComponents() {
 					currency: 'IDR',
 					minimumFractionDigits: 0,
 				}).format(price),
+		},
+		{
+			title: 'Category',
+			dataIndex: 'categoryName',
+			sorter: (a: StoreStockV2, b: StoreStockV2) => a.categoryName.length - b.categoryName.length,
+			render: (categoryName: string) => (categoryName.length > 0 ? categoryName : '-'),
 		},
 		{
 			title: 'Stocks',
@@ -84,13 +112,12 @@ export default function ManageStocksComponents() {
 			render: (id: number, storeStock: StoreStockV2) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
-						<div className="input-block add-lists"></div>
 						<Link
 							href="#"
 							className="me-2 p-2"
 							data-bs-toggle="modal"
 							data-bs-target="#edit-units"
-							onClick={() => (formState.state.isFormLoading ? null : setTobeEditStoreStock(storeStock))}
+							onClick={() => (isFetching ? null : setTobeEditStoreStock(storeStock))}
 						>
 							<Edit />
 						</Link>
@@ -104,135 +131,86 @@ export default function ManageStocksComponents() {
 		},
 	];
 
-	async function getStoreStock(storeId: number, tenantId: number, page: number, search: string) {
-		if (formState.state.isFormLoading) return;
-		try {
-			formState.setFormLoading(true);
-			const { result, error }: HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }> = await getAllV2(
-				storeId,
-				tenantId,
-				pagination.current!,
-				limit,
-				search
-			);
-			if (error !== null) {
-				// A special condition that maybe user not yet transfer any warehouse items
-				if (error.includes('[ERROR] no stock found') || error.includes('Fatal error: no stock found ')) {
-					setStoreStocks([]);
-					setPagination({ ...pagination, current: 1, total: 0 });
-				} else {
-					setStoreStocks([]);
-					formState.setError({ message: error });
-				}
-			} else {
-				setStoreStocks(result!.storeStockDefs.map((def: StoreStockV2Def) => new StoreStockV2(def)));
-				setPagination({ ...pagination, current: page, total: result!.count });
-			}
-		} catch (e: unknown) {
-			const error = e as Error;
-			console.error(`[ERROR] ${error.message}`);
-			formState.setError({ message: `Unexpected error: ${error.message}` });
-		} finally {
-			formState.setFormLoading(false);
-		}
-	}
-
 	async function handleOnConfirmEdit(transferStockRequest: TransferStockRequest) {
-		if (formState.state.isFormLoading || transferStockRequest.quantity === 0) return;
+		if (isFetching || transferStockRequest.quantity === 0) return;
 
 		try {
-			formState.setFormLoading(true);
-			let result: HTTPResult<void>;
+			setLoading(true);
+			let result;
 
-			// If quantity > 0 Else quantity < 0
 			if (transferStockRequest.quantity > 0) result = await transferStockToStoreStock(transferStockRequest);
-			else {
-				// Because quantity <= 0 could not be requested when transferring stock then we convert the value to positive value
+			else
 				result = await transferStockToWarehouse({ ...transferStockRequest, quantity: -transferStockRequest.quantity });
-			}
 
-			// Take only the error result, if error not null then tell the user
 			const { error } = result;
 			if (error !== null) {
-				formState.setError({ message: error });
+				setError(error);
 			} else {
-				formState.setSuccess({ message: 'Product edited successfully' });
-
-				// When the item successfully edited, then manually edit / set the reference
-				// It's guaranteed to be available otherwise the request will be fail
-				const newStocks = [...storeStocks]; // shallow clone array
-				const target = newStocks.find(i => i.itemId === transferStockRequest.itemId);
-				if (target !== undefined) {
-					target.stocks += transferStockRequest.quantity; // Mutate targeted store_stocks item
-				}
-				setStoreStocks(newStocks);
+				setSuccess('Product edited successfully');
+				// Invalidate to refetch fresh data
+				queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
 			}
 		} catch (e) {
 			const error = e as Error;
-			console.error(`[ERROR] ${error.message}`);
-			formState.setError({ message: `Unexpected error: ${error.message}` });
+			setError(`Unexpected error: ${error.message}`);
 		} finally {
-			formState.setFormLoading(false);
+			setLoading(false);
 		}
 	}
 
 	async function handleTransferItem(transferStockRequest: TransferStockRequest, itemName: string) {
-		if (formState.state.isFormLoading) return;
-		formState.setFormLoading(true);
+		if (isFetching) return;
+		setLoading(true);
 		const { error } = await transferStockToStoreStock(transferStockRequest);
 		if (error !== null) {
-			formState.setError({ message: error });
+			setError(error);
 		} else {
 			setNameQuery('');
-			await getStoreStock(selectedStore!.id, storeCtx.getCurrentTenantId(), 1, '');
-			formState.setSuccess({ message: `${itemName} successfully added to ${selectedStore!.name}` });
+			// Invalidate to refetch fresh data
+			queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
+			setSuccess(`${itemName} successfully added to ${selectedStore!.name}`);
 			closeBootstrapModal('#add-units [data-bs-dismiss="modal"]');
 		}
-		formState.setFormLoading(false);
+		setLoading(false);
 	}
-
-	function handleInputSearch(value: string) {
-		setNameQuery(value);
-		setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
-	}
-
-	useEffect(() => {
-		if (selectedStore !== undefined) {
-			getStoreStock(selectedStore.id, storeCtx.getCurrentTenantId(), pagination.current!, nameQuery);
-		}
-
-		// If store id changed or tenant id change, store provider will be re-render
-		// Because <Table /> don't have direct to maintain selectedStore, we use this useEffect
-	}, [selectedStore, nameQuery]);
 
 	useEffect(() => setIsMounted(true), []);
 
-	if (!isMounted || storeCtx.isStateLoading) return <SectionLoading caption={`Loading stores`} />;
+	useEffect(() => {
+		const modal = document.getElementById('select-category');
+		modal?.addEventListener('hidden.bs.modal', () => setCategoryModal(false));
+	}, []);
+
+	if (!isMounted || storeCtx.isStateLoading) return <SectionLoading caption="Loading stores" />;
 
 	return (
 		<>
 			{/* Success Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					id="liveToast"
-					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast`}
+					className={`toast ${isSuccess ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
 				>
 					<div className="toast-header bg-success text-fixed-white">
 						<strong className="me-auto">Success !</strong>
-						<button type="button" className="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+						<button
+							type="button"
+							className="btn-close"
+							data-bs-dismiss="toast"
+							aria-label="Close"
+							onClick={clearSuccess}
+						/>
 					</div>
-					<div className="toast-body">{formState.value.successMessage}</div>
+					<div className="toast-body">{successMessage}</div>
 				</div>
 			</div>
 
 			{/* Error Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					id="liveToast"
-					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast bg-danger-transparent`}
+					className={`toast ${isError ? 'show' : ''} colored-toast bg-danger-transparent`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -244,25 +222,83 @@ export default function ManageStocksComponents() {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ error: false })}
-						></button>
+							onClick={clearError}
+						/>
 					</div>
-					<div className="toast-body">{formState.value.errorMessage}</div>
+					<div className="toast-body">{errorMessage}</div>
 				</div>
 			</div>
 
-			{/* /product list */}
-			<div className="card table-list-card  manage-stock">
-				<div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
+			{/* Align Left */}
+			<div className="card table-list-card manage-stock">
+				<div className="card-header gap-3 d-flex align-items-center flex-wrap row-gap-3">
 					<div className="search-set">
 						<Input.Search
+							className="focus-ring"
 							placeholder="Search items..."
 							allowClear
-							className="focus-ring"
-							onSearch={value => handleInputSearch(value)}
+							value={nameQuery}
+							onChange={e => setNameQuery(e.target.value)}
+							onSearch={() => applyFilters()}
 						/>
 					</div>
-					<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+					<div className="page-btn">
+						<button
+							className="btn border text-secondary"
+							data-bs-toggle="modal"
+							data-bs-target="#select-category"
+							onClick={() => setCategoryModal(true)}
+						>
+							{selectedCategory.categoryId === 0 ? 'Select Category' : `Category: ${selectedCategory.categoryName}`}
+						</button>
+					</div>
+					<div className="page-btn">
+						<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3 ms-auto">
+							<div className="dropdown mb-0">
+								<button
+									className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center text-gray-3"
+									data-bs-toggle="dropdown"
+								>
+									Order: {isAscending ? 'Ascending' : 'Descending'}
+								</button>
+								<ul className="dropdown-menu dropdown-menu-end p-3">
+									<li>
+										<Link href="#" className="dropdown-item rounded-1" onClick={() => setAscending(true)}>
+											Ascending
+										</Link>
+									</li>
+									<li>
+										<Link href="#" className="dropdown-item rounded-1" onClick={() => setAscending(false)}>
+											Descending
+										</Link>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div className="page-btn">
+						<button
+							className={`btn btn-primary w-100 ${isLoading || isFetching ? 'wait' : ''}`}
+							type="button"
+							disabled={isLoading || isFetching}
+							onClick={() => applyFilters()}
+						>
+							{isLoading || isFetching ? 'Please wait' : 'Search'}
+						</button>
+					</div>
+					<div className="page-btn">
+						<button
+							className={`btn btn-primary-ghost w-100 ${isLoading || isFetching ? 'disabled' : ''}`}
+							type="button"
+							disabled={isLoading || isFetching}
+							onClick={() => resetFilters()}
+						>
+							Reset
+						</button>
+					</div>
+
+					{/* Align Right */}
+					<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3 ms-auto">
 						<div className="dropdown">
 							<button
 								className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -270,7 +306,7 @@ export default function ManageStocksComponents() {
 							>
 								{selectedStore?.name ?? 'Select Store'}
 							</button>
-							<ul className="dropdown-menu  dropdown-menu-end p-3">
+							<ul className="dropdown-menu dropdown-menu-end p-3">
 								{storeCtx.data.storeList.map(store => (
 									<li key={store.id} onClick={() => storeCtx.setCurrentStore(store.id)}>
 										<Link href="#" className="dropdown-item rounded-1">
@@ -288,34 +324,43 @@ export default function ManageStocksComponents() {
 						<Table<StoreStockV2>
 							rowKey={'itemId'}
 							columns={columns}
-							dataSource={dataSource}
-							pagination={pagination}
-							loading={{
-								spinning: formState.state.isFormLoading,
-								indicator: <SectionLoading />,
-							}}
-							onChange={newPagination =>
-								getStoreStock(selectedStore!.id, storeCtx.getCurrentTenantId(), newPagination.current!, nameQuery)
+							dataSource={storeStocks}
+							pagination={{ ...pagination, total }} // Inject real total
+							loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
+							onChange={
+								newPagination =>
+									setPagination({
+										...pagination,
+										current: newPagination.current!,
+										pageSize: newPagination.pageSize!,
+									})
+								// Changing pagination in Zustand changes queryKey → TanStack auto-refetches
 							}
 						/>
 					</div>
 				</div>
 			</div>
-			{/* /product list */}
-			<WithdrawItemModal />
 
+			<WithdrawItemModal />
 			<AddNewItem
 				storeList={storeCtx.data.storeList}
 				currentSelectedStoreId={selectedStore?.id ?? 0}
 				onNewTransferItem={handleTransferItem}
-				loading={formState.state.isFormLoading}
+				loading={isFetching}
 			/>
-
 			<EditStoreStock
 				tobeEditStoreStock={tobeEditStoreStock}
 				onConfirmEdit={handleOnConfirmEdit}
 				storeId={selectedStore?.id ?? 0}
-				tenantId={storeCtx.getCurrentTenantId()}
+				tenantId={currentTenantId}
+			/>
+			<SelectCategory
+				tenantId={currentTenantId}
+				isModalOpen={isSelectCategoryModalOpen}
+				onSelected={(categoryId, categoryName) => {
+					setCategoryModal(false);
+					setSelectedCategory({ categoryId, categoryName });
+				}}
 			/>
 		</>
 	);

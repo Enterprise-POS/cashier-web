@@ -15,8 +15,8 @@ import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 export default function ReportFilters() {
 	const dashboardCtx = useHomeDashboard();
 	const stores = dashboardCtx.stores;
-	const dateRange = dashboardCtx.data.dateRanges;
-	const isStateLoading = dashboardCtx.isStateLoading;
+	const dateRange = dashboardCtx.state.dateRanges; // data → state
+	const isStateLoading = dashboardCtx.isLoading; // isStateLoading → isLoading
 	const onEvent = dashboardCtx.onEvent;
 
 	// Because we use Date object from backend, we need to prevent hydration
@@ -27,7 +27,7 @@ export default function ReportFilters() {
 	if (!isMounted) return null;
 
 	return (
-		<div className="card border-0">
+		<div className="card">
 			<div className="card-body pb-1">
 				<form>
 					<div className="row align-items-end">
@@ -59,6 +59,7 @@ export default function ReportFilters() {
 									<div className="mb-3">
 										<label className="form-label">Store</label>
 										<SelectVariety
+											className=""
 											disabled={isStateLoading}
 											onChange={newValue => onEvent(new OnChangeSelectedStore(newValue.value))}
 											options={[...stores, { value: '0', label: 'Unselect' }]}

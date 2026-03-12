@@ -4,7 +4,7 @@ import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
 export default function OverviewCards() {
 	const homeDashboardCtx = useHomeDashboard();
-	const reportResult = homeDashboardCtx.data.reportResult;
+	const reportResult = homeDashboardCtx.reportResult;
 
 	return (
 		<div className="row">
