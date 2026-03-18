@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 
 import { OrderItem } from '@/_classes/OrderItem';
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import { formatIDR } from '@/_lib/utils';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 import { useState, useEffect } from 'react';
 import { GetSalesReport, OnClickErrorToastCloseButton } from '@/_classes/HomeDashboardEvent';
@@ -29,22 +30,25 @@ export default function SalesReport() {
 			title: 'Purchased Price',
 			dataIndex: 'purchasedPrice',
 			sorter: (a: OrderItem, b: OrderItem) => a.purchasedPrice - b.purchasedPrice,
+			render: (purchasedPrice: number) => formatIDR(purchasedPrice),
 		},
 		{
 			title: 'Sub Total',
 			dataIndex: 'subTotal',
 			sorter: (a: OrderItem, b: OrderItem) => a.subTotal - b.subTotal,
+			render: (subTotal: number) => formatIDR(subTotal),
 		},
 		{
 			title: 'Gross Sales',
 			dataIndex: 'subTotal',
 			sorter: (a: OrderItem, b: OrderItem) => a.totalAmount - b.totalAmount,
+			render: (subTotal: number) => formatIDR(subTotal),
 		},
 		{
 			title: 'Change',
 			dataIndex: 'id',
 			sorter: (a: OrderItem, b: OrderItem) => a.purchasedPrice - a.totalAmount - (b.purchasedPrice - b.totalAmount),
-			render: (id: number, orderItem: OrderItem) => orderItem.purchasedPrice - orderItem.totalAmount,
+			render: (id: number, orderItem: OrderItem) => formatIDR(orderItem.purchasedPrice - orderItem.totalAmount),
 		},
 		{
 			title: 'Date',

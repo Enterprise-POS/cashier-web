@@ -9,7 +9,7 @@ import { StoreStockV2 } from '@/_classes/StoreStock';
 import { StockType } from '@/_interface/ItemDef';
 import { TransferStockRequest } from '@/_interface/TransferStock';
 import { transferStockToStoreStock, transferStockToWarehouse } from '@/_lib/store_stock';
-import { closeBootstrapModal } from '@/_lib/utils';
+import { closeBootstrapModal, formatIDR } from '@/_lib/utils';
 import { useManageStocksQuery } from '@/components/hooks/useManageStocksQuery';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
@@ -76,12 +76,7 @@ export default function ManageStocksComponents() {
 			title: 'Price',
 			dataIndex: 'price',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.price - b.price,
-			render: (price: number) =>
-				new Intl.NumberFormat('id-ID', {
-					style: 'currency',
-					currency: 'IDR',
-					minimumFractionDigits: 0,
-				}).format(price),
+			render: (price: number) => formatIDR(price),
 		},
 		{
 			title: 'Category',

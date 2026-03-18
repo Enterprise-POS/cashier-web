@@ -140,6 +140,65 @@ export async function orderItemGetSearch(
 	}
 }
 
+export async function orderItemExportProfit(
+	tenantId: number,
+	storeId: number | null,
+	dateFilter: DateFilter | null,
+): Promise<HTTPResult<string>> {
+	try {
+		const userCookies = await cookies();
+
+		const reqBody = {
+			store_id: storeId,
+			date_filter: dateFilter,
+		};
+
+		const requestInit: RequestInit = {
+			method: 'POST',
+			credentials: 'include',
+			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqBody),
+		};
+
+		const targetURL = serverRoutes.orderItemExportProfit.replace('<tenantId>', tenantId.toString());
+		const response = await fetch(targetURL, requestInit);
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = {
+					code: response.status,
+					status: 'error',
+					message: `[DEV] Fatal error while parsing message: ${response.statusText}`,
+				};
+			}
+
+			switch (response.status) {
+				case 400:
+				case 401:
+				case 403:
+					return { result: null, error: body.message };
+				default:
+					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
+					return { result: null, error: body.message };
+			}
+		}
+
+		const buffer = await response.arrayBuffer();
+		const base64 = Buffer.from(buffer).toString('base64');
+		return { result: base64, error: null };
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error);
+			return { result: null, error: error.message };
+		}
+
+		console.error(error);
+		return { result: null, error: '[UNHANDLED ERROR] Unknown error' };
+	}
+}
+
 export type OrderItemFindByIdReturnType = {
 	order_item: OrderItemDef;
 	purchased_item_list: PurchasedItemDef[];

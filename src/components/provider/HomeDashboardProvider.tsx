@@ -1,6 +1,5 @@
 'use client';
 
-import { useQueryClient } from '@tanstack/react-query';
 import { TablePaginationConfig } from 'antd';
 import dayjs from 'dayjs';
 import { createContext, useContext, useMemo, useState } from 'react';
@@ -11,10 +10,12 @@ import {
 	OnChangeSelectedStore,
 	OnClickErrorToastCloseButton,
 	OnClickGenerateReport,
+	OnDismissExportError,
 	OnSetDateRange,
 } from '@/_classes/HomeDashboardEvent';
 import { OrderItem } from '@/_classes/OrderItem';
 import { ReportResult } from '@/_classes/ReportResult';
+import { orderItemExportProfit } from '@/_lib/order_item';
 import { convertTo } from '@/_lib/utils';
 import { useDashboardData } from '@/components/hooks/useDashboardData';
 import { useStore } from '@/components/provider/StoreProvider';
@@ -40,6 +41,8 @@ type HomeDashboardContextType = {
 	reportResult: ReportResult | undefined;
 	orderItems: OrderItem[];
 	isLoading: boolean;
+	isExporting: boolean;
+	exportError: string | null;
 	isError: boolean;
 	errorMessage: string;
 	stores: { value: string; label: string }[];
@@ -51,8 +54,9 @@ const HomeDashboardContext = createContext<HomeDashboardContextType | undefined>
 
 function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 	const [state, setState] = useState<HomeDashboardState>(initialState);
+	const [isExporting, setIsExporting] = useState(false);
+	const [exportError, setExportError] = useState<string | null>(null);
 	const storeCtx = useStore();
-	const queryClient = useQueryClient();
 
 	const stores = storeCtx.data.storeList.map(s => ({
 		value: String(s.id),
@@ -96,10 +100,45 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 		}
 
 		if (event instanceof OnClickGenerateReport) {
-			// Just invalidate — TanStack refetches automatically
-			setState(v => ({ ...v, pagination: initialState.pagination }));
-			queryClient.invalidateQueries({ queryKey: ['salesReport'] });
-			queryClient.invalidateQueries({ queryKey: ['orderItems'] });
+			setIsExporting(true);
+			setExportError(null);
+			try {
+				const result = await orderItemExportProfit(
+					storeCtx.getCurrentTenantId(),
+					state.selectedStoreId || null,
+					dateFilter,
+				);
+
+				if (result.error) {
+					setExportError(result.error);
+					return;
+				}
+
+				const byteCharacters = atob(result.result!);
+				const byteArray = new Uint8Array(byteCharacters.length);
+				for (let i = 0; i < byteCharacters.length; i++) {
+					byteArray[i] = byteCharacters.charCodeAt(i);
+				}
+				const blob = new Blob([byteArray], {
+					type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				});
+				const url = URL.createObjectURL(blob);
+				const anchor = document.createElement('a');
+				anchor.href = url;
+				const timestamp = dayjs().format('YYYY-MM-DD_HH-mm-ss');
+				anchor.download = `profit_report_${timestamp}.xlsx`;
+				anchor.click();
+				URL.revokeObjectURL(url);
+			} catch (e) {
+				setExportError(e instanceof Error ? e.message : 'Unknown error while exporting');
+			} finally {
+				setIsExporting(false);
+			}
+			return;
+		}
+
+		if (event instanceof OnDismissExportError) {
+			setExportError(null);
 			return;
 		}
 
@@ -144,6 +183,8 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 				reportResult,
 				orderItems,
 				isLoading,
+				isExporting,
+				exportError,
 				isError,
 				errorMessage,
 				stores,

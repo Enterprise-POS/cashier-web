@@ -8,6 +8,7 @@ import { Item } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { ItemDef, StockType } from '@/_interface/ItemDef';
+import { formatIDR } from '@/_lib/utils';
 import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useFormState } from '@/components/hooks/useFormState';
@@ -66,12 +67,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			title: 'Base Price',
 			dataIndex: 'basePrice',
 			sorter: (a: Item, b: Item) => a.basePrice - b.basePrice,
-			render: (basePrice: number) =>
-				new Intl.NumberFormat('id-ID', {
-					style: 'currency',
-					currency: 'IDR',
-					minimumFractionDigits: 0,
-				}).format(basePrice),
+			render: (basePrice: number) => formatIDR(basePrice),
 		},
 		{
 			title: 'T/U',
