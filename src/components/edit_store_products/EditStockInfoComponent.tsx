@@ -118,6 +118,7 @@ export default function EditStockInfoComponent() {
 				pagination.current!,
 				limit,
 				search,
+				0, // categoryId
 			);
 			if (error !== null) {
 				// A special condition that maybe user not yet transfer any warehouse items
@@ -176,6 +177,9 @@ export default function EditStockInfoComponent() {
 										stocks: storeStock.stocks,
 										price: convertedPrice,
 										created_at: storeStock.createdAt.toString(),
+
+										category_id: 0,
+										category_name: '',
 									})
 								: storeStock,
 						),
