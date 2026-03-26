@@ -8,8 +8,8 @@ import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
-import { OrderItemDef } from '@/_interface/OrderItemDef.js';
-import { PurchasedItemDef } from '@/_interface/PurchasedItemDef.js';
+import { OrderItemDef } from '@/_interface/OrderItemDef';
+import { PurchasedItemDef } from '@/_interface/PurchasedItemDef';
 
 export async function orderItemSalesReport(
 	tenantId: number,
