@@ -67,7 +67,7 @@ export async function emailAndPasswordSignInAction(formData: FormData): Promise<
 			secure: true,
 			maxAge: 60 * 60 * 24 * 7, // 1 week
 			path: '/',
-			sameSite: 'none',
+			sameSite: 'lax',
 		});
 
 		return { result: body.data.token, error: null };
@@ -139,7 +139,7 @@ export async function emailAndPasswordSignUpAction(formData: FormData): Promise<
 		_cookies.set(Constants.CookieKey.enterprisePOS, body.data.token as string, {
 			httpOnly: true,
 			path: '/',
-			sameSite: 'none',
+			sameSite: 'lax',
 			secure: true,
 			maxAge: 60 * 60 * 24 * 7, // 1 week
 		});
