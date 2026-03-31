@@ -148,23 +148,11 @@ export default function Sidebar() {
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Main</h6>
 							<ul>
-								<li className="submenu">
-									<Link href="#">
-										<i className="ti ti-layout-grid fs-16 me-2"></i>
-										<span>Dashboard</span>
-										<span className="menu-arrow"></span>
+								<li className={routes.index === pathname ? 'active' : ''}>
+									<Link href={routes.index}>
+										<i className="ti ti-home fs-16 me-2"></i>
+										<span>Home</span>
 									</Link>
-									<ul>
-										<li className="active">
-											<Link href={routes.index}>Home Dashboard</Link>
-										</li>
-										{/* <li>
-											<Link href="#">Admin Dashboard 2</Link>
-										</li>
-										<li>
-											<Link href="#">Sales Dashboard</Link>
-										</li> */}
-									</ul>
 								</li>
 								{/* <li className="submenu">
 									<Link href="#">
@@ -311,14 +299,14 @@ export default function Sidebar() {
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Inventory</h6>
 							<ul>
-								<li>
-									<Link href={routes.productList} className={routes.productList === pathname ? 'active' : ''}>
+								<li className={routes.productList === pathname ? 'active' : ''}>
+									<Link href={routes.productList}>
 										<i className="ti ti-box fs-16 me-2"></i>
 										<span>Products</span>
 									</Link>
 								</li>
-								<li>
-									<Link href={routes.addProduct} className={routes.addProduct === pathname ? 'active' : ''}>
+								<li className={routes.addProduct === pathname ? 'active' : ''}>
+									<Link href={routes.addProduct}>
 										<i className="ti ti-table-plus fs-16 me-2"></i>
 										<span>Create Product</span>
 									</Link>
@@ -336,7 +324,7 @@ export default function Sidebar() {
 									</Link>
 								</li> */}
 								<li>
-									<Link href={routes.categoryList}>
+									<Link href={routes.categoryList === pathname ? 'active' : ''}>
 										<i className="ti ti-list-details fs-16 me-2"></i>
 										<span>Category</span>
 									</Link>
@@ -388,19 +376,19 @@ export default function Sidebar() {
 						<li className="submenu-open">
 							<h6 className="submenu-hdr">Stock</h6>
 							<ul>
-								<li>
+								<li className={routes.storeList === pathname ? 'active' : ''}>
 									<Link href={routes.storeList}>
 										<i className="ti ti-home fs-16 me-2"></i>
 										<span>Store List</span>
 									</Link>
 								</li>
-								<li>
+								<li className={routes.manageStocks === pathname ? 'active' : ''}>
 									<Link href={routes.manageStocks}>
 										<i className="ti ti-stack-3 fs-16 me-2"></i>
 										<span>Manage Stocks</span>
 									</Link>
 								</li>
-								<li>
+								<li className={routes.editStoreProducts === pathname ? 'active' : ''}>
 									<Link href={routes.editStoreProducts}>
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
 										<span>Edit Store Products</span>
@@ -640,7 +628,7 @@ export default function Sidebar() {
 										<span>Employees</span>
 									</Link> */}
 								</li>
-								<li>
+								<li className={routes.tenantMembers === pathname ? 'active' : ''}>
 									<Link href={routes.tenantMembers}>
 										<i className="ti ti-archive fs-16 me-2"></i>
 										<span>Tenant Members</span>
