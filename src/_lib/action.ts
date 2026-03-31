@@ -67,6 +67,7 @@ export async function emailAndPasswordSignInAction(formData: FormData): Promise<
 			secure: true,
 			maxAge: 60 * 60 * 24 * 7, // 1 week
 			path: '/',
+			sameSite: 'none',
 		});
 
 		return { result: body.data.token, error: null };
