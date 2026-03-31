@@ -32,3 +32,4 @@ export class OnDateRangeOk extends HomeDashboardEvent {
 	}
 }
 export class OnClickErrorToastCloseButton extends HomeDashboardEvent {}
+export class OnDismissExportError extends HomeDashboardEvent {}

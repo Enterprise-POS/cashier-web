@@ -1,7 +1,8 @@
-export const baseURL = process.env.MODE === 'prod' ? process.env.BASE_URL : process.env.DEV_URL;
-export const apiVersion = process.env.API_VERSION || 'api/v1';
+export const baseURL =
+	process.env.NEXT_PUBLIC_MODE === 'prod' ? process.env.NEXT_PUBLIC_BASE_URL : process.env.NEXT_PUBLIC_DEV_URL;
+export const apiVersion = process.env.NEXT_PUBLIC_API_VER || 'api/v1';
 
-export const serverRoutes = {
+export const server_routes = {
 	// user
 	signIn: `${baseURL}/${apiVersion}/users/sign_in`,
 	signUp: `${baseURL}/${apiVersion}/users/sign_up`,
@@ -46,5 +47,4 @@ export const serverRoutes = {
 	orderItemSalesReport: `${baseURL}/${apiVersion}/order_items/sales_report/<tenantId>`, // POST
 	orderItemGetSearch: `${baseURL}/${apiVersion}/order_items/search/<tenantId>`, // POST
 	orderItemFindById: `${baseURL}/${apiVersion}/order_items/details/<tenantId>`, // GET
-	orderItemExportProfit: `${baseURL}/${apiVersion}/order_items/export_profit/<tenantId>`, // POST
 };

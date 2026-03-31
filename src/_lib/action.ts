@@ -204,7 +204,7 @@ export async function getTenantWithUser(): Promise<HTTPResult<TenantDef[]>> {
 			}
 		}
 
-		const body = (await response.json()) as HTTPSuccessResponse<{ tenants: TenantDef[] }>;
+		const body: HTTPSuccessResponse<{ tenants: TenantDef[] }> = await response.json();
 		if (body?.data?.tenants === undefined) {
 			return { result: null, error: 'Something wrong while parsing the data' };
 		}

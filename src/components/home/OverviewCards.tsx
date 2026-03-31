@@ -1,10 +1,10 @@
 'use client';
-import { setStringPrefix } from '@/_lib/utils';
+import { formatIDR } from '@/_lib/utils';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
 export default function OverviewCards() {
 	const homeDashboardCtx = useHomeDashboard();
-	const reportResult = homeDashboardCtx.data.reportResult;
+	const reportResult = homeDashboardCtx.reportResult;
 
 	return (
 		<div className="row">
@@ -17,7 +17,7 @@ export default function OverviewCards() {
 						<div className="ms-2">
 							<p className="fw-medium mb-1">Cash-in</p>
 							<div>
-								<h3>{reportResult !== undefined ? setStringPrefix(reportResult.sumPurchasedPrice, '￥') : '-'}</h3>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumPurchasedPrice) : '-'}</h3>
 							</div>
 						</div>
 					</div>
@@ -32,7 +32,7 @@ export default function OverviewCards() {
 						<div className="ms-2">
 							<p className="fw-medium mb-1">Gross Sales</p>
 							<div>
-								<h3>{reportResult !== undefined ? setStringPrefix(reportResult.sumTotalAmount, '￥') : '-'}</h3>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumTotalAmount) : '-'}</h3>
 							</div>
 						</div>
 					</div>
@@ -47,7 +47,7 @@ export default function OverviewCards() {
 						<div className="ms-2">
 							<p className="fw-medium mb-1">Change</p>
 							<div>
-								<h3>{reportResult !== undefined ? setStringPrefix(reportResult.getChanges(), '￥') : '-'}</h3>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.getChanges()) : '-'}</h3>
 							</div>
 						</div>
 					</div>

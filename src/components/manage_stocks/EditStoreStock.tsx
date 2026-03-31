@@ -1,7 +1,6 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import { MinusCircle, PlusCircle, Trash2 } from 'react-feather';
+import { MinusCircle, PlusCircle } from 'react-feather';
 
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { TransferStockRequest } from '@/_interface/TransferStock';

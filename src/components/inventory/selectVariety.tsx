@@ -6,15 +6,18 @@ export default function SelectVariety({
 	options,
 	disabled = false,
 	onChange,
+	className = '',
 }: {
 	options: any;
 	disabled: boolean;
+	className: string;
 	onChange: (newValue: any, actionMeta: any) => void;
 }) {
 	return (
 		<Select
 			isDisabled={disabled}
 			onChange={onChange}
+			className={className}
 			classNamePrefix="react-select"
 			options={options}
 			placeholder="Choose"

@@ -10,6 +10,8 @@ export interface StoreStockV2Def {
 	item_id: number;
 	created_at: string; // Warehouse item created_at;
 	stock_type: StockType;
+	category_name: string;
+	category_id: number;
 
 	// total_count: number; Will not use this property, instead use count that will return with StoreStockV2,
 	// see route GetAllV2

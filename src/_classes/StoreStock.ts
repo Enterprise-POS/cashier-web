@@ -9,6 +9,8 @@ export class StoreStockV2 {
 	stocks: number;
 	createdAt: Date; // Warehouse item created_at;
 	stockType: StockType;
+	categoryId: number;
+	categoryName: string;
 	constructor(def: StoreStockV2Def) {
 		this.id = def.id;
 		this.itemId = def.item_id;
@@ -16,6 +18,8 @@ export class StoreStockV2 {
 		this.price = def.price;
 		this.stocks = def.stocks;
 		this.stockType = def.stock_type;
+		this.categoryId = def.category_id;
+		this.categoryName = def.category_name;
 		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 	}
 

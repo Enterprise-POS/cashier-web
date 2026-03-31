@@ -20,3 +20,9 @@ export function setStringPrefix(val: string | number, prefix: string): string {
 export function toEpochInSeconds(epochInMs: number): number {
 	return Math.round(epochInMs / 1000);
 }
+
+const idrFormatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+
+export function formatIDR(value: number): string {
+	return idrFormatter.format(value);
+}

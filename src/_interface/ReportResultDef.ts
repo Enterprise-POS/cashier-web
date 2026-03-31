@@ -5,4 +5,5 @@ export interface ReportResultDef {
 	sum_discount_amount: number;
 	sum_total_amount: number;
 	sum_transactions: number;
+	sum_profit: number;
 }

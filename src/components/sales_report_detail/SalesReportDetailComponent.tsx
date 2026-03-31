@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { OrderItem } from '@/_classes/OrderItem';
 import { PurchasedItem } from '@/_classes/PurchasedItem';
 import { OrderItemFindByIdReturnType } from '@/_lib/order_item';
-import { setStringPrefix } from '@/_lib/utils';
+import { formatIDR } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import CreatedDate from '@/components/sales_report_detail/CreatedDate';
 
@@ -60,16 +60,16 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 											</td>
 											<td className="text-gray-9 fw-medium text-end">{purchasedItem.quantity}</td>
 											<td className="text-gray-9 fw-medium text-end">
-												{setStringPrefix(purchasedItem.storePriceSnapshot, '￥')}
+												{formatIDR(purchasedItem.storePriceSnapshot)}
 											</td>
 											<td className="text-gray-9 fw-medium text-end">
-												{setStringPrefix(purchasedItem.storePriceSnapshot * purchasedItem.quantity, '￥')}
+												{formatIDR(purchasedItem.storePriceSnapshot * purchasedItem.quantity)}
 											</td>
 											<td className="text-gray-9 fw-medium text-end">
-												{setStringPrefix(purchasedItem.discountAmount, '￥')}
+												{formatIDR(purchasedItem.discountAmount)}
 											</td>
 											<td className="text-gray-9 fw-medium text-end">
-												{setStringPrefix(purchasedItem.totalAmount, '￥')}
+												{formatIDR(purchasedItem.totalAmount)}
 											</td>
 										</tr>
 									))}
@@ -81,24 +81,24 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 						<div className="col-md-5 ms-auto mb-3">
 							<div className="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
 								<p className="mb-0">Sub Total</p>
-								<p className="text-dark fw-medium mb-2">{setStringPrefix(orderItem.subTotal, '￥')}</p>
+								<p className="text-dark fw-medium mb-2">{formatIDR(orderItem.subTotal)}</p>
 							</div>
 							<div className="d-flex justify-content-between align-items-center border-bottom mb-2 pe-3">
 								<p className="mb-0">Discount (0%)</p>
-								<p className="text-dark fw-medium mb-2">{setStringPrefix(orderItem.discountAmount, '￥')}</p>
+								<p className="text-dark fw-medium mb-2">{formatIDR(orderItem.discountAmount)}</p>
 							</div>
 							<div className="d-flex justify-content-between align-items-center mb-2 pe-3">
 								<h5>Total Amount</h5>
-								<h5>{setStringPrefix(orderItem.totalAmount, '￥')}</h5>
+								<h5>{formatIDR(orderItem.totalAmount)}</h5>
 							</div>
 							<div className="d-flex justify-content-between align-items-center mb-2 pe-3 border-bottom mb-2 pe-3">
 								<p className="mb-0">Paid Amount</p>
-								<p className="text-dark fw-medium mb-2">{setStringPrefix(orderItem.purchasedPrice, '￥')}</p>
+								<p className="text-dark fw-medium mb-2">{formatIDR(orderItem.purchasedPrice)}</p>
 							</div>
 							<div className="d-flex justify-content-between align-items-center mb-2 pe-3">
 								<p className="mb-0">Change</p>
 								<p className="text-dark fw-medium mb-2">
-									{setStringPrefix(orderItem.purchasedPrice - orderItem.totalAmount, '￥')}
+									{formatIDR(orderItem.purchasedPrice - orderItem.totalAmount)}
 								</p>
 							</div>
 							{/* <p className="fs-12">Amount in Words : Dollar Five thousand Seven Seventy Five</p> */}
