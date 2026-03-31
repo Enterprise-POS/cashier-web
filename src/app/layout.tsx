@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Nunito } from 'next/font/google';
+import { cookies } from 'next/headers';
 import Script from 'next/script';
 
 import '@/assets/css/bootstrap.min.css';
@@ -8,11 +9,12 @@ import '@/assets/plugins/fontawesome/css/fontawesome.min.css';
 import '@/assets/plugins/tabler-icons/tabler-icons.min.css';
 import '@/assets/scss/main.scss';
 
+import { Constants } from '@/components/core/data/constant';
 import Header from '@/components/partials/header/header';
 import Sidebar from '@/components/partials/sidebar';
-import { TenantProvider } from '@/components/provider/TenantProvider';
-import { StoreProvider } from '@/components/provider/StoreProvider';
 import { QueryProvider } from '@/components/provider/QueryProvider';
+import { StoreProvider } from '@/components/provider/StoreProvider';
+import { TenantProvider } from '@/components/provider/TenantProvider';
 
 export const metadata: Metadata = {
 	title: {
@@ -42,7 +44,10 @@ export const nunito = Nunito({
 	variable: '--Nunito',
 });
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+	const cookieStore = await cookies();
+	const token = cookieStore.get(Constants.CookieKey.enterprisePOS)?.value ?? '';
+
 	return (
 		<html lang="en">
 			<head>
@@ -51,7 +56,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 			</head>
 			<body className={`${nunito.variable} ${nunito.variable} antialiased main-wrapper`} data-layout="default">
 				<QueryProvider>
-					<TenantProvider>
+					<TenantProvider token={token}>
 						<Sidebar />
 						<Header />
 						<StoreProvider>{children}</StoreProvider>

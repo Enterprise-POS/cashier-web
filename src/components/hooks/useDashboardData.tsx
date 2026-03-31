@@ -12,10 +12,11 @@ export function useDashboardData(
 	page: number,
 	pageSize: number,
 	dateFilter: DateFilter,
+	token: string,
 ) {
 	const salesQuery = useQuery({
 		queryKey: ['salesReport', tenantId, storeId, dateFilter],
-		queryFn: () => orderItemSalesReport(tenantId, storeId, dateFilter),
+		queryFn: () => orderItemSalesReport(tenantId, storeId, dateFilter, token),
 		enabled: tenantId !== 0,
 		staleTime: 1000 * 60 * 5, // cache for 5 min
 		select: (data: HTTPResult<ReportResultDef>) => {
@@ -26,7 +27,7 @@ export function useDashboardData(
 
 	const orderItemsQuery = useQuery({
 		queryKey: ['orderItems', tenantId, storeId, page, pageSize, dateFilter],
-		queryFn: () => orderItemGetSearch(tenantId, storeId, pageSize, page, dateFilter),
+		queryFn: () => orderItemGetSearch(tenantId, storeId, pageSize, page, dateFilter, token),
 		enabled: tenantId !== 0,
 		staleTime: 1000 * 60 * 5,
 		select: (data: HTTPResult<{ defs: OrderItemDef[]; total_count: number }>) => {

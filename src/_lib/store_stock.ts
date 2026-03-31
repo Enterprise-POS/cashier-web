@@ -13,6 +13,7 @@ export async function getAllV2(
 	limit: number,
 	nameQuery: string,
 	categoryId: number,
+	token: string,
 ): Promise<HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }>> {
 	const targetURL = server_routes.storeStocksGetAllV2.replace('<tenantId>', tenantId.toString());
 	const url = new URL(targetURL);
@@ -26,7 +27,7 @@ export async function getAllV2(
 	try {
 		const response = await fetch(url.href, {
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 		});
 
 		if (!response.ok) {
@@ -74,7 +75,7 @@ export async function getAllV2(
 	}
 }
 
-export async function transferStockToWarehouse(val: TransferStockRequest): Promise<HTTPResult<void>> {
+export async function transferStockToWarehouse(val: TransferStockRequest, token: string): Promise<HTTPResult<void>> {
 	if (convertTo.number(val.itemId) === null) return { result: null, error: 'Check input for item ID' };
 	if (convertTo.number(val.quantity) === null) return { result: null, error: 'Check input for quantity' };
 	if (convertTo.number(val.storeId) === null) return { result: null, error: 'Check input for store ID' };
@@ -91,7 +92,7 @@ export async function transferStockToWarehouse(val: TransferStockRequest): Promi
 		const response = await fetch(targetURL, {
 			method: 'PUT',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify(reqBody),
 		});
 
@@ -128,7 +129,7 @@ export async function transferStockToWarehouse(val: TransferStockRequest): Promi
 	}
 }
 
-export async function transferStockToStoreStock(val: TransferStockRequest): Promise<HTTPResult<void>> {
+export async function transferStockToStoreStock(val: TransferStockRequest, token: string): Promise<HTTPResult<void>> {
 	if (convertTo.number(val.itemId) === null) return { result: null, error: 'Check input for item ID' };
 	if (convertTo.number(val.quantity) === null) return { result: null, error: 'Check input for quantity' };
 	if (convertTo.number(val.storeId) === null) return { result: null, error: 'Check input for store ID' };
@@ -145,7 +146,7 @@ export async function transferStockToStoreStock(val: TransferStockRequest): Prom
 		const response = await fetch(targetURL, {
 			method: 'PUT',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify(reqBody),
 		});
 
@@ -182,7 +183,7 @@ export async function transferStockToStoreStock(val: TransferStockRequest): Prom
 	}
 }
 
-export async function editStoreStock(formData: FormData): Promise<HTTPResult<void>> {
+export async function editStoreStock(formData: FormData, token: string): Promise<HTTPResult<void>> {
 	const id = formData.get('id');
 	const price = formData.get('price');
 	const storeId = formData.get('storeId');
@@ -211,7 +212,7 @@ export async function editStoreStock(formData: FormData): Promise<HTTPResult<voi
 		const response = await fetch(targetURL, {
 			method: 'PUT',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify(reqBody),
 		});
 

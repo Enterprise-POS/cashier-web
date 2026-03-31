@@ -119,6 +119,7 @@ export default function EditStockInfoComponent() {
 				limit,
 				search,
 				0, // categoryId
+				tenantCtx.getToken(),
 			);
 			if (error !== null) {
 				// A special condition that maybe user not yet transfer any warehouse items
@@ -151,7 +152,7 @@ export default function EditStockInfoComponent() {
 		try {
 			const formData = new FormData(e.currentTarget);
 
-			const { error }: HTTPResult<void> = await editStoreStock(formData);
+			const { error }: HTTPResult<void> = await editStoreStock(formData, tenantCtx.getToken());
 			if (error !== null) {
 				formState.setError({ message: error });
 			} else {

@@ -11,6 +11,7 @@ export async function orderItemSalesReport(
 	tenantId: number,
 	storeId: number | null,
 	dateFilter: DateFilter | null,
+	token: string,
 ): Promise<HTTPResult<ReportResultDef>> {
 	try {
 		const reqBody = {
@@ -22,7 +23,7 @@ export async function orderItemSalesReport(
 		const requestInit: RequestInit = {
 			method: 'POST',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify(reqBody),
 		};
 
@@ -72,6 +73,7 @@ export async function orderItemGetSearch(
 	limit: number,
 	page: number,
 	dateFilter: DateFilter | null,
+	token: string,
 ): Promise<HTTPResult<{ defs: OrderItemDef[]; total_count: number }>> {
 	try {
 		const reqBody = {
@@ -86,7 +88,7 @@ export async function orderItemGetSearch(
 		const requestInit: RequestInit = {
 			method: 'POST',
 			credentials: 'include',
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify(reqBody),
 		};
 

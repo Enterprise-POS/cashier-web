@@ -6,7 +6,7 @@ import { getAllV2 } from '@/_lib/store_stock';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
-export function useManageStocksQuery() {
+export function useManageStocksQuery(token: string) {
 	const storeCtx = useStore();
 	const { pagination, appliedNameQuery, appliedCategoryId, appliedAscending } = useManageStocksStore();
 
@@ -32,6 +32,7 @@ export function useManageStocksQuery() {
 				pagination.pageSize!,
 				appliedNameQuery,
 				appliedCategoryId,
+				token,
 			);
 
 			if (error !== null) {

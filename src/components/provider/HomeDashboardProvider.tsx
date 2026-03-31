@@ -52,7 +52,7 @@ type HomeDashboardContextType = {
 
 const HomeDashboardContext = createContext<HomeDashboardContextType | undefined>(undefined);
 
-function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
+function HomeDashboardProvider({ children, token }: { children: React.ReactNode; token: string }) {
 	const [state, setState] = useState<HomeDashboardState>(initialState);
 	const [isExporting, setIsExporting] = useState(false);
 	const [exportError, setExportError] = useState<string | null>(null);
@@ -78,6 +78,7 @@ function HomeDashboardProvider({ children }: { children: React.ReactNode }) {
 		state.pagination.current!,
 		state.pagination.pageSize!,
 		dateFilter,
+		token, // pass the token
 	);
 
 	const isLoading = salesQuery.isLoading || orderItemsQuery.isLoading;

@@ -1,3 +1,4 @@
+'use client';
 import { useQueryClient } from '@tanstack/react-query';
 import { Input, Table } from 'antd';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ import SectionLoading from '@/components/partials/SectionLoading';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
-export default function ManageStocksComponents() {
+export default function ManageStocksComponents({ token }: { token: string }) {
 	const storeCtx = useStore();
 	const queryClient = useQueryClient();
 	const [isMounted, setIsMounted] = useState(false);
@@ -57,7 +58,7 @@ export default function ManageStocksComponents() {
 	);
 
 	// TanStack handles fetching — auto-refetches when queryKey changes
-	const { data, isFetching } = useManageStocksQuery();
+	const { data, isFetching } = useManageStocksQuery(token);
 	const storeStocks = data?.storeStocks ?? [];
 	const total = data?.total ?? 0;
 
@@ -133,9 +134,12 @@ export default function ManageStocksComponents() {
 			setLoading(true);
 			let result;
 
-			if (transferStockRequest.quantity > 0) result = await transferStockToStoreStock(transferStockRequest);
+			if (transferStockRequest.quantity > 0) result = await transferStockToStoreStock(transferStockRequest, token);
 			else
-				result = await transferStockToWarehouse({ ...transferStockRequest, quantity: -transferStockRequest.quantity });
+				result = await transferStockToWarehouse(
+					{ ...transferStockRequest, quantity: -transferStockRequest.quantity },
+					token,
+				);
 
 			const { error } = result;
 			if (error !== null) {
@@ -156,7 +160,7 @@ export default function ManageStocksComponents() {
 	async function handleTransferItem(transferStockRequest: TransferStockRequest, itemName: string) {
 		if (isFetching) return;
 		setLoading(true);
-		const { error } = await transferStockToStoreStock(transferStockRequest);
+		const { error } = await transferStockToStoreStock(transferStockRequest, token);
 		if (error !== null) {
 			setError(error);
 		} else {

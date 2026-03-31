@@ -1,14 +1,15 @@
-'use client';
+import { Constants } from '@/components/core/data/constant';
 import ManageStocksComponents from '@/components/manage_stocks/ManageStocksComponents';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
 import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
+import { cookies } from 'next/headers';
 
 import Link from 'next/link';
 
 // export default function ManageStock({ searchParams }: { searchParams: Promise<{ storeId: string | undefined }> }) {
-export default function ManageStock() {
+export default async function ManageStock() {
 	/*
 		1. When user click manage_stocks from navbar then by default there is no id could be detected
 		2. Check cookie session
@@ -18,6 +19,9 @@ export default function ManageStock() {
 		4b. If the request success then just display all current store stocks -> end
 		5. After get all user store, then make user select what want to load
 	 */
+
+	const cookieStore = await cookies();
+	const token = cookieStore.get(Constants.CookieKey.enterprisePOS)?.value ?? '';
 
 	return (
 		<>
@@ -42,7 +46,7 @@ export default function ManageStock() {
 							</Link>
 						</div>
 					</div>
-					<ManageStocksComponents />
+					<ManageStocksComponents token={token} />
 				</div>
 				<Footer />
 			</div>

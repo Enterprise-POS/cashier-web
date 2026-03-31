@@ -20,6 +20,7 @@ type TenantContextType = {
 
 	refetchGetTenants: () => void; // internal use
 	// setTenantState: (state: SetStateAction<TenantProviderState>) => void; // internal use
+	getToken: () => string;
 };
 
 const initialState: TenantProviderState = {
@@ -31,7 +32,7 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 const EXCLUDED_ROUTES = ['/server_error'];
 
-function TenantProvider({ children }: { children: React.ReactNode }) {
+function TenantProvider({ children, token }: { children: React.ReactNode; token: string }) {
 	const [data, setTenantState] = useState<TenantProviderState>(initialState);
 	const [isStateLoading, setIsLoading] = useState(false);
 	const isFetchingRef = useRef(false); // Track fetch status immediately
@@ -95,6 +96,10 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 		}
 	}
 
+	function getToken() {
+		return token;
+	}
+
 	// When this page first open then this effect will run to fetch immediately user tenant
 	// Will not re fetch when the user logout and login again.
 	// The refetch for this case handled by HeaderFloatingMenu.tsx,
@@ -104,7 +109,7 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 	}, []);
 
 	return (
-		<TenantContext.Provider value={{ data, isStateLoading, refetchGetTenants, setCurrentTenant }}>
+		<TenantContext.Provider value={{ data, isStateLoading, refetchGetTenants, setCurrentTenant, getToken }}>
 			{children}
 		</TenantContext.Provider>
 	);
