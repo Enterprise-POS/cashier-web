@@ -69,7 +69,7 @@ export async function emailAndPasswordSignInAction(formData: FormData): Promise<
 			path: '/',
 		});
 
-		return { result: 'Sign in success', error: null };
+		return { result: body.data.token, error: null };
 	} catch (e) {
 		const error = e as Error;
 		return { result: null, error: error.message };
@@ -130,7 +130,7 @@ export async function emailAndPasswordSignUpAction(formData: FormData): Promise<
 
 		const body = await response.json();
 		if (body?.data.token === undefined) {
-			throw new Error('Unkown error, could not get response body, status code: ' + response.status);
+			throw new Error('Unknown error, could not get response body, status code: ' + response.status);
 		}
 
 		// set the cookie
@@ -143,7 +143,7 @@ export async function emailAndPasswordSignUpAction(formData: FormData): Promise<
 			maxAge: 60 * 60 * 24 * 7, // 1 week
 		});
 
-		return { result: 'Sing up success', error: null };
+		return { result: body.data.token, error: null };
 	} catch (e) {
 		const error = e as Error;
 		throw new Error(error.message);

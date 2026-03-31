@@ -1,11 +1,12 @@
 'use client';
 
-import { emailAndPasswordSignUpAction } from '@/_lib/action';
-import { all_routes as routes } from '@/components/core/data/all_routes';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+
+import { emailAndPasswordSignUpAction } from '@/_lib/action';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 
 type PasswordVisibility = { [key: string]: boolean };
 

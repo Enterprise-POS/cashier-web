@@ -26,7 +26,7 @@ export default function Login() {
 		if (isFormLoading) return;
 		setFormLoading(true);
 
-		const { result, error } = await emailAndPasswordSignInAction(formData);
+		const { error } = await emailAndPasswordSignInAction(formData);
 		if (error !== null) {
 			// show error
 			console.warn('DEV NOTE: ', error);
@@ -38,7 +38,7 @@ export default function Login() {
 			// refresh will re-render the UI
 			setShowError(false);
 			setShowSuccess(true);
-			setSuccessMessage(result!);
+			setSuccessMessage('Login success');
 			router.push('/');
 
 			// Will force to re-render again header

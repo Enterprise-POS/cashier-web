@@ -62,16 +62,12 @@ function TenantProvider({ children }: { children: React.ReactNode }) {
 				if (error.includes('[LOGIN]')) {
 					setTenantState(val => ({ ...val, tenantList: [] }));
 					return; // We don't want the page keep executing code even the page is change
+				} else if (error.includes('[SERVER ERROR]')) {
+					sessionStorage.setItem('lastError', error);
+					sessionStorage.setItem('lastErrorTime', Date.now().toString());
+					router.push('/500');
+					return; // Navigating so return is required here
 				} else {
-					console.warn(error);
-					const isFatalError = error.includes('[SERVER ERROR]');
-					if (isFatalError) {
-						sessionStorage.setItem('lastError', error);
-						sessionStorage.setItem('lastErrorTime', Date.now().toString());
-						router.push('/500');
-						return; // Navigating so return is required here
-					}
-
 					// Normal error, should show what cause error to user
 					setTenantState(val => ({ ...val, tenantList: [] }));
 				}
