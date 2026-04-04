@@ -323,18 +323,12 @@ export default function Sidebar() {
 										<span>Low Stocks</span>
 									</Link>
 								</li> */}
-								<li>
-									<Link href={routes.categoryList === pathname ? 'active' : ''}>
+								<li className={routes.categoryList === pathname ? 'active' : ''}>
+									<Link href={routes.categoryList}>
 										<i className="ti ti-list-details fs-16 me-2"></i>
 										<span>Category</span>
 									</Link>
 								</li>
-								{/* <li>
-									<Link href="sub-categories.html">
-										<i className="ti ti-carousel-vertical fs-16 me-2"></i>
-										<span>Sub Category</span>
-									</Link>
-								</li> */}
 								{/* <li>
 									<Link href={routes.brandList}>
 										<i className="ti ti-triangles fs-16 me-2"></i>
