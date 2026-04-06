@@ -13,6 +13,17 @@ export function closeBootstrapModal(selector: string) {
 	}
 }
 
+export function openBootstrapModal(selector: string) {
+	const modalElement = document.querySelector(selector);
+
+	if (modalElement) {
+		// Bootstrap 5 way
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const modal = new (window as any).bootstrap.Modal(modalElement);
+		modal.show();
+	}
+}
+
 export function setStringPrefix(val: string | number, prefix: string): string {
 	return val.toString().padStart(val.toString().length + 1, prefix);
 }

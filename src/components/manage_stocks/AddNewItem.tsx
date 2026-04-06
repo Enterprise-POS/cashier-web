@@ -4,12 +4,23 @@ import Select from 'react-select';
 import { Store } from '@/_classes/Store';
 import { Tenant } from '@/_classes/Tenant';
 import { TransferStockRequest } from '@/_interface/TransferStock';
-import { convertTo } from '@/_lib/utils';
+import { closeBootstrapModal, convertTo, openBootstrapModal } from '@/_lib/utils';
 import { getActiveWarehouseItem } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
 import { useTenant } from '@/components/provider/TenantProvider';
 import AsyncSelect from 'react-select/async';
+import { SelectProductToAddNew } from '@/components/manage_stocks/SelectProductToAddNew';
 
+/*
+	User flow when click 'Add New'
+	01. This current / AddNewItem modal will open
+	02. By default selected store id already set
+	03. User click 'select product'
+	04. SelectProductToAddNew modal will open
+	05. When user clicked what product to add then
+	06. Back to AddNewItem modal
+	07. Confirm clicked request to server
+*/
 export function AddNewItem({
 	storeList,
 	currentSelectedStoreId,
@@ -23,51 +34,39 @@ export function AddNewItem({
 }) {
 	const tenantCtx = useTenant();
 	const formState = useFormState();
+	const [selectedStoreId, setSelectedStoreId] = useState(currentSelectedStoreId);
 	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 	const [changedProduct, setChangedProduct] = useState<{ value: string; label: string } | null>(null);
+	const [isOpenAddNewItem, setIsOpenAddItem] = useState(false);
 	const currentSelectedStore: Store | undefined = storeList.find(s => s.id === currentSelectedStoreId);
 	const selectedTenant: Tenant | undefined = tenantCtx.data.tenantList.find(
-		t => t.id === tenantCtx.data.selectedTenantId
+		t => t.id === tenantCtx.data.selectedTenantId,
 	);
 
-	// 01 Get latest products
-	// 02 If user start typing then fetch another
-	const handleGetProducts = async (keyword: string): Promise<{ value: string; label: string }[]> => {
-		if (selectedTenant === undefined) return [];
-
-		try {
-			const page = 1;
-			const limit = 10;
-			const { error, result } = await getActiveWarehouseItem(selectedTenant.id, limit, page, keyword);
-			if (error === null) {
-				return result!.itemDefs.map(def => ({ value: def.item_id!.toString(), label: def.item_name! }));
-			} else {
-				formState.setError({ message: error });
-				return [];
-			}
-		} catch (e) {
-			const error = e as Error;
-			console.error(`[ERROR] ${error.message}`);
-			formState.setError({ message: `Unexpected error: ${error.message}` });
-			return [];
+	const handleOnNewTransferItem = () => {
+		if (tenantCtx.data.selectedTenantId === 0) {
+			formState.setError({ message: 'You are not under any tenant mode. Please make sure the tenant is selected' });
+			return;
 		}
-	};
+		if (selectedStoreId === 0) {
+			formState.setError({ message: 'Please select target store first' });
+			return;
+		}
+		if (itemId === null) return;
 
-	type SelectItemType = { value: string; label: string }[];
-	const loadProducts = (inputValue: string, callback: (options: SelectItemType) => void) => {
-		/*
-			When user not yet complete type then
-			cancel previous request
-		*/
-		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
-		timeoutRef.current = setTimeout(async () => callback(await handleGetProducts(inputValue)), 150);
+		// Callback from parameter. Execute when the confirm button clicked
+		onNewTransferItem(
+			{
+				itemId,
+				quantity: 1,
+				storeId: selectedStoreId,
+				tenantId: tenantCtx.data.selectedTenantId,
+			},
+			changedProduct!.label,
+		);
 	};
 
 	const itemId = convertTo.number(changedProduct?.value ?? '');
-
-	const formName = {
-		item: 'item',
-	};
 
 	return (
 		<>
@@ -75,7 +74,7 @@ export function AddNewItem({
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
 					id="liveToast"
-					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast bg-danger-transparent`}
+					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -111,7 +110,7 @@ export function AddNewItem({
 									<div className="col-lg-12">
 										<div className="mb-3">
 											<label className="form-label">
-												Target Store <span className="text-danger ms-1">*</span>
+												Select Store <span className="text-danger ms-1">*</span>
 											</label>
 											<Select
 												classNamePrefix="react-select"
@@ -119,16 +118,16 @@ export function AddNewItem({
 												placeholder="Choose"
 												tabSelectsValue
 												defaultValue={
-													currentSelectedStore !== undefined && {
-														label: currentSelectedStore.name,
-														value: currentSelectedStore.id,
-													}
+													currentSelectedStore !== undefined
+														? { label: currentSelectedStore.name, value: currentSelectedStore.id }
+														: undefined
 												}
+												onChange={e => setSelectedStoreId(e?.value ?? currentSelectedStoreId)}
 											/>
 										</div>
 									</div>
 									<div className="col-lg-12">
-										<div className="search-form mb-0">
+										{/* <div className="search-form mb-0">
 											<label className="form-label">
 												Product <span className="text-danger ms-1">*</span>
 											</label>
@@ -144,6 +143,28 @@ export function AddNewItem({
 												Product names are case-sensitive. Before adding a new item to the current store, please make
 												sure at least 1 unit is available in the warehouse.
 											</p>
+										</div> */}
+
+										<label className="form-label">
+											Select product to add new<span className="text-danger ms-1">*</span>
+										</label>
+										<div className="page-btn">
+											<button
+												className="btn border text-secondary w-100"
+												type="button"
+												data-bs-toggle="modal"
+												data-bs-target="#select-product-to-add-new"
+												onClick={() => {
+													// Triggers the fetch / fetch the product when select product modal is show
+													setIsOpenAddItem(true);
+
+													// Close add unit for a moment, later will return
+													// AddNewItem -> SelectProductToAddNew -> AddNewItem
+													closeBootstrapModal('#add-units');
+												}}
+											>
+												{changedProduct === null ? 'select product' : changedProduct.label}
+											</button>
 										</div>
 									</div>
 								</div>
@@ -155,27 +176,26 @@ export function AddNewItem({
 								<button
 									className="btn btn-primary"
 									type="button"
-									disabled={itemId === null}
-									onClick={() => {
-										if (itemId === null) return;
-										onNewTransferItem(
-											{
-												itemId,
-												quantity: 1,
-												storeId: currentSelectedStoreId,
-												tenantId: selectedTenant?.id ?? 0,
-											},
-											changedProduct!.label
-										);
-									}}
+									disabled={itemId === null || loading}
+									onClick={() => handleOnNewTransferItem()}
 								>
-									Confirm
+									{loading ? 'Please wait...' : 'Confirm'}
 								</button>
 							</div>
 						</form>
 					</div>
 				</div>
 			</div>
+
+			<SelectProductToAddNew
+				tenantId={tenantCtx.data.selectedTenantId}
+				isModalOpen={isOpenAddNewItem}
+				onSelected={(itemId, itemName) => {
+					setChangedProduct({ value: itemId.toString(), label: itemName });
+					setIsOpenAddItem(false);
+					openBootstrapModal('#add-units');
+				}}
+			/>
 		</>
 	);
 }

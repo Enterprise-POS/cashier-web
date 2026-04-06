@@ -1,6 +1,6 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input, Table } from 'antd';
+import { Input, Pagination, Table } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Delete, Edit } from 'react-feather';
@@ -162,7 +162,11 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 		setLoading(true);
 		const { error } = await transferStockToStoreStock(transferStockRequest, token);
 		if (error !== null) {
-			setError(error);
+			if (error.includes('Not enough stock')) {
+				setError('Please make sure the the new item is available at least 1');
+			} else {
+				setError(error);
+			}
 		} else {
 			setNameQuery('');
 			// Invalidate to refetch fresh data
@@ -209,7 +213,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 			{/* Error Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					className={`toast ${isError ? 'show' : ''} colored-toast bg-danger-transparent`}
+					className={`toast ${isError ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -318,34 +322,44 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 					</div>
 				</div>
 
-				<div className="card-body">
-					<div className="custom-datatable-filter table-responsive">
-						<Table<StoreStockV2>
-							rowKey={'itemId'}
-							columns={columns}
-							dataSource={storeStocks}
-							pagination={{ ...pagination, total }} // Inject real total
-							loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
-							onChange={
-								newPagination =>
-									setPagination({
-										...pagination,
-										current: newPagination.current!,
-										pageSize: newPagination.pageSize!,
-									})
-								// Changing pagination in Zustand changes queryKey → TanStack auto-refetches
-							}
-						/>
-					</div>
+				<div className="custom-datatable-filter table-responsive">
+					<Table<StoreStockV2>
+						rowKey={'itemId'}
+						columns={columns}
+						dataSource={storeStocks}
+						pagination={false}
+						loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
+						onChange={
+							newPagination =>
+								setPagination({
+									...pagination,
+									current: newPagination.current!,
+									pageSize: newPagination.pageSize!,
+								})
+							// Changing pagination in Zustand changes queryKey -> TanStack auto-refetches
+						}
+					/>
+				</div>
+
+				<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">
+					<Pagination
+						current={pagination.current}
+						pageSize={pagination.pageSize}
+						total={total}
+						showSizeChanger={false}
+						onChange={(page, pageSize) => setPagination({ ...pagination, current: page, pageSize })}
+					/>
 				</div>
 			</div>
 
 			<WithdrawItemModal />
+
+			{/* This modal connect with Page: manage_stocks */}
 			<AddNewItem
 				storeList={storeCtx.data.storeList}
 				currentSelectedStoreId={selectedStore?.id ?? 0}
 				onNewTransferItem={handleTransferItem}
-				loading={isFetching}
+				loading={isFetching || isLoading}
 			/>
 			<EditStoreStock
 				tobeEditStoreStock={tobeEditStoreStock}

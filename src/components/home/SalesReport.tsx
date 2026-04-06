@@ -1,5 +1,5 @@
 'use client';
-import { Table, Tooltip } from 'antd';
+import { Pagination, Table, Tooltip } from 'antd';
 import Link from 'next/link';
 import { Eye } from 'react-feather';
 import dayjs from 'dayjs';
@@ -14,6 +14,7 @@ import { GetSalesReport, OnClickErrorToastCloseButton } from '@/_classes/HomeDas
 export default function SalesReport() {
 	const { state, orderItems, isLoading, onEvent, isError, errorMessage, selectedTenantId } = useHomeDashboard();
 	const pagination = state.pagination;
+	const count = state.pagination.total;
 	const dataSource = orderItems;
 
 	const [isMounted, setIsMounted] = useState(false);
@@ -81,7 +82,6 @@ export default function SalesReport() {
 					<h4>Sales Report</h4>
 				</div>
 				<ul className="table-top-head">
-					{/* <TooltipIcons /> */}
 					<li>
 						<Tooltip title="Refresh">
 							<Link href="#">
@@ -103,10 +103,18 @@ export default function SalesReport() {
 				<Table<OrderItem>
 					rowKey={'id'}
 					loading={isLoading}
-					pagination={pagination}
+					pagination={false}
 					columns={columns}
-					onChange={newPagination => onEvent(new GetSalesReport(newPagination.current!, newPagination.pageSize!))}
 					dataSource={dataSource}
+				/>
+			</div>
+			<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">
+				<Pagination
+					current={pagination.current}
+					pageSize={pagination.pageSize}
+					total={count}
+					showSizeChanger={false}
+					onChange={(page, pageSize) => onEvent(new GetSalesReport(page, pageSize))}
 				/>
 			</div>
 
