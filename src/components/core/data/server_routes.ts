@@ -42,6 +42,7 @@ export const server_routes = {
 	transferStockToStoreStock: `${baseURL}/${apiVersion}/store_stocks/transfer_to_store_stock/<tenantId>`, // PUT
 	transferStockToWarehouse: `${baseURL}/${apiVersion}/store_stocks/transfer_to_warehouse/<tenantId>`, // PUT
 	editStoreStock: `${baseURL}/${apiVersion}/store_stocks/edit/<tenantId>`, // PUT
+	withdrawStoreStock: `${baseURL}/${apiVersion}/store_stocks/withdraw/<tenantId>`, // DELETE
 
 	// order_item
 	orderItemSalesReport: `${baseURL}/${apiVersion}/order_items/sales_report/<tenantId>`, // POST

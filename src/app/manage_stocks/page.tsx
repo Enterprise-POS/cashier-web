@@ -7,6 +7,7 @@ import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 import { cookies } from 'next/headers';
 
 import Link from 'next/link';
+import { PlusCircle } from 'react-feather';
 
 // export default function ManageStock({ searchParams }: { searchParams: Promise<{ storeId: string | undefined }> }) {
 export default async function ManageStock() {
@@ -30,20 +31,25 @@ export default async function ManageStock() {
 					<div className="page-header">
 						<div className="add-item d-flex">
 							<div className="page-title">
-								<h4>Manage Stock</h4>
-								<h6>Manage your stock</h6>
+								<h4>Manage Stocks</h4>
+								<h6>Manage your store stocks</h6>
 							</div>
 						</div>
 						<ul className="table-top-head">
-							<TooltipIcons />
 							<RefreshIcon />
 							<CollapseIcon />
 						</ul>
+
+						{/* Button for ManageStocksComponent/AddNewItem */}
 						<div className="page-btn">
-							<Link href="#" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-units">
-								<i className="ti ti-circle-plus me-1"></i>
+							<button
+								className="btn btn-primary py-1.5 d-flex align-items-center"
+								data-bs-toggle="modal"
+								data-bs-target="#add-units"
+							>
+								<PlusCircle width={13} height={13} className="ti ti-circle-plus me-1"></PlusCircle>
 								Add New
-							</Link>
+							</button>
 						</div>
 					</div>
 					<ManageStocksComponents token={token} />

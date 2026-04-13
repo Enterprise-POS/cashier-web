@@ -33,3 +33,22 @@ export class OnDateRangeOk extends HomeDashboardEvent {
 }
 export class OnClickErrorToastCloseButton extends HomeDashboardEvent {}
 export class OnDismissExportError extends HomeDashboardEvent {}
+
+export enum QuickFilterTag {
+	Today = 'Today',
+	LastHour = 'Last hour',
+	Last6Hours = 'last 6 hours',
+	Last12Hours = 'Last 12 hours',
+	Last7Days = 'Last 7 days',
+	ThisMonth = 'This month',
+	Custom = 'Custom',
+}
+
+export class OnTagSelect extends HomeDashboardEvent {
+	constructor(
+		public tag: QuickFilterTag,
+		public checked: boolean,
+	) {
+		super();
+	}
+}

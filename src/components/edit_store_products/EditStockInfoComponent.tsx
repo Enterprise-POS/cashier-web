@@ -119,6 +119,7 @@ export default function EditStockInfoComponent() {
 				limit,
 				search,
 				0, // categoryId
+				[],
 				tenantCtx.getToken(),
 			);
 			if (error !== null) {

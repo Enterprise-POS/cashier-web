@@ -1,19 +1,20 @@
 'use client';
-import { Table, Tooltip } from 'antd';
+import { Pagination, Table, Tooltip } from 'antd';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { Eye } from 'react-feather';
-import dayjs from 'dayjs';
 
-import { OrderItem } from '@/_classes/OrderItem';
-import { all_routes as routes } from '@/components/core/data/all_routes';
-import { formatIDR } from '@/_lib/utils';
-import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
-import { useState, useEffect } from 'react';
 import { GetSalesReport, OnClickErrorToastCloseButton } from '@/_classes/HomeDashboardEvent';
+import { OrderItem } from '@/_classes/OrderItem';
+import dayjs from '@/_lib/dayjs';
+import { formatIDR } from '@/_lib/utils';
+import { all_routes as routes } from '@/components/core/data/all_routes';
+import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
 export default function SalesReport() {
 	const { state, orderItems, isLoading, onEvent, isError, errorMessage, selectedTenantId } = useHomeDashboard();
 	const pagination = state.pagination;
+	const count = state.pagination.total;
 	const dataSource = orderItems;
 
 	const [isMounted, setIsMounted] = useState(false);
@@ -54,7 +55,8 @@ export default function SalesReport() {
 			title: 'Date',
 			dataIndex: 'createdAt',
 			sorter: (a: OrderItem, b: OrderItem) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (id: number, orderItem: OrderItem) => dayjs(orderItem.createdAt).format('ddd D MMM, YYYY - h:mm A'),
+			render: (id: number, orderItem: OrderItem) =>
+				dayjs.utc(orderItem.createdAt).local().format('ddd D MMM, YYYY - h:mm A'),
 		},
 		{
 			title: 'Action',
@@ -81,7 +83,6 @@ export default function SalesReport() {
 					<h4>Sales Report</h4>
 				</div>
 				<ul className="table-top-head">
-					{/* <TooltipIcons /> */}
 					<li>
 						<Tooltip title="Refresh">
 							<Link href="#">
@@ -103,10 +104,18 @@ export default function SalesReport() {
 				<Table<OrderItem>
 					rowKey={'id'}
 					loading={isLoading}
-					pagination={pagination}
+					pagination={false}
 					columns={columns}
-					onChange={newPagination => onEvent(new GetSalesReport(newPagination.current!, newPagination.pageSize!))}
 					dataSource={dataSource}
+				/>
+			</div>
+			<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">
+				<Pagination
+					current={pagination.current}
+					pageSize={pagination.pageSize}
+					total={count}
+					showSizeChanger={false}
+					onChange={(page, pageSize) => onEvent(new GetSalesReport(page, pageSize))}
 				/>
 			</div>
 
