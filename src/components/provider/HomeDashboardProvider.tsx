@@ -1,7 +1,7 @@
 'use client';
 
 import { TablePaginationConfig } from 'antd';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 import {
@@ -12,6 +12,8 @@ import {
 	OnClickGenerateReport,
 	OnDismissExportError,
 	OnSetDateRange,
+	OnTagSelect,
+	QuickFilterTag,
 } from '@/_classes/HomeDashboardEvent';
 import { OrderItem } from '@/_classes/OrderItem';
 import { ReportResult } from '@/_classes/ReportResult';
@@ -28,12 +30,14 @@ export type HomeDashboardState = {
 	dateRanges: [dayjs.Dayjs | null, dayjs.Dayjs | null];
 	selectedStoreId: number;
 	pagination: TablePaginationConfig;
+	singleSelectedTag: QuickFilterTag;
 };
 
 const initialState: HomeDashboardState = {
 	dateRanges: [todayStart, todayEnd],
 	selectedStoreId: 0,
 	pagination: { current: 1, pageSize: 20, total: 0, responsive: true },
+	singleSelectedTag: QuickFilterTag.Today,
 };
 
 type HomeDashboardContextType = {
@@ -56,6 +60,7 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 	const [state, setState] = useState<HomeDashboardState>(initialState);
 	const [isExporting, setIsExporting] = useState(false);
 	const [exportError, setExportError] = useState<string | null>(null);
+
 	const storeCtx = useStore();
 
 	const stores = storeCtx.data.storeList.map(s => ({
@@ -167,6 +172,53 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 			// TanStack handles this via query state — optionally reset
 			salesQuery.refetch();
 			orderItemsQuery.refetch();
+			return;
+		}
+
+		if (event instanceof OnTagSelect) {
+			const tag = event.tag;
+			// const checked = event.checked;
+
+			setState(v => ({ ...v, singleSelectedTag: tag }));
+
+			// Calculate the date range
+			const now = dayjs();
+			let start: Dayjs | null = null;
+			let end: Dayjs | null = null;
+
+			switch (tag) {
+				case QuickFilterTag.Today:
+					start = now.startOf('day');
+					end = now.endOf('day');
+					break;
+				case QuickFilterTag.LastHour:
+					start = now.subtract(1, 'hour');
+					end = now;
+					break;
+				case QuickFilterTag.Last6Hours:
+					start = now.subtract(6, 'hour');
+					end = now;
+					break;
+				case QuickFilterTag.Last12Hours:
+					start = now.subtract(12, 'hour');
+					end = now;
+					break;
+				case QuickFilterTag.Last7Days:
+					start = now.subtract(7, 'day').startOf('day');
+					end = now.endOf('day');
+					break;
+				case QuickFilterTag.ThisMonth:
+					start = now.startOf('month');
+					end = now.endOf('month');
+					break;
+				case QuickFilterTag.Custom:
+					return; // Let user pick manually, don't override
+			}
+
+			if (start && end) {
+				// Recursive call OnSetDateRange that will set the date range picker
+				onEvent(new OnSetDateRange([start, end], [start.format('YYYY-MM-DD HH:mm'), end.format('YYYY-MM-DD HH:mm')]));
+			}
 			return;
 		}
 	}

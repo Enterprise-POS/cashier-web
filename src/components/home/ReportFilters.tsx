@@ -1,10 +1,8 @@
 'use client';
-import { ConfigProvider, DatePicker, Form, Tag } from 'antd';
+import { ConfigProvider, DatePicker, Tag } from 'antd';
 import { useEffect, useState } from 'react';
-import dayjs, { Dayjs } from 'dayjs';
-const { RangePicker } = DatePicker;
-
 import { Download } from 'react-feather';
+const { RangePicker } = DatePicker;
 
 import {
 	OnChangeSelectedStore,
@@ -12,68 +10,29 @@ import {
 	OnDateRangeOk,
 	OnDismissExportError,
 	OnSetDateRange,
+	OnTagSelect,
+	QuickFilterTag,
 } from '@/_classes/HomeDashboardEvent';
 import SelectVariety from '@/components/inventory/selectVariety';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
-const tagsData = ['Today', 'Last hour', 'last 6 hours', 'Last 12 hours', 'Last 7 days', 'This month', 'Custom'];
-
 export default function ReportFilters() {
+	// Because we use Date object from backend, we need to prevent hydration
+	// by checking if the the component already mounted or not
+	const [isMounted, setIsMounted] = useState(false);
 	const dashboardCtx = useHomeDashboard();
+	const singleSelectedTag = dashboardCtx.state.singleSelectedTag;
 	const stores = dashboardCtx.stores;
 	const dateRange = dashboardCtx.state.dateRanges;
 	const isStateLoading = dashboardCtx.isLoading;
 	const isExporting = dashboardCtx.isExporting;
 	const exportError = dashboardCtx.exportError;
 	const onEvent = dashboardCtx.onEvent;
-	const [singleSelected, setSingleSelected] = useState<string | null>('Today');
-
-	// Because we use Date object from backend, we need to prevent hydration
-	// by checking if the the component already mounted or not
-	const [isMounted, setIsMounted] = useState(false);
-	const handleTagSelect = (tag: string | null) => {
-		setSingleSelected(tag);
-
-		const now = dayjs();
-		let start: Dayjs | null = null;
-		let end: Dayjs | null = null;
-
-		switch (tag) {
-			case 'Today':
-				start = now.startOf('day');
-				end = now.endOf('day');
-				break;
-			case 'Last hour':
-				start = now.subtract(1, 'hour');
-				end = now;
-				break;
-			case 'last 6 hours':
-				start = now.subtract(6, 'hour');
-				end = now;
-				break;
-			case 'Last 12 hours':
-				start = now.subtract(12, 'hour');
-				end = now;
-				break;
-			case 'Last 7 days':
-				start = now.subtract(7, 'day').startOf('day');
-				end = now.endOf('day');
-				break;
-			case 'This month':
-				start = now.startOf('month');
-				end = now.endOf('month');
-				break;
-			case 'Custom':
-				return; // Let user pick manually, don't override
-		}
-
-		if (start && end) {
-			onEvent(new OnSetDateRange([start, end], [start.format('YYYY-MM-DD HH:mm'), end.format('YYYY-MM-DD HH:mm')]));
-		}
-	};
 
 	useEffect(() => setIsMounted(true), []);
 	if (!isMounted) return null;
+
+	const tagsData = Object.values(QuickFilterTag);
 
 	return (
 		<>
@@ -102,7 +61,7 @@ export default function ReportFilters() {
 						<div className="row align-items-end g-3 mb-3">
 							<div className="col-md-5">
 								<label className="form-label">Choose Date</label>
-								<div style={{ height: '38px' }}>
+								<div className="date-picker-centered" style={{ height: '38px' }}>
 									<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
 										<RangePicker
 											value={dateRange}
@@ -114,7 +73,7 @@ export default function ReportFilters() {
 											disabled={isStateLoading || isExporting}
 											onOk={v => {
 												onEvent(new OnDateRangeOk(v));
-												handleTagSelect('Custom');
+												onEvent(new OnTagSelect(QuickFilterTag.Custom, false));
 											}}
 											className="h-100 w-100"
 										/>
@@ -159,8 +118,8 @@ export default function ReportFilters() {
 										{tagsData.map(tag => (
 											<Tag.CheckableTag
 												key={tag}
-												checked={singleSelected === tag}
-												onChange={checked => handleTagSelect(checked ? tag : null)}
+												checked={singleSelectedTag === tag}
+												onChange={checked => onEvent(new OnTagSelect(tag, checked))}
 												style={{
 													height: '32px',
 													lineHeight: '32px',

@@ -5,11 +5,9 @@ import { Store } from '@/_classes/Store';
 import { Tenant } from '@/_classes/Tenant';
 import { TransferStockRequest } from '@/_interface/TransferStock';
 import { closeBootstrapModal, convertTo, openBootstrapModal } from '@/_lib/utils';
-import { getActiveWarehouseItem } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
-import { useTenant } from '@/components/provider/TenantProvider';
-import AsyncSelect from 'react-select/async';
 import { SelectProductToAddNew } from '@/components/manage_stocks/SelectProductToAddNew';
+import { useTenant } from '@/components/provider/TenantProvider';
 
 /*
 	User flow when click 'Add New'
@@ -35,13 +33,9 @@ export function AddNewItem({
 	const tenantCtx = useTenant();
 	const formState = useFormState();
 	const [selectedStoreId, setSelectedStoreId] = useState(currentSelectedStoreId);
-	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
 	const [changedProduct, setChangedProduct] = useState<{ value: string; label: string } | null>(null);
 	const [isOpenAddNewItem, setIsOpenAddItem] = useState(false);
 	const currentSelectedStore: Store | undefined = storeList.find(s => s.id === currentSelectedStoreId);
-	const selectedTenant: Tenant | undefined = tenantCtx.data.tenantList.find(
-		t => t.id === tenantCtx.data.selectedTenantId,
-	);
 
 	const handleOnNewTransferItem = () => {
 		if (tenantCtx.data.selectedTenantId === 0) {

@@ -44,25 +44,24 @@ export function EditStoreStock({
 										<span className="text-primary">Please proceed carefully.</span>
 									</p>
 								</div>
-								<div className="row">
-									<div className="col-lg-12">
-										<div className="modal-body-table">
-											<div className="table-responsive">
-												<table className="table  datanew">
-													<thead>
-														<tr>
-															<th>Product</th>
-															<th>ID</th>
-															<th>Price</th>
-															<th>Qty</th>
-															{/* <th className="no-sort" /> */}
-														</tr>
-													</thead>
-													<tbody>
-														<tr>
-															<td>
-																<div className="d-flex align-items-center">
-																	{/* <Link href="#" className="avatar avatar-md">
+								<div className="col-lg-12">
+									<div className="modal-body-table">
+										<div className="table-responsive">
+											<table className="table  datanew">
+												<thead>
+													<tr>
+														<th>ID</th>
+														<th>Product</th>
+														<th className="text-center">Qty</th>
+														{/* <th className="no-sort" /> */}
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>{tobeEditStoreStock?.id.toString() ?? '0'}</td>
+														<td>
+															<div className="d-flex align-items-center">
+																{/* <Link href="#" className="avatar avatar-md">
 																		<Image
 																			src="/assets/img/products/stock-img-02.png"
 																			alt="product"
@@ -70,51 +69,48 @@ export function EditStoreStock({
 																			height={60}
 																		/>
 																	</Link> */}
-																	<Link href="#" className="ms-2">
-																		{tobeEditStoreStock?.itemName ?? 'unselected'}
-																	</Link>
-																</div>
-															</td>
-															<td>{tobeEditStoreStock?.id.toString() ?? '0'}</td>
-															<td>{tobeEditStoreStock?.price ?? 0}</td>
-															<td>
-																<div className="product-quantity bg-gray-transparent border-0">
-																	<span className="quantity-btn" onClick={() => setQuantity(quantity - 1)}>
-																		<MinusCircle />
-																	</span>
-																	{tobeEditStoreStock !== undefined && (
-																		<>
-																			<input
-																				type="text"
-																				className="quntity-input bg-transparent"
-																				value={tobeEditStoreStock.stocks + quantity}
-																				onChange={e => {
-																					e.preventDefault();
-																					const value = Number(e.target.value);
-																					if (isNaN(value)) return;
-																					setQuantity(value);
-																				}}
-																			/>
-																		</>
-																	)}
-																	<span className="quantity-btn" onClick={() => setQuantity(quantity + 1)}>
-																		+
-																		<PlusCircle className="plus-circle" />
-																	</span>
-																</div>
-															</td>
-															{/* NOT YET IMPLEMENTED: delete item */}
-															{/* <td>
+																<Link href="#" className="ms-2">
+																	{tobeEditStoreStock?.itemName ?? 'unselected'}
+																</Link>
+															</div>
+														</td>
+														<td>
+															<div className="product-quantity bg-gray-transparent border-0 m-auto">
+																<span className="quantity-btn" onClick={() => setQuantity(quantity - 1)}>
+																	<MinusCircle />
+																</span>
+																{tobeEditStoreStock !== undefined && (
+																	<>
+																		<input
+																			type="text"
+																			className="quntity-input bg-transparent"
+																			value={tobeEditStoreStock.stocks + quantity}
+																			onChange={e => {
+																				e.preventDefault();
+																				const value = Number(e.target.value);
+																				if (isNaN(value)) return;
+																				setQuantity(value);
+																			}}
+																		/>
+																	</>
+																)}
+																<span className="quantity-btn" onClick={() => setQuantity(quantity + 1)}>
+																	+
+																	<PlusCircle className="plus-circle" />
+																</span>
+															</div>
+														</td>
+														{/* NOT YET IMPLEMENTED: delete item */}
+														{/* <td>
 																<div className="d-flex align-items-center justify-content-between edit-delete-action">
 																	<Link className="d-flex align-items-center border rounded p-2" href="#">
 																		<Trash2 />
 																	</Link>
 																</div>
 															</td> */}
-														</tr>
-													</tbody>
-												</table>
-											</div>
+													</tr>
+												</tbody>
+											</table>
 										</div>
 									</div>
 								</div>

@@ -1,17 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { StoreStockV2 } from '@/_classes/StoreStock';
+import { HTTPResult } from '@/_interface/HTTPResult';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { getAllV2 } from '@/_lib/store_stock';
+import { buildQueryFilters } from '@/_lib/utils';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
 export function useManageStocksQuery(token: string) {
 	const storeCtx = useStore();
-	const { pagination, appliedNameQuery, appliedCategoryId, appliedAscending } = useManageStocksStore();
+	const { pagination, appliedNameQuery, appliedCategoryId, appliedSorts } = useManageStocksStore();
 
+	// Derive state
 	const storeId = storeCtx.data.selectedStoreId;
 	const tenantId = storeCtx.getCurrentTenantId();
+	const queryFilters = buildQueryFilters(appliedSorts);
 
 	return useQuery({
 		queryKey: [
@@ -22,30 +26,24 @@ export function useManageStocksQuery(token: string) {
 			pagination.pageSize,
 			appliedNameQuery,
 			appliedCategoryId,
-			appliedAscending,
+			appliedSorts,
 		],
-		queryFn: async () => {
-			const { result, error } = await getAllV2(
+		queryFn: () =>
+			getAllV2(
 				storeId,
 				tenantId,
 				pagination.current!,
 				pagination.pageSize!,
 				appliedNameQuery,
 				appliedCategoryId,
+				queryFilters,
 				token,
-			);
-
-			if (error !== null) {
-				// Special case — no stock found is not a real error
-				if (error.includes('[ERROR] no stock found') || error.includes('Fatal error: no stock found')) {
-					return { storeStocks: [], total: 0 };
-				}
-				throw new Error(error);
-			}
-
+			),
+		select: (data: HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }>) => {
+			if (data.error) throw new Error(data.error); // Set ReactQuery as error response by throwing an error
 			return {
-				storeStocks: result!.storeStockDefs.map((def: StoreStockV2Def) => new StoreStockV2(def)),
-				total: result!.count,
+				storeStocks: data.result!.storeStockDefs.map((def: StoreStockV2Def) => new StoreStockV2(def)),
+				total: data.result!.count,
 			};
 		},
 		enabled: storeId !== 0 && tenantId !== 0,

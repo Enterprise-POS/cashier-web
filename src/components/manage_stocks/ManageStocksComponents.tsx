@@ -8,9 +8,7 @@ import { Delete, Edit } from 'react-feather';
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { StockType } from '@/_interface/ItemDef';
-import { TransferStockRequest } from '@/_interface/TransferStock';
-import { transferStockToStoreStock, transferStockToWarehouse } from '@/_lib/store_stock';
-import { closeBootstrapModal, formatIDR } from '@/_lib/utils';
+import { formatIDR } from '@/_lib/utils';
 import { useManageStocksQuery } from '@/components/hooks/useManageStocksQuery';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
@@ -25,6 +23,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	const queryClient = useQueryClient();
 	const [isMounted, setIsMounted] = useState(false);
 	const [tobeEditStoreStock, setTobeEditStoreStock] = useState<StoreStockV2>();
+	const [tobeWithdrawStoreStock, setTobeWithdrawStoreStock] = useState<StoreStockV2>();
 	const [isSelectCategoryModalOpen, setCategoryModal] = useState(false);
 
 	// Only subscribe to what this component needs — no unnecessary re-renders
@@ -37,20 +36,22 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	const errorMessage = useManageStocksStore(s => s.errorMessage);
 	const successMessage = useManageStocksStore(s => s.successMessage);
 	const selectedCategory = useManageStocksStore(s => s.selectedCategory);
-	const isAscending = useManageStocksStore(s => s.ascending);
+	const sorts = useManageStocksStore(s => s.sorts);
 
 	// Action
 	const setSelectedCategory = useManageStocksStore(s => s.setSelectedCategory);
-	const setAscending = useManageStocksStore(s => s.setAscending);
+	const setSort = useManageStocksStore(s => s.setSort);
 	const setPagination = useManageStocksStore(s => s.setPagination);
 	const setNameQuery = useManageStocksStore(s => s.setNameQuery);
-	const setLoading = useManageStocksStore(s => s.setLoading);
-	const setError = useManageStocksStore(s => s.setError);
-	const setSuccess = useManageStocksStore(s => s.setSuccess);
 	const clearError = useManageStocksStore(s => s.clearError);
 	const clearSuccess = useManageStocksStore(s => s.clearSuccess);
 	const resetFilters = useManageStocksStore(s => s.resetFilters);
 	const applyFilters = useManageStocksStore(s => s.applyFilters);
+
+	// Async actions
+	const handleTransferItem = useManageStocksStore(s => s.handleTransferItem);
+	const handleOnConfirmWithdraw = useManageStocksStore(s => s.handleConfirmWithdraw);
+	const handleOnConfirmEdit = useManageStocksStore(s => s.handleConfirmEdit);
 
 	const currentTenantId = storeCtx.getCurrentTenantId();
 	const selectedStore: Store | undefined = storeCtx.data.storeList.find(
@@ -117,7 +118,13 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 						>
 							<Edit />
 						</Link>
-						<Link href="#" className="confirm-text p-2" data-bs-toggle="modal" data-bs-target="#delete-modal">
+						<Link
+							href="#"
+							className="confirm-text p-2"
+							data-bs-toggle="modal"
+							data-bs-target="#delete-modal"
+							onClick={() => (isFetching ? null : setTobeWithdrawStoreStock(storeStock))}
+						>
 							<Delete />
 						</Link>
 					</div>
@@ -127,62 +134,15 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 		},
 	];
 
-	async function handleOnConfirmEdit(transferStockRequest: TransferStockRequest) {
-		if (isFetching || transferStockRequest.quantity === 0) return;
-
-		try {
-			setLoading(true);
-			let result;
-
-			if (transferStockRequest.quantity > 0) result = await transferStockToStoreStock(transferStockRequest, token);
-			else
-				result = await transferStockToWarehouse(
-					{ ...transferStockRequest, quantity: -transferStockRequest.quantity },
-					token,
-				);
-
-			const { error } = result;
-			if (error !== null) {
-				setError(error);
-			} else {
-				setSuccess('Product edited successfully');
-				// Invalidate to refetch fresh data
-				queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
-			}
-		} catch (e) {
-			const error = e as Error;
-			setError(`Unexpected error: ${error.message}`);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	async function handleTransferItem(transferStockRequest: TransferStockRequest, itemName: string) {
-		if (isFetching) return;
-		setLoading(true);
-		const { error } = await transferStockToStoreStock(transferStockRequest, token);
-		if (error !== null) {
-			if (error.includes('Not enough stock')) {
-				setError('Please make sure the the new item is available at least 1');
-			} else {
-				setError(error);
-			}
-		} else {
-			setNameQuery('');
-			// Invalidate to refetch fresh data
-			queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
-			setSuccess(`${itemName} successfully added to ${selectedStore!.name}`);
-			closeBootstrapModal('#add-units [data-bs-dismiss="modal"]');
-		}
-		setLoading(false);
-	}
+	// Sync total after fetch into pagination so Antd knows how many pages to render, otherwise the page button always render button 1
+	// We want <[1][2][3]> even the page is loading
+	// Without this useEffect sync with Ant every time the button click and loading it
+	// render <[1]> rather than render <[1][2][3]>
+	useEffect(() => {
+		if (total > 0) setPagination({ ...pagination, total });
+	}, [total]);
 
 	useEffect(() => setIsMounted(true), []);
-
-	useEffect(() => {
-		const modal = document.getElementById('select-category');
-		modal?.addEventListener('hidden.bs.modal', () => setCategoryModal(false));
-	}, []);
 
 	if (!isMounted || storeCtx.isStateLoading) return <SectionLoading caption="Loading stores" />;
 
@@ -242,7 +202,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 							allowClear
 							value={nameQuery}
 							onChange={e => setNameQuery(e.target.value)}
-							onSearch={() => applyFilters()}
+							onSearch={applyFilters}
 						/>
 					</div>
 					<div className="page-btn">
@@ -262,18 +222,24 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 									className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center text-gray-3"
 									data-bs-toggle="dropdown"
 								>
-									Order: {isAscending ? 'Ascending' : 'Descending'}
+									Order: Created at {sorts[0]?.ascending ? 'Oldest' : 'Latest'}
 								</button>
 								<ul className="dropdown-menu dropdown-menu-end p-3">
 									<li>
-										<Link href="#" className="dropdown-item rounded-1" onClick={() => setAscending(true)}>
-											Ascending
-										</Link>
+										<button
+											className="dropdown-item rounded-1"
+											onClick={() => setSort({ column: 'created_at', ascending: false })}
+										>
+											Latest
+										</button>
 									</li>
 									<li>
-										<Link href="#" className="dropdown-item rounded-1" onClick={() => setAscending(false)}>
-											Descending
-										</Link>
+										<button
+											className="dropdown-item rounded-1"
+											onClick={() => setSort({ column: 'created_at', ascending: true })}
+										>
+											Oldest
+										</button>
 									</li>
 								</ul>
 							</div>
@@ -284,7 +250,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 							className={`btn btn-primary w-100 ${isLoading || isFetching ? 'wait' : ''}`}
 							type="button"
 							disabled={isLoading || isFetching}
-							onClick={() => applyFilters()}
+							onClick={applyFilters}
 						>
 							{isLoading || isFetching ? 'Please wait' : 'Search'}
 						</button>
@@ -294,7 +260,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 							className={`btn btn-primary-ghost w-100 ${isLoading || isFetching ? 'disabled' : ''}`}
 							type="button"
 							disabled={isLoading || isFetching}
-							onClick={() => resetFilters()}
+							onClick={resetFilters}
 						>
 							Reset
 						</button>
@@ -329,15 +295,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 						dataSource={storeStocks}
 						pagination={false}
 						loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
-						onChange={
-							newPagination =>
-								setPagination({
-									...pagination,
-									current: newPagination.current!,
-									pageSize: newPagination.pageSize!,
-								})
-							// Changing pagination in Zustand changes queryKey -> TanStack auto-refetches
-						}
+						// onChange={}
 					/>
 				</div>
 
@@ -345,25 +303,23 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 					<Pagination
 						current={pagination.current}
 						pageSize={pagination.pageSize}
-						total={total}
+						total={pagination.total} //  Was: rather than use total from data
 						showSizeChanger={false}
 						onChange={(page, pageSize) => setPagination({ ...pagination, current: page, pageSize })}
 					/>
 				</div>
 			</div>
 
-			<WithdrawItemModal />
-
-			{/* This modal connect with Page: manage_stocks */}
-			<AddNewItem
-				storeList={storeCtx.data.storeList}
-				currentSelectedStoreId={selectedStore?.id ?? 0}
-				onNewTransferItem={handleTransferItem}
-				loading={isFetching || isLoading}
+			<WithdrawItemModal
+				tenantId={currentTenantId}
+				storeId={selectedStore?.id ?? 0}
+				tobeWithdrawStoreStock={tobeWithdrawStoreStock}
+				onConfirmWithdraw={body => handleOnConfirmWithdraw(body, token, queryClient, isFetching)}
 			/>
+
 			<EditStoreStock
 				tobeEditStoreStock={tobeEditStoreStock}
-				onConfirmEdit={handleOnConfirmEdit}
+				onConfirmEdit={body => handleOnConfirmEdit(body, token, queryClient, isFetching)}
 				storeId={selectedStore?.id ?? 0}
 				tenantId={currentTenantId}
 			/>
@@ -374,6 +330,15 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 					setCategoryModal(false);
 					setSelectedCategory({ categoryId, categoryName });
 				}}
+			/>
+			{/* This modal connect with Page: manage_stocks */}
+			<AddNewItem
+				storeList={storeCtx.data.storeList}
+				currentSelectedStoreId={selectedStore?.id ?? 0}
+				loading={isFetching || isLoading}
+				onNewTransferItem={(req, name) =>
+					handleTransferItem(req, name, selectedStore?.name ?? '', token, queryClient, isFetching)
+				}
 			/>
 		</>
 	);

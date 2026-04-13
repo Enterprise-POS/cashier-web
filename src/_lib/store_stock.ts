@@ -4,7 +4,12 @@ import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { server_routes } from '@/components/core/data/server_routes';
 import { TransferStockRequest } from '@/_interface/TransferStock';
-import { convertTo } from '@/_lib/utils';
+import { convertQueryFilters, convertTo } from '@/_lib/utils';
+import { QueryFilter } from '@/_interface/QueryFilter';
+import {
+	WithdrawProductFromStoreRequestBody,
+	WithdrawProductFromStoreRequestValue,
+} from '@/_interface/WithdrawProductFromStoreRequestBody.js';
 
 export async function getAllV2(
 	storeId: number,
@@ -13,6 +18,7 @@ export async function getAllV2(
 	limit: number,
 	nameQuery: string,
 	categoryId: number,
+	queryFilters: QueryFilter[],
 	token: string,
 ): Promise<HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }>> {
 	const targetURL = server_routes.storeStocksGetAllV2.replace('<tenantId>', tenantId.toString());
@@ -23,6 +29,10 @@ export async function getAllV2(
 	params.set('store_id', storeId.toString());
 	params.set('name_query', nameQuery);
 	params.set('category_id', categoryId.toString());
+	const sort = convertQueryFilters(queryFilters);
+	if (sort !== '') {
+		params.set('sort', sort);
+	}
 
 	try {
 		const response = await fetch(url.href, {
@@ -239,6 +249,63 @@ export async function editStoreStock(formData: FormData, token: string): Promise
 			}
 		}
 
+		return { result: null, error: null };
+	} catch (error) {
+		if (error instanceof Error) {
+			console.error(error);
+			return { result: null, error: error.message };
+		}
+		return { result: null, error: '[UNHANDLED ERROR] Unknown error' };
+	}
+}
+
+export async function withdrawStoreStock(
+	body: WithdrawProductFromStoreRequestValue,
+	token: string,
+): Promise<HTTPResult<void>> {
+	if (convertTo.number(body.itemId) === null) return { result: null, error: 'Check input for item ID' };
+	if (convertTo.number(body.storeId) === null) return { result: null, error: 'Check input for store ID' };
+	if (convertTo.number(body.tenantId) === null) return { result: null, error: 'Check input for tenant ID' };
+
+	try {
+		const reqBody: WithdrawProductFromStoreRequestBody = {
+			item_id: body.itemId,
+			store_id: body.storeId,
+			store_stock_id: body.storeStockId,
+		};
+
+		const targetURL = server_routes.withdrawStoreStock.replace('<tenantId>', body.tenantId.toString());
+		const response = await fetch(targetURL, {
+			method: 'DELETE',
+			credentials: 'include',
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify(reqBody),
+		});
+
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = {
+					code: response.status,
+					status: 'error',
+					message: `[DEV] Fatal error while parsing message: ${response.statusText}`,
+				};
+			}
+
+			switch (response.status) {
+				case 400:
+				case 401:
+				case 403:
+					return { result: null, error: body.message };
+				default:
+					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
+					return { result: null, error: body.message };
+			}
+		}
+
+		// 204
 		return { result: null, error: null };
 	} catch (error) {
 		if (error instanceof Error) {
