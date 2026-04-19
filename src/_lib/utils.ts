@@ -14,6 +14,16 @@ export function closeBootstrapModal(selector: string) {
 	else console.warn(`Nothing to close from ${selector}`);
 }
 
+export function hideBootstrapModal(selector: string) {
+	const modalElement = document.querySelector(selector);
+	if (modalElement) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		(window as any).bootstrap.Modal.getInstance(modalElement)?.hide();
+	} else {
+		console.warn(`Modal element not found: ${selector}`);
+	}
+}
+
 export function openBootstrapModal(selector: string) {
 	const modalElement = document.querySelector(selector);
 

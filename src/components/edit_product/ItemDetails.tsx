@@ -1,9 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { FormEventHandler, useEffect, useRef, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { Info, LifeBuoy, PlusCircle } from 'react-feather';
 import Select from 'react-select';
-import AsyncSelect from 'react-select/async';
 
 import { CategoryWithItem } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
@@ -12,6 +11,7 @@ import { HTTPResult } from '@/_interface/HTTPResult';
 import { StockType } from '@/_interface/ItemDef';
 import { getCategories, registerCategory } from '@/_lib/category';
 import { editWarehouseItem, findCompleteById } from '@/_lib/warehouse';
+import { hideBootstrapModal } from '@/_lib/utils';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
@@ -32,7 +32,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 	const [changedCategory, setChangedCategory] = useState<{ value: number; label: string }>();
 	const [changedStockType, setChangedStockType] = useState<{ value: string; label: string }>();
 
-	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
+	const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
 
 	const handleForm: FormEventHandler<HTMLFormElement> = async e => {
@@ -77,34 +77,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		}
 	};
 
-	const handleGetCategory = async (keyword: string): Promise<{ value: string; label: string }[]> => {
-		if (selectedTenant === undefined) return [];
-
-		try {
-			const { error, result } = await getCategories(selectedTenant.id, 1, 10, keyword);
-			if (error === null) {
-				return result!.categoryDefs.map(def => ({ value: def.id!.toString(), label: def.category_name! }));
-			} else {
-				formState.setError({ message: error });
-				return [];
-			}
-		} catch (e) {
-			const error = e as Error;
-			console.error(`[ERROR] ${error.message}`);
-			formState.setError({ message: `Unexpected error: ${error.message}` });
-			return [];
-		}
-	};
-
-	const loadCategoryOptions = (inputValue: string, callback: (options: { value: string; label: string }[]) => void) => {
-		/*
-			When user not yet complete type then
-			cancel previous request
-		*/
-		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
-		timeoutRef.current = setTimeout(async () => callback(await handleGetCategory(inputValue)), 150);
-	};
-
 	const handleClear = () => {
 		// Reset base price to initial value
 		setInpBasePrice(initialItem?.basePrice ?? 0);
@@ -135,6 +107,11 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 						setInpBasePrice(result!.base_price);
 						setInitialItem(new CategoryWithItem(result!));
 					}
+
+					const { error: catError, result: catResult } = await getCategories(selectedTenant.id, 1, 100, '');
+					if (catError === null && catResult) {
+						setCategories(catResult.categoryDefs.map(def => ({ value: def.id!.toString(), label: def.category_name })));
+					}
 				}
 			} catch (e) {
 				const error = e as Error;
@@ -146,7 +123,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		}
 
 		getData();
-		// getAvailableCategories();
 	}, [selectedTenant]);
 
 	/*
@@ -167,6 +143,8 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		categoryId: 'categoryId',
 		basePrice: 'basePrice',
 	};
+
+	const selectedCategoryId = changedCategory?.value.toString() ?? currentItem?.categoryId?.toString();
 
 	return (
 		<>
@@ -248,6 +226,43 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 				</div>
 			</div>
 
+			{/* Select Category Modal */}
+			<div className="modal fade" id="select-category-modal">
+				<div className="modal-dialog modal-dialog-centered">
+					<div className="modal-content">
+						<div className="modal-header border-0 custom-modal-header">
+							<div className="page-title">
+								<h4>Select Category</h4>
+							</div>
+							<button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div className="modal-body custom-modal-body" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+							{categories.length === 0 ? (
+								<p className="text-muted text-center">No categories found</p>
+							) : (
+								<div className="list-group">
+									{categories.map(cat => (
+										<button
+											key={cat.value}
+											type="button"
+											className={`list-group-item list-group-item-action ${selectedCategoryId === cat.value ? 'bg-primary text-white' : ''}`}
+											onClick={() => {
+												setChangedCategory({ value: Number(cat.value), label: cat.label });
+												hideBootstrapModal('#select-category-modal');
+											}}
+										>
+											{cat.label}
+										</button>
+									))}
+								</div>
+							)}
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<form className="add-product-form" onSubmit={handleForm}>
 				<input type="hidden" name={formName.tenantId} value={selectedTenant?.id ?? 0} />
 				<input type="hidden" name={formName.itemId} value={itemId} />
@@ -311,21 +326,19 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 														<span>Add New</span>
 													</Link>
 												</div>
-												<AsyncSelect
-													className="react-select"
-													loadOptions={loadCategoryOptions}
-													placeholder="Choose"
+												<input
+													type="hidden"
 													name={formName.categoryId}
-													onChange={e => setChangedCategory({ label: e?.label ?? '', value: Number(e?.value) })}
-													defaultValue={
-														currentItem?.categoryId && currentItem?.categoryName
-															? {
-																	value: currentItem.categoryId.toString(),
-																	label: currentItem.categoryName,
-																}
-															: null
-													}
+													value={changedCategory?.value ?? currentItem?.categoryId ?? 0}
 												/>
+												<button
+													type="button"
+													className="form-control text-start"
+													data-bs-toggle="modal"
+													data-bs-target="#select-category-modal"
+												>
+													{changedCategory?.label ?? currentItem?.categoryName ?? 'Choose category...'}
+												</button>
 											</div>
 										</div>
 										<div className="col-sm-6 col-12">
