@@ -6,33 +6,42 @@ import Select from 'react-select';
 
 import { CategoryWithItem } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
-import { CategoryWithItemDef } from '@/_interface/CategoryDef';
-import { HTTPResult } from '@/_interface/HTTPResult';
+import { CategoryDef, CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { StockType } from '@/_interface/ItemDef';
-import { getCategories, registerCategory } from '@/_lib/category';
-import { editWarehouseItem, findCompleteById } from '@/_lib/warehouse';
+import { registerCategory } from '@/_lib/category';
 import { hideBootstrapModal } from '@/_lib/utils';
+import { editWarehouseItem } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
 
-export function ItemDetails({ itemId }: { itemId: number }) {
+export function ItemDetails({
+	itemId,
+	categoryWithItemDef,
+	categoryDefs,
+	token,
+}: {
+	itemId: number;
+	categoryWithItemDef: CategoryWithItemDef;
+	categoryDefs: CategoryDef[];
+	token: string;
+}) {
 	const [isMounted, setIsMounted] = useState(false);
 	const { data, isStateLoading: loadingUserTenant } = useTenant();
 	const formState = useFormState();
 
 	// Maintain current item if it's change or not
-	const [initialItem, setInitialItem] = useState<CategoryWithItem | null>(null);
-	const [currentItem, setCurrentItem] = useState<CategoryWithItem | null>(null);
+	const initialItem = new CategoryWithItem(categoryWithItemDef);
+	const [currentItem, setCurrentItem] = useState<CategoryWithItem>(initialItem);
 
 	// Input
 	const [addAndReduceCounter, setAddAndReduceCounter] = useState(0);
-	const [inpItemName, setInpItemName] = useState('');
-	const [inpBasePrice, setInpBasePrice] = useState(0);
+	const [inpItemName, setInpItemName] = useState(initialItem.itemName);
+	const [inpBasePrice, setInpBasePrice] = useState(initialItem.basePrice);
 	const [changedCategory, setChangedCategory] = useState<{ value: number; label: string }>();
 	const [changedStockType, setChangedStockType] = useState<{ value: string; label: string }>();
 
-	const [categories, setCategories] = useState<{ value: string; label: string }[]>([]);
+	const categories = categoryDefs.map(def => ({ value: def.id!.toString(), label: def.category_name }));
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
 
 	const handleForm: FormEventHandler<HTMLFormElement> = async e => {
@@ -55,18 +64,18 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 			// Success
 			formState.setSuccess({ message: 'Update success' });
 			setAddAndReduceCounter(0);
-			setCurrentItem(v =>
-				v
-					? new CategoryWithItem({
-							category_id: changedCategory?.value ?? 0,
-							category_name: changedCategory?.label ?? '',
-							item_name: inpItemName,
-							item_id: v.itemId,
-							stocks: v.stocks + addAndReduceCounter,
-							stock_type: v.stockType,
-							base_price: inpBasePrice,
-						})
-					: null,
+			setCurrentItem(
+				v =>
+					new CategoryWithItem({
+						category_id: changedCategory?.value ?? 0,
+						category_name: changedCategory?.label ?? '',
+						item_name: inpItemName,
+						item_id: v.itemId,
+						stocks: v.stocks + addAndReduceCounter,
+						stock_type: v.stockType,
+						base_price: inpBasePrice,
+						tenant_id: selectedTenant.id,
+					}),
 			);
 		} catch (err) {
 			const message = err instanceof Error ? err.message : String(err);
@@ -83,47 +92,6 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 		// Reset add/reduce counter to 0 (so "After edit" shows current quantity)
 		setAddAndReduceCounter(0);
 	};
-
-	/*
-		Triggered if current user tenant is change
-		also triggered at first open the page
-	*/
-	useEffect(() => {
-		async function getData() {
-			if (formState.state.isFormLoading) return;
-			formState.setFormLoading(true);
-
-			try {
-				// If tenant not selected then it's an error
-				if (selectedTenant === undefined) {
-					// Sometime at the first time page load, then the tenant not yet arrived
-				} else {
-					const { result, error }: HTTPResult<CategoryWithItemDef> = await findCompleteById(itemId, selectedTenant.id);
-					if (error !== null) {
-						formState.setError({ message: error });
-					} else {
-						setCurrentItem(new CategoryWithItem(result!));
-						setInpItemName(result!.item_name);
-						setInpBasePrice(result!.base_price);
-						setInitialItem(new CategoryWithItem(result!));
-					}
-
-					const { error: catError, result: catResult } = await getCategories(selectedTenant.id, 1, 100, '');
-					if (catError === null && catResult) {
-						setCategories(catResult.categoryDefs.map(def => ({ value: def.id!.toString(), label: def.category_name })));
-					}
-				}
-			} catch (e) {
-				const error = e as Error;
-				console.error(`[ERROR] ${error.message}`);
-				formState.setError({ message: `Unexpected error: ${error.message}` });
-			} finally {
-				formState.setFormLoading(false);
-			}
-		}
-
-		getData();
-	}, [selectedTenant]);
 
 	/*
 		Some component may take a time to render,
@@ -337,7 +305,7 @@ export function ItemDetails({ itemId }: { itemId: number }) {
 													data-bs-toggle="modal"
 													data-bs-target="#select-category-modal"
 												>
-													{changedCategory?.label ?? currentItem?.categoryName ?? 'Choose category...'}
+													{changedCategory?.label || currentItem.categoryName || 'Choose category...'}
 												</button>
 											</div>
 										</div>

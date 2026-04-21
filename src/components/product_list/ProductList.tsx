@@ -35,6 +35,8 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 
 	const formState = useFormState();
 
+	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
+
 	const dataSource = optimisticItems;
 	const columns = [
 		{
@@ -119,7 +121,12 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 						{/* <Link className="me-2 p-2" href={routes.productdetails}>
 							<Eye className="feather-view" />
 						</Link> */}
-						<Link className="me-2 p-2" href={routes.editProduct.replace('<itemId>', itemId.toString())}>
+						<Link
+							className="me-2 p-2"
+							href={routes.editProduct
+								.replace('<tenantId>', item.tenantId.toString())
+								.replace('<itemId>', itemId.toString())}
+						>
 							<Edit className="feather-edit" />
 						</Link>
 						<Link
@@ -137,8 +144,6 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 	];
-
-	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
 
 	async function getData(page: number, limit: number, nameQuery: string) {
 		if (isComponentLoading) return;
