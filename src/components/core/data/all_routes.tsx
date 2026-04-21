@@ -1,4 +1,6 @@
-export const all_routes = {
+export type RouteLink = string;
+
+export const all_routes: { [key: string]: RouteLink } = {
 	index: '/',
 	newTenant: '/new_tenant',
 	newdashboard: '/new_dashboard',
@@ -103,7 +105,7 @@ export const all_routes = {
 	lowStocks: '/low_stocks',
 	categoryList: '/category_list',
 	subcategories: '/sub_categories',
-	editProduct: '/edit_product/<itemId>',
+	editProduct: '<tenantId>/edit_product/<itemId>',
 	expenselist: '/expense_list',
 	expensecategory: '/expense_category',
 	calendars: '/calendar',

@@ -3,10 +3,8 @@ import ManageStocksComponents from '@/components/manage_stocks/ManageStocksCompo
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
-import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 import { cookies } from 'next/headers';
 
-import Link from 'next/link';
 import { PlusCircle } from 'react-feather';
 
 // export default function ManageStock({ searchParams }: { searchParams: Promise<{ storeId: string | undefined }> }) {

@@ -11,6 +11,7 @@ export class Item {
 	stockType: StockType;
 	basePrice: number;
 	id: number;
+	tenantId: number;
 	constructor(def: ItemDef) {
 		// Although this is the same properties
 		// <Table> need .id otherwise the component throw 'unique key' error
@@ -24,6 +25,7 @@ export class Item {
 		this.basePrice = def.base_price;
 		this.createdAt = new Date(def.created_at);
 		this.unit = 'Pc';
+		this.tenantId = def.tenant_id;
 	}
 }
 
@@ -39,6 +41,7 @@ export class CategoryWithItem extends Item {
 			is_active: 0,
 			stock_type: def.stock_type,
 			base_price: def.base_price,
+			tenant_id: def.tenant_id,
 		});
 		this.categoryId = def.category_id;
 		this.categoryName = def.category_name;

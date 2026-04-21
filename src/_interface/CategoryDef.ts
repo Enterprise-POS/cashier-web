@@ -15,4 +15,5 @@ export interface CategoryWithItemDef {
 	stocks: number;
 	stock_type: StockType;
 	base_price: number;
+	tenant_id: number;
 }

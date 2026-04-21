@@ -1,6 +1,6 @@
 export enum StockType {
-	TRACKED = "TRACKED",
-	UNLIMITED = "UNLIMITED",
+	TRACKED = 'TRACKED',
+	UNLIMITED = 'UNLIMITED',
 }
 
 export interface ItemDef {
@@ -11,4 +11,5 @@ export interface ItemDef {
 	stock_type: StockType;
 	created_at: string;
 	base_price: number;
+	tenant_id: number;
 }
