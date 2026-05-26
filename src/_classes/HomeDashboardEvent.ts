@@ -52,3 +52,17 @@ export class OnTagSelect extends HomeDashboardEvent {
 		super();
 	}
 }
+
+export class OnClickDeleteInvoiceBtn extends HomeDashboardEvent {
+	constructor(public orderItemId: number) {
+		super();
+	}
+}
+
+export class OnClickYesDeleteInvoiceBtn extends HomeDashboardEvent {
+	constructor(public orderItemId: number) {
+		super();
+	}
+}
+
+export class OnClickRefreshBtn extends HomeDashboardEvent {}

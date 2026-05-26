@@ -8,8 +8,11 @@ import {
 	GetSalesReport,
 	HomeDashboardEvent,
 	OnChangeSelectedStore,
+	OnClickDeleteInvoiceBtn,
 	OnClickErrorToastCloseButton,
 	OnClickGenerateReport,
+	OnClickRefreshBtn,
+	OnClickYesDeleteInvoiceBtn,
 	OnDismissExportError,
 	OnSetDateRange,
 	OnTagSelect,
@@ -17,7 +20,7 @@ import {
 } from '@/_classes/HomeDashboardEvent';
 import { OrderItem } from '@/_classes/OrderItem';
 import { ReportResult } from '@/_classes/ReportResult';
-import { orderItemExportProfit } from '@/_lib/order_item';
+import { orderItemDeleteInvoice, orderItemExportProfit } from '@/_lib/order_item';
 import { convertTo } from '@/_lib/utils';
 import { useDashboardData } from '@/components/hooks/useDashboardData';
 import { useStore } from '@/components/provider/StoreProvider';
@@ -31,6 +34,7 @@ export type HomeDashboardState = {
 	selectedStoreId: number;
 	pagination: TablePaginationConfig;
 	singleSelectedTag: QuickFilterTag;
+	tobeDeletedInvoiceId: number;
 };
 
 const initialState: HomeDashboardState = {
@@ -38,6 +42,7 @@ const initialState: HomeDashboardState = {
 	selectedStoreId: 0,
 	pagination: { current: 1, pageSize: 20, total: 0, responsive: true },
 	singleSelectedTag: QuickFilterTag.Today,
+	tobeDeletedInvoiceId: 0,
 };
 
 type HomeDashboardContextType = {
@@ -51,6 +56,9 @@ type HomeDashboardContextType = {
 	errorMessage: string;
 	stores: { value: string; label: string }[];
 	selectedTenantId: number;
+	tobeDeletedInvoiceId: number;
+	isDeletingInvoice: boolean;
+	deleteInvoiceError: string | null;
 	onEvent: (event: HomeDashboardEvent) => void;
 };
 
@@ -60,6 +68,8 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 	const [state, setState] = useState<HomeDashboardState>(initialState);
 	const [isExporting, setIsExporting] = useState(false);
 	const [exportError, setExportError] = useState<string | null>(null);
+	const [isDeletingInvoice, setIsDeletingInvoice] = useState(false);
+	const [deleteInvoiceError, setDeleteInvoiceError] = useState<string | null>(null);
 
 	const storeCtx = useStore();
 
@@ -221,6 +231,46 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 			}
 			return;
 		}
+
+		if (event instanceof OnClickDeleteInvoiceBtn) {
+			const orderItemId = event.orderItemId;
+			setState(v => ({ ...v, tobeDeletedInvoiceId: orderItemId }));
+			return;
+		}
+
+		if (event instanceof OnClickYesDeleteInvoiceBtn) {
+			if (isDeletingInvoice) return;
+
+			const orderItemId = event.orderItemId;
+			setIsDeletingInvoice(true);
+			setDeleteInvoiceError(null);
+			try {
+				const { error } = await orderItemDeleteInvoice(orderItemId, storeCtx.getCurrentTenantId());
+
+				if (error) {
+					setDeleteInvoiceError(error);
+					return;
+				}
+
+				// Reset the tobe deleted invoice id
+				setState(v => ({ ...v, tobeDeletedInvoiceId: 0 }));
+
+				// Refetch to reflect the deletion
+				orderItemsQuery.refetch();
+				salesQuery.refetch();
+			} catch (e) {
+				setDeleteInvoiceError(e instanceof Error ? e.message : 'Unknown error while deleting invoice');
+			} finally {
+				setIsDeletingInvoice(false);
+			}
+
+			return;
+		}
+
+		if (event instanceof OnClickRefreshBtn) {
+			orderItemsQuery.refetch();
+			salesQuery.refetch();
+		}
 	}
 
 	return (
@@ -233,11 +283,14 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 						total,
 					},
 				},
+				tobeDeletedInvoiceId: state.tobeDeletedInvoiceId,
 				reportResult,
 				orderItems,
 				isLoading,
 				isExporting,
 				exportError,
+				isDeletingInvoice,
+				deleteInvoiceError,
 				isError,
 				errorMessage,
 				stores,

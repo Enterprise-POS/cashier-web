@@ -59,18 +59,12 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 												</Link>
 											</td>
 											<td className="text-gray-9 fw-medium text-end">{purchasedItem.quantity}</td>
-											<td className="text-gray-9 fw-medium text-end">
-												{formatIDR(purchasedItem.storePriceSnapshot)}
-											</td>
+											<td className="text-gray-9 fw-medium text-end">{formatIDR(purchasedItem.storePriceSnapshot)}</td>
 											<td className="text-gray-9 fw-medium text-end">
 												{formatIDR(purchasedItem.storePriceSnapshot * purchasedItem.quantity)}
 											</td>
-											<td className="text-gray-9 fw-medium text-end">
-												{formatIDR(purchasedItem.discountAmount)}
-											</td>
-											<td className="text-gray-9 fw-medium text-end">
-												{formatIDR(purchasedItem.totalAmount)}
-											</td>
+											<td className="text-gray-9 fw-medium text-end">{formatIDR(purchasedItem.discountAmount)}</td>
+											<td className="text-gray-9 fw-medium text-end">{formatIDR(purchasedItem.totalAmount)}</td>
 										</tr>
 									))}
 								</tbody>
@@ -139,7 +133,7 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 				</div>
 			</div>
 			{/* /Invoices */}
-			<div className="d-flex justify-content-center align-items-center mb-4">
+			{/* <div className="d-flex justify-content-center align-items-center mb-4">
 				<Link href="#" className="btn btn-primary d-flex justify-content-center align-items-center me-2">
 					<i className="ti ti-printer me-2" />
 					Print Invoice
@@ -148,7 +142,7 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 					<i className="ti ti-copy me-2" />
 					Clone Invoice
 				</Link>
-			</div>
+			</div> */}
 		</>
 	);
 }

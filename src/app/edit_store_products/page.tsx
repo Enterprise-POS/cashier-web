@@ -3,9 +3,7 @@ import { cookies } from 'next/headers';
 import { Constants } from '@/components/core/data/constant';
 import EditStockInfoComponent from '@/components/edit_store_products/EditStockInfoComponent';
 import Footer from '@/components/partials/footer';
-import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
-import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 
 export default async function StockAdjustment() {
 	const cookieStore = await cookies();
@@ -22,9 +20,9 @@ export default async function StockAdjustment() {
 							</div>
 						</div>
 						<ul className="table-top-head">
-							<TooltipIcons />
+							{/* <TooltipIcons /> */}
 							<RefreshIcon />
-							<CollapseIcon />
+							{/* <CollapseIcon /> */}
 						</ul>
 					</div>
 
