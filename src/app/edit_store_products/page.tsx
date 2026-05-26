@@ -1,12 +1,15 @@
-'use client';
+import { cookies } from 'next/headers';
 
+import { Constants } from '@/components/core/data/constant';
 import EditStockInfoComponent from '@/components/edit_store_products/EditStockInfoComponent';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
 import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
 
-export default function StockAdjustment() {
+export default async function StockAdjustment() {
+	const cookieStore = await cookies();
+	const token = cookieStore.get(Constants.CookieKey.enterprisePOS)?.value ?? '';
 	return (
 		<>
 			<div className="page-wrapper">
@@ -25,7 +28,7 @@ export default function StockAdjustment() {
 						</ul>
 					</div>
 
-					<EditStockInfoComponent />
+					<EditStockInfoComponent token={token} />
 				</div>
 				{/* /product list */}
 				<Footer />

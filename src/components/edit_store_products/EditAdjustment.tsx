@@ -83,7 +83,7 @@ export default function EditAdjustment({
 									<div className="col-lg-6">
 										<div className="mb-3">
 											<label className="form-label">
-												Price<span className="text-danger ms-1">*</span>
+												Selling Price<span className="text-danger ms-1">*</span>
 											</label>
 											<input
 												type="text"

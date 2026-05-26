@@ -1,60 +1,66 @@
-import { Input, Table, TablePaginationConfig } from 'antd';
+'use client';
+import { useQueryClient } from '@tanstack/react-query';
+import { Input, Pagination, Table, Tooltip } from 'antd';
+import { SorterResult } from 'antd/es/table/interface.js';
 import Link from 'next/link';
-import { FormEventHandler, useEffect, useState } from 'react';
-import { Edit } from 'react-feather';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Edit, HelpCircle } from 'react-feather';
 
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { Tenant } from '@/_classes/Tenant';
-import { HTTPResult } from '@/_interface/HTTPResult';
 import { StockType } from '@/_interface/ItemDef';
-import { StoreStockV2Def } from '@/_interface/StoreStockDef';
-import { editStoreStock, getAllV2 } from '@/_lib/store_stock';
-import { closeBootstrapModal, convertTo } from '@/_lib/utils';
+import { formatIDR } from '@/_lib/utils';
 import EditAdjustment from '@/components/edit_store_products/EditAdjustment';
-import { useFormState } from '@/components/hooks/useFormState';
+import { useEditStockInfoQuery } from '@/components/hooks/useEditStockInfoQuery';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useTenant } from '@/components/provider/TenantProvider';
+import { useEditStockInfoStore } from '@/components/store/editStockInfoStore';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 
-export default function EditStockInfoComponent() {
-	const limit = 10;
-	const [isMounted, setIsMounted] = useState(false);
+export default function EditStockInfoComponent({ token }: { token: string }) {
+	const router = useRouter();
 	const storeCtx = useStore();
 	const tenantCtx = useTenant();
-	const formState = useFormState();
-
-	const [nameQuery, setNameQuery] = useState('');
-	const [pagination, setPagination] = useState<TablePaginationConfig>({
-		current: 1, // By default when user open is 1
-		pageSize: limit,
-		total: 0,
-		responsive: true,
-	});
-	const [storeStocks, setStoreStocks] = useState<StoreStockV2[]>([]);
-
+	const queryClient = useQueryClient();
+	const [isMounted, setIsMounted] = useState(false);
 	const [tobeEditStoreStock, setTobeEditStoreStock] = useState<StoreStockV2>();
 
-	const selectedTenant: Tenant | undefined = tenantCtx.data.tenantList.find(
-		tenant => tenant.id === tenantCtx.data.selectedTenantId,
-	);
-	const selectedStore: Store | undefined = storeCtx.data.storeList.find(
-		store => store.id === storeCtx.data.selectedStoreId,
-	);
+	const pagination = useEditStockInfoStore(s => s.pagination);
+	const nameQuery = useEditStockInfoStore(s => s.nameQuery);
+	const isError = useEditStockInfoStore(s => s.isError);
+	const isSuccess = useEditStockInfoStore(s => s.isSuccess);
+	const errorMessage = useEditStockInfoStore(s => s.errorMessage);
+	const successMessage = useEditStockInfoStore(s => s.successMessage);
+
+	const setPagination = useEditStockInfoStore(s => s.setPagination);
+	const setNameQuery = useEditStockInfoStore(s => s.setNameQuery);
+	// const setCreatedAtSorter = useEditStockInfoStore(s => s.setCreatedAtSorter);
+	const applyFilters = useEditStockInfoStore(s => s.applyFilters);
+	const clearError = useEditStockInfoStore(s => s.clearError);
+	const clearSuccess = useEditStockInfoStore(s => s.clearSuccess);
+	const handleSortChange = useEditStockInfoStore(s => s.handleSortChange);
+	const handleConfirmEdit = useEditStockInfoStore(s => s.handleConfirmEdit);
+
+	const selectedTenant = tenantCtx.data.tenantList.find(t => t.id === tenantCtx.data.selectedTenantId) as
+		| Tenant
+		| undefined;
+	const selectedStore = storeCtx.data.storeList.find(s => s.id === storeCtx.data.selectedStoreId) as Store | undefined;
+
+	const { data, isFetching } = useEditStockInfoQuery(token);
+	const storeStocks = data?.storeStocks ?? [];
+	const total = data?.total ?? 0;
+
+	useEffect(() => {
+		if (total > 0) setPagination({ ...pagination, total });
+	}, [total]);
 
 	useEffect(() => setIsMounted(true), []);
-	useEffect(() => {
-		if (selectedStore !== undefined) {
-			getStoreStock(selectedStore.id, storeCtx.getCurrentTenantId(), pagination.current!, nameQuery);
-		}
 
-		// If store id changed or tenant id change, store provider will be re-render
-		// Because <Table /> don't have direct to maintain selectedStore, we use this useEffect
-	}, [selectedStore, nameQuery]);
+	if (!isMounted || storeCtx.isStateLoading) return <SectionLoading caption="Loading store products..." />;
 
-	if (!isMounted || storeCtx.isStateLoading) return <SectionLoading caption={`Loading store products...`} />;
-
-	const dataSource = storeStocks;
 	const columns = [
 		{
 			title: 'ID',
@@ -64,171 +70,117 @@ export default function EditStockInfoComponent() {
 		{
 			title: 'Product',
 			dataIndex: 'itemName',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
+			// sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
 		},
-
 		{
-			title: 'Price',
+			title: (
+				<span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+					Selling Price
+					<Tooltip title="Selling price is what the customer pays. Edit the product to configure it.">
+						<HelpCircle size={13} color="#8c8c8c" style={{ cursor: 'help', flexShrink: 0 }} />
+					</Tooltip>
+				</span>
+			),
 			dataIndex: 'price',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.price - b.price,
+			// sorter: (a: StoreStockV2, b: StoreStockV2) => a.price - b.price,
+			render: (price: number) => {
+				if (price === 0)
+					return (
+						<Tooltip title="No selling price configured. Click edit to set one.">
+							<p className="fst-italic text-muted" style={{ cursor: 'help', marginBottom: 0 }}>
+								— not set
+							</p>
+						</Tooltip>
+					);
+				return formatIDR(price);
+			},
+		},
+		{
+			title: 'Base Price',
+			dataIndex: 'basePrice',
+			render: (basePrice: number, item: StoreStockV2) => {
+				if (basePrice === 0)
+					return (
+						<Tooltip title="No base price configured. Click this to edit base price.">
+							<p
+								className="fst-italic text-muted"
+								style={{ marginBottom: 0, cursor: 'pointer' }}
+								onClick={() => {
+									router.push(
+										routes.editProduct
+											.replace('<tenantId>', storeCtx.getCurrentTenantId().toString())
+											.replace('<itemId>', item.itemId.toString()),
+									);
+								}}
+							>
+								— not set
+							</p>
+						</Tooltip>
+					);
+				return formatIDR(basePrice);
+			},
 		},
 		{
 			title: 'T/U',
 			dataIndex: 'stockType',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.stockType.length - b.stockType.length,
+			// sorter: (a: StoreStockV2, b: StoreStockV2) => a.stockType.length - b.stockType.length,
 			render: (stockType: StockType) => stockType.at(0),
 		},
 		{
 			title: 'Item Created At',
 			dataIndex: 'createdAt',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (date: Date) => date.toLocaleDateString() + ' ' + date.toLocaleTimeString(),
+			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
 		{
 			title: 'Action',
 			dataIndex: 'id',
-			render: (id: number, storeStock: StoreStockV2) => (
+			render: (_id: number, storeStock: StoreStockV2) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
-						<div className="input-block add-lists"></div>
 						<Link
 							className="me-2 p-2"
 							href="#"
 							data-bs-toggle="modal"
 							data-bs-target="#edit-units"
-							onClick={() => setTobeEditStoreStock(storeStock)}
+							onClick={() => (isFetching ? null : setTobeEditStoreStock(storeStock))}
 						>
 							<Edit />
 						</Link>
 					</div>
 				</div>
 			),
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 	];
-
-	async function getStoreStock(storeId: number, tenantId: number, page: number, search: string) {
-		if (formState.state.isFormLoading) return;
-
-		try {
-			formState.setFormLoading(true);
-			const { result, error }: HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }> = await getAllV2(
-				storeId,
-				tenantId,
-				pagination.current!,
-				limit,
-				search,
-				0, // categoryId
-				[],
-				tenantCtx.getToken(),
-			);
-			if (error !== null) {
-				// A special condition that maybe user not yet transfer any warehouse items
-				if (error.includes('[ERROR] no stock found')) {
-					setStoreStocks([]);
-					setPagination({ ...pagination, current: 1, total: 0 });
-				} else {
-					formState.setError({ message: error });
-				}
-			} else {
-				setStoreStocks(result!.storeStockDefs.map((def: StoreStockV2Def) => new StoreStockV2(def)));
-				setPagination({ ...pagination, current: page, total: result!.count });
-			}
-		} catch (e: unknown) {
-			const error = e as Error;
-			console.error(`[ERROR] ${error.message}`);
-			formState.setError({ message: `Unexpected error: ${error.message}` });
-		} finally {
-			formState.setFormLoading(false);
-		}
-	}
-
-	const handleForm: FormEventHandler<HTMLFormElement> = async e => {
-		e.preventDefault();
-
-		const { isFormLoading } = formState.state;
-		if (isFormLoading || !tobeEditStoreStock) return;
-		formState.setFormLoading(true);
-
-		try {
-			const formData = new FormData(e.currentTarget);
-
-			const { error }: HTTPResult<void> = await editStoreStock(formData, tenantCtx.getToken());
-			if (error !== null) {
-				formState.setError({ message: error });
-			} else {
-				// Because it's guaranteed to success then take immediately the changed value here
-				const price: FormDataEntryValue | null = formData.get('price');
-				const id: FormDataEntryValue | null = formData.get('id');
-
-				const convertedId = convertTo.number(id);
-				const convertedPrice = convertTo.number(price);
-				if (convertedPrice === null || convertedId === null) {
-					formState.setSuccess({
-						message: 'Product edited successfully, something wrong while refreshing edited item',
-					});
-				} else {
-					setStoreStocks(
-						storeStocks.map(storeStock =>
-							storeStock.id === convertedId
-								? new StoreStockV2({
-										id: storeStock.id,
-										item_id: storeStock.itemId,
-										item_name: storeStock.itemName,
-										stock_type: storeStock.stockType,
-										stocks: storeStock.stocks,
-										price: convertedPrice,
-										created_at: storeStock.createdAt.toString(),
-
-										category_id: 0,
-										category_name: '',
-									})
-								: storeStock,
-						),
-					);
-					formState.setSuccess({ message: 'Edited successfully' });
-					closeBootstrapModal('#edit-units [data-bs-dismiss="modal"]');
-				}
-			}
-		} catch (err) {
-			const message = err instanceof Error ? err.message : String(err);
-			console.warn(err);
-			formState.setError({ message });
-		} finally {
-			formState.setFormLoading(false);
-		}
-	};
 
 	return (
 		<>
 			{/* Success Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					id="liveToast"
-					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast`}
+					className={`toast ${isSuccess ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
 				>
 					<div className="toast-header bg-success text-fixed-white">
-						<strong className="me-auto">Success !</strong>
+						<strong className="me-auto">Success!</strong>
 						<button
 							type="button"
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ success: false })}
-						></button>
+							onClick={clearSuccess}
+						/>
 					</div>
-					<div className="toast-body">{formState.value.successMessage}</div>
+					<div className="toast-body">{successMessage}</div>
 				</div>
 			</div>
 
 			{/* Error Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					id="liveToast"
-					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast bg-danger-transparent`}
+					className={`toast ${isError ? 'show' : ''} colored-toast`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -240,27 +192,58 @@ export default function EditStockInfoComponent() {
 							className="btn-close"
 							data-bs-dismiss="toast"
 							aria-label="Close"
-							onClick={() => formState.setState({ error: false })}
-						></button>
+							onClick={clearError}
+						/>
 					</div>
-					<div className="toast-body">{formState.value.errorMessage}</div>
+					<div className="toast-body">{errorMessage}</div>
 				</div>
 			</div>
 
 			<div className="card table-list-card manage-stock">
 				<div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-					<div className="search-set">
-						<Input.Search
-							placeholder="Search items..."
-							allowClear
-							className="focus-ring"
-							onSearch={value => {
-								setNameQuery(value);
-								setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
-							}}
-						/>
+					<div className="d-flex gap-3">
+						<div className="search-set">
+							<Input.Search
+								placeholder="Search items..."
+								allowClear
+								className="focus-ring"
+								value={nameQuery}
+								onChange={e => setNameQuery(e.target.value)}
+								onSearch={applyFilters}
+							/>
+						</div>
+						{/* <div className="page-btn">
+							<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3 ms-auto">
+								<div className="dropdown mb-0">
+									<button
+										className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center text-gray-3"
+										data-bs-toggle="dropdown"
+									>
+										Order: Created at {sortCreatedAt === SortBy.ASCENDING ? 'Oldest' : 'Latest'}
+									</button>
+									<ul className="dropdown-menu dropdown-menu-end p-3">
+										<li>
+											<button className="dropdown-item rounded-1" onClick={() => setCreatedAtSorter(SortBy.DESCENDING)}>
+												Latest
+											</button>
+										</li>
+										<li>
+											<button className="dropdown-item rounded-1" onClick={() => setCreatedAtSorter(SortBy.ASCENDING)}>
+												Oldest
+											</button>
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div> */}
+						<button
+							className={`btn btn-primary ${isFetching ? 'wait' : ''}`}
+							disabled={isFetching}
+							onClick={applyFilters}
+						>
+							{isFetching ? 'Please wait' : 'Search'}
+						</button>
 					</div>
-
 					<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
 						<div className="dropdown">
 							<button
@@ -269,7 +252,7 @@ export default function EditStockInfoComponent() {
 							>
 								{selectedStore?.name ?? 'Select Store'}
 							</button>
-							<ul className="dropdown-menu  dropdown-menu-end p-3">
+							<ul className="dropdown-menu dropdown-menu-end p-3">
 								{storeCtx.data.storeList.map(store => (
 									<li key={store.id} onClick={() => storeCtx.setCurrentStore(store.id)}>
 										<Link href="#" className="dropdown-item rounded-1">
@@ -281,138 +264,67 @@ export default function EditStockInfoComponent() {
 						</div>
 					</div>
 				</div>
-				<div className="card-body">
-					<div className="custom-datatable-filter table-responsive">
-						<Table<StoreStockV2>
-							rowKey={'itemId'}
-							columns={columns}
-							dataSource={dataSource}
-							pagination={pagination}
-							loading={{
-								spinning: formState.state.isFormLoading,
-								indicator: <SectionLoading />,
-							}}
-							onChange={newPagination =>
-								getStoreStock(selectedStore!.id, storeCtx.getCurrentTenantId(), newPagination.current!, nameQuery)
-							}
-						/>
-					</div>
+
+				<div className="custom-datatable-filter table-responsive">
+					<Table<StoreStockV2>
+						rowKey={'itemId'}
+						columns={columns}
+						dataSource={storeStocks}
+						pagination={false}
+						loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
+						onChange={(_, __, sorter) =>
+							handleSortChange(sorter as SorterResult<StoreStockV2> | SorterResult<StoreStockV2>[])
+						}
+						footer={currentPageData => {
+							const tracked = currentPageData.filter(s => s.stockType === StockType.TRACKED).length;
+							const sellingPriceUnset = currentPageData.filter(s => s.price === 0).length;
+							const basePriceUnset = currentPageData.filter(s => s.basePrice === 0).length;
+							return (
+								<div className="d-flex align-items-center justify-content-between flex-wrap gap-2 text-muted small">
+									<div className="d-flex gap-3">
+										<span>
+											<strong>{currentPageData.length}</strong> items on this page
+										</span>
+										<span className="vr" />
+										<span>
+											<strong>{tracked}</strong> tracked · <strong>{total - tracked}</strong> unlimited
+										</span>
+										<span className="vr" />
+										<span>
+											<strong>{sellingPriceUnset}</strong> selling price{sellingPriceUnset !== 1 ? 's' : ''} not set
+										</span>
+										<span className="vr" />
+										<span>
+											<strong>{basePriceUnset}</strong> base price{basePriceUnset !== 1 ? 's' : ''} not set
+										</span>
+									</div>
+									<div className="text-muted">{pagination.total} total records</div>
+								</div>
+							);
+						}}
+					/>
+				</div>
+
+				<div className="d-flex justify-content-md-end py-3 px-3">
+					<Pagination
+						current={pagination.current}
+						pageSize={pagination.pageSize}
+						total={pagination.total}
+						showSizeChanger={true}
+						onChange={(page, pageSize) => setPagination({ ...pagination, current: page, pageSize })}
+					/>
 				</div>
 			</div>
 
-			{/* Edit Adjustment */}
 			<EditAdjustment
 				selectedTenant={selectedTenant}
 				selectedStore={selectedStore}
 				tobeEditStoreStock={tobeEditStoreStock}
-				handleForm={handleForm}
+				handleForm={async e => {
+					e.preventDefault();
+					await handleConfirmEdit(new FormData(e.currentTarget), token, queryClient, isFetching);
+				}}
 			/>
-			{/* /Edit Adjustment */}
-			{/* View Notes */}
-			<div className="modal fade" id="view-notes">
-				<div className="modal-dialog modal-dialog-centered">
-					<div className="modal-content">
-						<div className="modal-header">
-							<div className="page-title">
-								<h4>Notes</h4>
-							</div>
-							<button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-								<span aria-hidden="true">×</span>
-							</button>
-						</div>
-						<div className="modal-body">
-							<p>
-								The Jordan brand is owned by Nike (owned by the Knight family), as, at the time, the company was
-								building its strategy to work with athletes to launch shows that could inspire consumers.Although Jordan
-								preferred Converse and Adidas, they simply could not match the offer Nike made. Jordan also signed with
-								Nike because he loved the way they wanted to market him with the banned colored shoes. Nike promised to
-								cover the fine Jordan would receive from the NBA.
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-			{/* /View Notes */}
 		</>
 	);
 }
-
-/**
-	<div className="modal fade" id="add-units">
-		<div className="modal-dialog modal-dialog-centered stock-adjust-modal">
-			<div className="modal-content">
-				<div className="modal-header">
-					<div className="page-title">
-						<h4>Add Adjustment</h4>
-					</div>
-					<button type="button" className="close" data-bs-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">×</span>
-					</button>
-				</div>
-				<form>
-					<div className="modal-body">
-						<div className="search-form mb-3">
-							<label className="form-label">
-								Product<span className="text-danger ms-1">*</span>
-							</label>
-							<input type="text" className="form-control" placeholder="Search Product" />
-							<Search className="feather-search" />
-						</div>
-						<div className="row">
-							<div className="col-lg-6">
-								<div className="mb-3">
-									<label className="form-label">
-										Warehouse<span className="text-danger ms-1">*</span>
-									</label>
-									<Select classNamePrefix="react-select" options={WareHouse} placeholder="Choose" />
-								</div>
-							</div>
-							<div className="col-lg-6">
-								<div className="mb-3">
-									<label className="form-label">
-										Reference Number
-										<span className="text-danger ms-1">*</span>
-									</label>
-									<input type="text" className="form-control" />
-								</div>
-							</div>
-							<div className="col-lg-12">
-								<div className="mb-3">
-									<label className="form-label">
-										Store<span className="text-danger ms-1">*</span>
-									</label>
-									<Select classNamePrefix="react-select" options={Store} placeholder="Choose" />
-								</div>
-							</div>
-							<div className="col-lg-12">
-								<div className="mb-3">
-									<label className="form-label">
-										Responsible Person
-										<span className="text-danger ms-1">*</span>
-									</label>
-									<Select classNamePrefix="react-select" options={ResponsiblePerson} placeholder="Choose" />
-								</div>
-							</div>
-						</div>
-						<div className="col-lg-12">
-							<div className="summer-description-box">
-								<label className="form-label">
-									Notes<span className="text-danger ms-1">*</span>
-								</label>
-								<textarea className="form-control" defaultValue={''} />
-							</div>
-						</div>
-					</div>
-					<div className="modal-footer">
-						<button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal">
-							Cancel
-						</button>
-						<Link href="#" className="btn btn-primary" data-bs-dismiss="modal">
-							Create Adjustment
-						</Link>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
- */

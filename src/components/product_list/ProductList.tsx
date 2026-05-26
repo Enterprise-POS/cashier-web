@@ -371,8 +371,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					</div> */}
 					</div>
 				</div>
-				<div className="card-body">
-					{/* <div className="table-top">
+				{/* <div className="table-top">
               <div className="search-set">
                 <div className="search-input">
                   <input
@@ -414,8 +413,8 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
                 />
               </div>
             </div> */}
-					{/* /Filter */}
-					{/* <div
+				{/* /Filter */}
+				{/* <div
               className={`card${isFilterVisible ? " visible" : ""}`}
               id="filter_inputs"
               style={{ display: isFilterVisible ? "block" : "none" }}
@@ -497,20 +496,19 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
                 </div>
               </div>
             </div> */}
-					{/* /Filter */}
-					<div className="table-responsive">
-						<Table<Item>
-							rowKey={'itemId'}
-							columns={columns}
-							dataSource={dataSource}
-							pagination={pagination}
-							loading={{
-								spinning: isComponentLoading,
-								indicator: <SectionLoading />,
-							}}
-							onChange={newPagination => getData(newPagination.current!, newPagination.pageSize!, search)}
-						/>
-					</div>
+				{/* /Filter */}
+				<div className="table-responsive">
+					<Table<Item>
+						rowKey={'itemId'}
+						columns={columns}
+						dataSource={dataSource}
+						pagination={pagination}
+						loading={{
+							spinning: isComponentLoading,
+							indicator: <SectionLoading />,
+						}}
+						onChange={newPagination => getData(newPagination.current!, newPagination.pageSize!, search)}
+					/>
 				</div>
 			</div>
 
