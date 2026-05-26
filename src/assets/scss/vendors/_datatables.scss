@@ -237,23 +237,23 @@ table.dataTable {
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
-	background-color: #ff9025;
-	border-color: #ff9025;
+	background-color: $primary;
+	border-color: $primary;
 }
 
 .ant-checkbox-checked .ant-checkbox-inner:hover {
-	background-color: #ff9025;
-	border-color: #ff9025;
+	background-color: $primary;
+	border-color: $primary;
 }
 
 .ant-checkbox-checked:not(.ant-checkbox-disabled):hover .ant-checkbox-inner {
-	background-color: #ff9025 !important;
-	border-color: #ff9025 !important;
+	background-color: $primary !important;
+	border-color: $primary !important;
 }
 
 .ant-checkbox-indeterminate .ant-checkbox-inner:after {
-	background-color: #ff9025;
-	border-color: #ff9025;
+	background-color: $primary;
+	border-color: $primary;
 }
 
 .table tbody tr td a:hover i {
@@ -265,5 +265,14 @@ table.dataTable {
 	left: 10px;
 	top: 39px;
 	width: 15px;
+}
+
+.ant-select-focused .ant-select-selector {
+	border-color: $primary !important;
+}
+.ant-select-selector {
+	&:hover {
+		border-color: $primary !important;
+	}
 }
 // end table

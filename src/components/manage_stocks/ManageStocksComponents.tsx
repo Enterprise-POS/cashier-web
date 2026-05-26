@@ -1,14 +1,16 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input, Pagination, Table } from 'antd';
+import { Input, Pagination, Table, Tooltip } from 'antd';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Delete, Edit } from 'react-feather';
+import { Delete, Edit, HelpCircle } from 'react-feather';
 
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { StockType } from '@/_interface/ItemDef';
 import { formatIDR } from '@/_lib/utils';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useManageStocksQuery } from '@/components/hooks/useManageStocksQuery';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
@@ -19,6 +21,7 @@ import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
 export default function ManageStocksComponents({ token }: { token: string }) {
+	const router = useRouter();
 	const storeCtx = useStore();
 	const queryClient = useQueryClient();
 	const [isMounted, setIsMounted] = useState(false);
@@ -75,10 +78,52 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
 		},
 		{
-			title: 'Price',
+			title: (
+				<span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+					Selling Price
+					<Tooltip title="Selling price is what the customer pays. Edit the product to configure it.">
+						<HelpCircle size={13} color="#8c8c8c" style={{ cursor: 'help', flexShrink: 0 }} />
+					</Tooltip>
+				</span>
+			),
 			dataIndex: 'price',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.price - b.price,
-			render: (price: number) => formatIDR(price),
+			// sorter: (a: StoreStockV2, b: StoreStockV2) => a.price - b.price,
+			render: (price: number) => {
+				if (price === 0)
+					return (
+						<Tooltip title="No selling price configured. Go to Edit Store Products to set selling price.">
+							<p className="fst-italic text-muted" style={{ cursor: 'pointer', marginBottom: 0 }}>
+								— not set
+							</p>
+						</Tooltip>
+					);
+				return formatIDR(price);
+			},
+		},
+		{
+			title: 'Base Price',
+			dataIndex: 'basePrice',
+			render: (basePrice: number, item: StoreStockV2) => {
+				if (basePrice === 0)
+					return (
+						<Tooltip title="No base price configured. Click this to edit base price." style={{ cursor: 'pointer' }}>
+							<p
+								className="fst-italic text-muted"
+								style={{ marginBottom: 0, cursor: 'pointer' }}
+								onClick={() => {
+									router.push(
+										routes.editProduct
+											.replace('<tenantId>', storeCtx.getCurrentTenantId().toString())
+											.replace('<itemId>', item.itemId.toString()),
+									);
+								}}
+							>
+								— not set
+							</p>
+						</Tooltip>
+					);
+				return formatIDR(basePrice);
+			},
 		},
 		{
 			title: 'Category',

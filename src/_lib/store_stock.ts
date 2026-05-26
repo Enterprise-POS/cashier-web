@@ -206,8 +206,12 @@ export async function editStoreStock(formData: FormData, token: string): Promise
 	const convertedItemId = convertTo.number(itemId);
 	const convertedTenantId = convertTo.number(tenantId);
 
-	if (!convertedId || !convertedPrice || !convertedStoreId || !convertedItemId || !convertedTenantId) {
+	if (!convertedId || !convertedStoreId || !convertedItemId || !convertedTenantId) {
 		return { result: null, error: 'Something wrong while submitting. Form malfunction' };
+	}
+
+	if (convertedPrice !== null && convertedPrice < 0) {
+		return { result: null, error: 'Something wrong. Please check the selling price before submitting' };
 	}
 
 	try {
