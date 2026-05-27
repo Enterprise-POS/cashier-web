@@ -13,7 +13,7 @@ export function SelectProductToAddNew({
 }: {
 	tenantId: number;
 	isModalOpen: boolean;
-	onSelected: (itemId: number, itemName: string) => void;
+	onSelected: (itemId: number, itemName: string, stocks: number) => void;
 }) {
 	const [nameQuery, setNameQuery] = useState('');
 	const [appliedQuery, setAppliedQuery] = useState('');
@@ -86,23 +86,36 @@ export function SelectProductToAddNew({
 														<tr>
 															<th>ID</th>
 															<th>Product Name</th>
+															<th>Stock</th>
 														</tr>
 													</thead>
 													<tbody>
-														{paddedItems.real.map(item => (
-															<tr
-																key={item.id}
-																role="button"
-																style={{ cursor: 'pointer' }}
-																data-bs-dismiss="modal"
-																onClick={() => onSelected(item.id, item.itemName)}
-															>
-																<td>{item.id}</td>
-																<td>{item.itemName}</td>
-															</tr>
-														))}
+														{paddedItems.real.map(item => {
+															const outOfStock = item.stocks === 0;
+															return (
+																<tr
+																	key={item.id}
+																	role={outOfStock ? undefined : 'button'}
+																	style={{
+																		cursor: outOfStock ? 'not-allowed' : 'pointer',
+																		opacity: outOfStock ? 0.45 : 1,
+																	}}
+																	data-bs-dismiss={outOfStock ? undefined : 'modal'}
+																	onClick={outOfStock ? undefined : () => onSelected(item.id, item.itemName, item.stocks)}
+																>
+																	<td>{item.id}</td>
+																	<td>{item.itemName}</td>
+																	<td>
+																		{outOfStock
+																			? <span className="badge bg-danger">Out of stock</span>
+																			: item.stocks}
+																	</td>
+																</tr>
+															);
+														})}
 														{paddedItems.placeholders.map(p => (
 															<tr key={p.id} style={{ pointerEvents: 'none' }}>
+																<td>&nbsp;</td>
 																<td>&nbsp;</td>
 																<td>&nbsp;</td>
 															</tr>

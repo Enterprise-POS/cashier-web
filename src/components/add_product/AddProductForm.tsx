@@ -1,43 +1,79 @@
 'use client';
 
-import { FormEventHandler, useRef } from 'react';
-import { Info, LifeBuoy } from 'react-feather';
-
 import { Tenant } from '@/_classes/Tenant';
-import { createItem } from '@/_lib/warehouse';
+import { createItems } from '@/_lib/warehouse';
 import { useFormState } from '@/components/hooks/useFormState';
 import { useTenant } from '@/components/provider/TenantProvider';
+import { useCallback, useState } from 'react';
+import { PlusCircle, Trash2 } from 'react-feather';
+
+type ProductRow = {
+	id: string;
+	productName: string;
+	stocks: string;
+	basePrice: string;
+};
+
+function makeRow(): ProductRow {
+	return { id: crypto.randomUUID(), productName: '', stocks: '', basePrice: '' };
+}
 
 export default function AddProductForm() {
 	const formState = useFormState();
 	const { data } = useTenant();
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
-	const formRef = useRef<HTMLFormElement>(null);
 
-	const handleForm: FormEventHandler<HTMLFormElement> = async e => {
+	const [rows, setRows] = useState<ProductRow[]>(() => [makeRow()]);
+
+	const addRow = useCallback(() => setRows(prev => [...prev, makeRow()]), []);
+
+	const removeRow = useCallback((id: string) => {
+		setRows(prev => (prev.length === 1 ? prev : prev.filter(r => r.id !== id)));
+	}, []);
+
+	const updateRow = useCallback((id: string, field: keyof Omit<ProductRow, 'id'>, value: string) => {
+		setRows(prev => prev.map(r => (r.id === id ? { ...r, [field]: value } : r)));
+	}, []);
+
+	const handleClear = useCallback(() => setRows([makeRow()]), []);
+
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
 		if (formState.state.isFormLoading) return;
-		formState.setFormLoading(true);
 
+		const tenantId = selectedTenant?.id;
+		if (!tenantId) {
+			formState.setError({ message: 'No tenant selected.' });
+			return;
+		}
+
+		for (let i = 0; i < rows.length; i++) {
+			if (rows[i].productName.trim() === '') {
+				formState.setError({ message: `Row ${i + 1}: Product name is required.` });
+				return;
+			}
+		}
+
+		const items = rows.map(r => ({
+			item_name: r.productName.trim(),
+			stocks: r.stocks === '' ? 0 : Number(r.stocks),
+			base_price: r.basePrice === '' ? 0 : Number(r.basePrice),
+		}));
+
+		formState.setFormLoading(true);
 		try {
-			const formData = new FormData(e.currentTarget);
-			const { result, error } = await createItem(formData);
+			const { result, error } = await createItems(tenantId, items);
 			if (error !== null) {
 				formState.setError({ message: error });
 			} else {
-				formState.setSuccess({ message: `${result!.item_name} created` });
+				const count = (result ?? []).length;
+				formState.setSuccess({ message: `${count} product${count > 1 ? 's' : ''} created successfully.` });
+				handleClear();
 			}
 		} catch (e: unknown) {
-			const error = e as Error;
-			console.warn(error);
+			console.warn(e);
 		} finally {
 			formState.setFormLoading(false);
-		}
-	};
-
-	const handleClear = () => {
-		if (formRef.current) {
-			formRef.current.reset();
 		}
 	};
 
@@ -46,21 +82,14 @@ export default function AddProductForm() {
 			{/* Success Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					id="liveToast"
 					className={`toast ${formState.state.isSuccess ? 'show' : ''} colored-toast bg-success-transparent`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
 				>
 					<div className="toast-header bg-success text-fixed-white">
-						<strong className="me-auto">Success !</strong>
-						<button
-							type="button"
-							className="btn-close"
-							data-bs-dismiss="toast"
-							aria-label="Close"
-							onClick={() => formState.setState({ success: false })}
-						></button>
+						<strong className="me-auto">Success!</strong>
+						<button type="button" className="btn-close" onClick={() => formState.setState({ success: false })} />
 					</div>
 					<div className="toast-body">{formState.value.successMessage}</div>
 				</div>
@@ -69,7 +98,6 @@ export default function AddProductForm() {
 			{/* Error Toast */}
 			<div className="toast-container position-fixed bottom-0 end-0 p-3">
 				<div
-					id="liveToast"
 					className={`toast ${formState.state.isError ? 'show' : ''} colored-toast bg-danger-transparent`}
 					role="alert"
 					aria-live="assertive"
@@ -77,480 +105,111 @@ export default function AddProductForm() {
 				>
 					<div className="toast-header bg-danger text-fixed-white">
 						<strong className="me-auto">Warning</strong>
-						<button
-							type="button"
-							className="btn-close"
-							data-bs-dismiss="toast"
-							aria-label="Close"
-							onClick={() => formState.setState({ error: false })}
-						></button>
+						<button type="button" className="btn-close" onClick={() => formState.setState({ error: false })} />
 					</div>
 					<div className="toast-body">{formState.value.errorMessage}</div>
 				</div>
 			</div>
 
-			<form className="add-product-form" onSubmit={handleForm} ref={formRef}>
-				<input type="hidden" name="tenantId" value={selectedTenant?.id ?? 0} />
-				<div className="add-product">
-					<div className="accordions-items-seperate" id="accordionSpacingExample">
-						<div className="accordion-item border mb-4">
-							<h2 className="accordion-header" id="headingSpacingOne">
-								<div
-									className="accordion-button collapsed bg-white"
-									data-bs-toggle="collapse"
-									data-bs-target="#SpacingOne"
-									aria-expanded="true"
-									aria-controls="SpacingOne"
-								>
-									<div className="d-flex align-items-center justify-content-between flex-fill">
-										<h5 className="d-flex align-items-center">
-											<Info className="text-primary me-2" />
-											<span>Product Information</span>
-										</h5>
-									</div>
-								</div>
-							</h2>
-							<div id="SpacingOne" className="accordion-collapse collapse show" aria-labelledby="headingSpacingOne">
-								<div className="accordion-body border-top">
-									<div className="row">
-										<div className="col-sm-6 col-12">
-											<div className="mb-3">
-												<label className="form-label">
-													Product Name
-													<span className="text-danger ms-1">*</span>
-												</label>
-												{/*	In DB this is item_name */}
-												<input
-													type="text"
-													className="form-control"
-													name="productName"
-													disabled={formState.state.isFormLoading}
-												/>
-											</div>
-										</div>
-										<div className="col-sm-6 col-12">
-											<div className="mb-3">
-												<label className="form-label">
-													Unit<span className="text-danger ms-1">*</span>
-												</label>
-												<input type="text" className="form-control" value="PC" disabled />
-											</div>
-										</div>
-									</div>
-									{/* <div className="addservice-info">
-													<div className="row">
-														<div className="col-sm-6 col-12">
-															<div className="mb-3">
-																<div className="add-newplus">
-																	<label className="form-label">
-																		Category
-																		<span className="text-danger ms-1">*</span>
-																	</label>
-																	<Link href="#" data-bs-toggle="modal" data-bs-target="#add-units-category">
-																		<PlusCircle data-feather="plus-circle" className="plus-down-add" />
-																		<span>Add New</span>
-																	</Link>
-																</div>
-																<Select className="react-select" options={category} placeholder="Choose" />
-															</div>
-														</div>
-														<div className="col-sm-6 col-12">
-															<div className="mb-3">
-																<label className="form-label">
-																	Sub Category
-																	<span className="text-danger ms-1">*</span>
-																</label>
-																<Select className="react-select" options={subcategory} placeholder="Choose" />
-															</div>
-														</div>
-													</div>
-												</div> */}
-									{/* Editor */}
-									{/* <div className="col-lg-12">
-													<div className="summer-description-box">
-														<label className="form-label">Description</label>
-														<TextEditor />
-														<p className="fs-14 mt-1">Maximum 60 Words</p>
-													</div>
-												</div> */}
-									{/* /Editor */}
-								</div>
-							</div>
-						</div>
-						<div className="accordion-item border mb-4">
-							<h2 className="accordion-header" id="headingSpacingTwo">
-								<div
-									className="accordion-button collapsed bg-white"
-									data-bs-toggle="collapse"
-									data-bs-target="#SpacingTwo"
-									aria-expanded="true"
-									aria-controls="SpacingTwo"
-								>
-									<div className="d-flex align-items-center justify-content-between flex-fill">
-										<h5 className="d-flex align-items-center">
-											<LifeBuoy data-feather="life-buoy" className="text-primary me-2" />
-											<span>Pricing &amp; Stocks</span>
-										</h5>
-									</div>
-								</div>
-							</h2>
-							<div id="SpacingTwo" className="accordion-collapse collapse show" aria-labelledby="headingSpacingTwo">
-								<div className="accordion-body border-top">
-									{/* <div className="mb-3s">
-													<label className="form-label">
-														Product Type
-														<span className="text-danger ms-1">*</span>
-													</label>
-													<div className="single-pill-product mb-3">
-														<ul className="nav nav-pills" id="pills-tab1" role="tablist">
-															<li className="nav-item" role="presentation">
-																<span
-																	className="custom_radio me-4 mb-0 active"
-																	id="pills-home-tab"
-																	data-bs-toggle="pill"
-																	data-bs-target="#pills-home"
-																	role="tab"
-																	aria-controls="pills-home"
-																	aria-selected="true"
-																>
-																	<input type="radio" className="form-control" name="payment" />
-																	<span className="checkmark" /> Single Product
-																</span>
-															</li>
-															<li className="nav-item" role="presentation">
-																<span
-																	className="custom_radio me-2 mb-0"
-																	id="pills-profile-tab"
-																	data-bs-toggle="pill"
-																	data-bs-target="#pills-profile"
-																	role="tab"
-																	aria-controls="pills-profile"
-																	aria-selected="false"
-																>
-																	<input type="radio" className="form-control" name="sign" />
-																	<span className="checkmark" /> Variable Product
-																</span>
-															</li>
-														</ul>
-													</div>
-												</div> */}
-									<div className="tab-content" id="pills-tabContent">
-										<div
-											className="tab-pane fade show active"
-											id="pills-home"
-											role="tabpanel"
-											aria-labelledby="pills-home-tab"
+			<form onSubmit={handleSubmit}>
+				<div className="table-responsive mb-3">
+					<table className="table table-bordered align-middle">
+						<thead className="table-light">
+							<tr>
+								<th style={{ width: '3rem' }}>No</th>
+								<th>Product Name <span className="text-danger">*</span></th>
+								<th style={{ width: '12rem' }}>Quantity</th>
+								<th style={{ width: '14rem' }}>Base Price</th>
+								<th style={{ width: '4rem' }}></th>
+							</tr>
+						</thead>
+						<tbody>
+							{rows.map((row, index) => (
+								<tr key={row.id}>
+									<td className="text-center text-muted">{index + 1}</td>
+									<td>
+										<input
+											type="text"
+											className="form-control form-control-sm"
+											value={row.productName}
+											placeholder="Product name"
+											disabled={formState.state.isFormLoading}
+											onChange={e => updateRow(row.id, 'productName', e.target.value)}
+										/>
+									</td>
+									<td>
+										<input
+											type="number"
+											className="form-control form-control-sm"
+											value={row.stocks}
+											placeholder="0"
+											min={0}
+											disabled={formState.state.isFormLoading}
+											onChange={e => updateRow(row.id, 'stocks', e.target.value)}
+										/>
+									</td>
+									<td>
+										<input
+											type="number"
+											className="form-control form-control-sm"
+											value={row.basePrice}
+											placeholder="0"
+											min={0}
+											disabled={formState.state.isFormLoading}
+											onChange={e => updateRow(row.id, 'basePrice', e.target.value)}
+										/>
+									</td>
+									<td className="text-center">
+										<button
+											type="button"
+											className="btn btn-sm btn-outline-danger"
+											disabled={rows.length === 1 || formState.state.isFormLoading}
+											onClick={() => removeRow(row.id)}
+											title="Remove row"
 										>
-											<div className="single-product">
-												<div className="row">
-													<div className="col-sm-6 col-12">
-														<div className="mb-3">
-															<label className="form-label">Quantity (0 or empty is allowed)</label>
-															<input
-																type="number"
-																className="form-control"
-																name="stocks"
-																disabled={formState.state.isFormLoading}
-																placeholder="0"
-															/>
-														</div>
-													</div>
-													<div className="col-sm-6 col-12">
-														<div className="mb-3">
-															<label className="form-label">Base Price</label>
-															<input
-																type="number"
-																className="form-control"
-																name="basePrice"
-																disabled={formState.state.isFormLoading}
-																placeholder="0"
-															/>
-														</div>
-													</div>
-													{/* <div className="col-lg-4 col-sm-6 col-12">
-																	<div className="mb-3">
-																		<label className="form-label">
-																			Price
-																			<span className="text-danger ms-1">*</span>
-																		</label>
-																		<input type="number" className="form-control" />
-																	</div>
-																</div> */}
-													{/* <div className="col-lg-4 col-sm-6 col-12">
-																	<div className="mb-3">
-																		<label className="form-label">
-																			Tax Type
-																			<span className="text-danger ms-1">*</span>
-																		</label>
-																		<Select className="react-select" options={taxtype} placeholder="Select Option" />
-																	</div>
-																</div>
-																<div className="col-lg-4 col-sm-6 col-12">
-																	<div className="mb-3">
-																		<label className="form-label">
-																			Discount Type
-																			<span className="text-danger ms-1">*</span>
-																		</label>
-																		<Select className="react-select" options={discounttype} placeholder="Choose" />
-																	</div>
-																</div>
-																<div className="col-lg-4 col-sm-6 col-12">
-																	<div className="mb-3">
-																		<label className="form-label">
-																			Discount Value
-																			<span className="text-danger ms-1">*</span>
-																		</label>
-																		<input className="form-control" type="text" />
-																	</div>
-																</div>
-																<div className="col-lg-4 col-sm-6 col-12">
-																	<div className="mb-3">
-																		<label className="form-label">
-																			Quantity Alert
-																			<span className="text-danger ms-1">*</span>
-																		</label>
-																		<input type="text" className="form-control" />
-																	</div>
-																</div> */}
-												</div>
-											</div>
-										</div>
-										{/* <div
-														className="tab-pane fade"
-														id="pills-profile"
-														role="tabpanel"
-														aria-labelledby="pills-profile-tab"
-													>
-														<div className="row select-color-add">
-															<div className="col-lg-6 col-sm-6 col-12">
-																<div className="mb-3">
-																	<label className="form-label">
-																		Variant Attribute <span className="text-danger ms-1">*</span>
-																	</label>
-																	<div className="row">
-																		<div className="col-lg-10 col-sm-10 col-10">
-																			<select
-																				className="form-control variant-select select-option"
-																				id="colorSelect"
-																				onChange={() => setProduct(true)}
-																			>
-																				<option>Choose</option>
-																				<option>Color</option>
-																				<option value="red">Red</option>
-																				<option value="black">Black</option>
-																			</select>
-																		</div>
-																		<div className="col-lg-2 col-sm-2 col-2 ps-0">
-																			<div className="add-icon tab">
-																				<Link
-																					href="#"
-																					className="btn btn-filter"
-																					data-bs-toggle="modal"
-																					data-bs-target="#add-units"
-																				>
-																					<i className="feather feather-plus-circle" />
-																				</Link>
-																			</div>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div> */}
-									</div>
-								</div>
-							</div>
-						</div>
-						{/* <div className="accordion-item border mb-4">
-										<h2 className="accordion-header" id="headingSpacingThree">
-											<div
-												className="accordion-button collapsed bg-white"
-												data-bs-toggle="collapse"
-												data-bs-target="#SpacingThree"
-												aria-expanded="true"
-												aria-controls="SpacingThree"
-											>
-												<div className="d-flex align-items-center justify-content-between flex-fill">
-													<h5 className="d-flex align-items-center">
-														<Image data-feather="image" className="text-primary me-2" />
-														<span>Images</span>
-													</h5>
-												</div>
-											</div>
-										</h2>
-										<div
-											id="SpacingThree"
-											className="accordion-collapse collapse show"
-											aria-labelledby="headingSpacingThree"
-										>
-											<div className="accordion-body border-top">
-												<div className="text-editor add-list add">
-													<div className="col-lg-12">
-														<div className="add-choosen">
-															<div className="mb-3">
-																<div className="image-upload">
-																	<input type="file" />
-																	<div className="image-uploads">
-																		<PlusCircle data-feather="plus-circle" className="plus-down-add me-0" />
-																		<h4>Add Images</h4>
-																	</div>
-																</div>
-															</div>
-															{isImageVisible1 && (
-																<div className="phone-img">
-																	<img src="/assets/img/products/phone-add-2.png" alt="image" />
-																	<Link href="#">
-																		<X className="x-square-add remove-product" onClick={handleRemoveProduct1} />
-																	</Link>
-																</div>
-															)}
-															{isImageVisible && (
-																<div className="phone-img">
-																	<img src="/assets/img/products/phone-add-1.png" alt="image" />
-																	<Link href="#">
-																		<X className="x-square-add remove-product" onClick={handleRemoveProduct} />
-																	</Link>
-																</div>
-															)}
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div> */}
-						{/* <div className="accordion-item border mb-4">
-										<h2 className="accordion-header" id="headingSpacingFour">
-											<div
-												className="accordion-button collapsed bg-white"
-												data-bs-toggle="collapse"
-												data-bs-target="#SpacingFour"
-												aria-expanded="true"
-												aria-controls="SpacingFour"
-											>
-												<div className="d-flex align-items-center justify-content-between flex-fill">
-													<h5 className="d-flex align-items-center">
-														<List data-feather="list" className="text-primary me-2" />
-														<span>Custom Fields</span>
-													</h5>
-												</div>
-											</div>
-										</h2>
-										<div
-											id="SpacingFour"
-											className="accordion-collapse collapse show"
-											aria-labelledby="headingSpacingFour"
-										>
-											<div className="accordion-body border-top">
-												<div>
-													<div className="p-3 bg-light rounded d-flex align-items-center border mb-3">
-														<div className=" d-flex align-items-center">
-															<div className="form-check form-check-inline">
-																<input
-																	className="form-check-input"
-																	type="checkbox"
-																	id="warranties"
-																	defaultValue="option1"
-																/>
-																<label className="form-check-label" htmlFor="warranties">
-																	Warranties
-																</label>
-															</div>
-															<div className="form-check form-check-inline">
-																<input
-																	className="form-check-input"
-																	type="checkbox"
-																	id="manufacturer"
-																	defaultValue="option2"
-																/>
-																<label className="form-check-label" htmlFor="manufacturer">
-																	Manufacturer
-																</label>
-															</div>
-															<div className="form-check form-check-inline">
-																<input className="form-check-input" type="checkbox" id="expiry" defaultValue="option2" />
-																<label className="form-check-label" htmlFor="expiry">
-																	Expiry
-																</label>
-															</div>
-														</div>
-													</div>
-													<div className="row">
-														<div className="col-sm-6 col-12">
-															<div className="mb-3">
-																<label className="form-label">
-																	Warranty
-																	<span className="text-danger ms-1">*</span>
-																</label>
-																<Select className="react-select" options={warrenty} placeholder="Choose" />
-															</div>
-														</div>
-														<div className="col-sm-6 col-12">
-															<div className="mb-3 add-product">
-																<label className="form-label">
-																	Manufacturer
-																	<span className="text-danger ms-1">*</span>
-																</label>
-																<input type="text" className="form-control" />
-															</div>
-														</div>
-													</div>
-													<div className="row">
-														<div className="col-sm-6 col-12">
-															<div className="mb-3">
-																<label className="form-label">
-																	Manufactured Date
-																	<span className="text-danger ms-1">*</span>
-																</label>
-																<div className="input-groupicon calender-input">
-																	<Calendar className="info-img" />
-																	<DatePicker className="form-control datetimepicker" placeholder="dd/mm/yyyy" />
-																</div>
-															</div>
-														</div>
-														<div className="col-sm-6 col-12">
-															<div className="mb-3">
-																<label className="form-label">
-																	Expiry On
-																	<span className="text-danger ms-1">*</span>
-																</label>
-																<div className="input-groupicon calender-input">
-																	<Calendar className="info-img" />
-																	<DatePicker className="form-control datetimepicker" placeholder="dd/mm/yyyy" />
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div> */}
-					</div>
+											<Trash2 size={14} />
+										</button>
+									</td>
+								</tr>
+							))}
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colSpan={5}>
+									<button
+										type="button"
+										className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+										disabled={formState.state.isFormLoading}
+										onClick={addRow}
+									>
+										<PlusCircle size={14} />
+										Add Row
+									</button>
+								</td>
+							</tr>
+						</tfoot>
+					</table>
 				</div>
-				<div className="col-lg-12">
-					<div className="d-flex align-items-center justify-content-end mb-4">
-						<button
-							type="button"
-							className="btn btn-secondary me-2"
-							disabled={formState.state.isFormLoading}
-							onClick={handleClear}
-						>
-							Clear
-						</button>
-						<button
-							type="submit"
-							className="btn btn-primary"
-							disabled={formState.state.isFormLoading}
-							style={{ cursor: formState.state.isFormLoading ? 'progress' : 'pointer' }}
-						>
-							{formState.state.isFormLoading ? (
-								<div className="spinner-border spinner-border-sm me-1" role="status">
-									<span className="sr-only">Loading...</span>
-								</div>
-							) : (
-								<>Add Product</>
-							)}
-						</button>
-					</div>
+
+				<div className="d-flex align-items-center justify-content-end mb-4 gap-2">
+					<button type="button" className="btn btn-secondary" disabled={formState.state.isFormLoading} onClick={handleClear}>
+						Clear
+					</button>
+					<button
+						type="submit"
+						className="btn btn-primary"
+						disabled={formState.state.isFormLoading}
+						style={{ cursor: formState.state.isFormLoading ? 'progress' : 'pointer' }}
+					>
+						{formState.state.isFormLoading ? (
+							<>
+								<span className="spinner-border spinner-border-sm me-1" role="status" />
+								Submitting...
+							</>
+						) : (
+							`Add ${rows.length} Product${rows.length > 1 ? 's' : ''}`
+						)}
+					</button>
 				</div>
 			</form>
 		</>

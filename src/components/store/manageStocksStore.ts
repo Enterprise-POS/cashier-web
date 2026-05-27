@@ -80,6 +80,14 @@ type ManageStocksActions = {
 		isFetching: boolean,
 	) => Promise<void>;
 
+	handleTransferItems: (
+		items: Array<{ req: TransferStockRequest; itemName: string }>,
+		selectedStoreName: string,
+		token: string,
+		queryClient: QueryClient,
+		isFetching: boolean,
+	) => Promise<number[]>;
+
 	handleConfirmEdit: (
 		body: TransferStockRequest,
 		token: string,
@@ -187,6 +195,45 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 			closeBootstrapModal('#add-units [data-bs-dismiss="modal"]');
 		} catch (e) {
 			setError(`Unexpected error: ${(e as Error).message}`);
+		} finally {
+			setLoading(false);
+		}
+	},
+
+	handleTransferItems: async (items, selectedStoreName, token, queryClient, isFetching) => {
+		if (isFetching) return [];
+
+		const { setLoading, setError, setSuccess, setNameQuery } = get();
+
+		setLoading(true);
+		try {
+			const results = await Promise.all(items.map(({ req }) => transferStockToStoreStock(req, token)));
+
+			const failed = results
+				.map((r, i) => ({ error: r.error, itemId: items[i].req.itemId, itemName: items[i].itemName }))
+				.filter(r => r.error !== null);
+			const successCount = results.length - failed.length;
+
+			if (successCount > 0) {
+				setNameQuery('');
+				queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
+			}
+
+			if (failed.length > 0) {
+				const failedNames = failed.map(f => f.itemName).join(', ');
+				const prefix = successCount > 0
+					? `${successCount} of ${items.length} added to ${selectedStoreName}. `
+					: '';
+				setError(`${prefix}Failed to add: ${failedNames}`);
+				return failed.map(f => f.itemId);
+			}
+
+			setSuccess(`${successCount} product${successCount > 1 ? 's' : ''} successfully added to ${selectedStoreName}`);
+			closeBootstrapModal('#add-units [data-bs-dismiss="modal"]');
+			return [];
+		} catch (e) {
+			setError(`Unexpected error: ${(e as Error).message}`);
+			return items.map(i => i.req.itemId);
 		} finally {
 			setLoading(false);
 		}

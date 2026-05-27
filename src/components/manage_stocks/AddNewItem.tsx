@@ -1,43 +1,110 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Select from 'react-select';
 
 import { Store } from '@/_classes/Store';
-import { Tenant } from '@/_classes/Tenant';
 import { TransferStockRequest } from '@/_interface/TransferStock';
-import { closeBootstrapModal, convertTo, openBootstrapModal } from '@/_lib/utils';
+import { closeBootstrapModal, openBootstrapModal } from '@/_lib/utils';
 import { useFormState } from '@/components/hooks/useFormState';
 import { SelectProductToAddNew } from '@/components/manage_stocks/SelectProductToAddNew';
 import { useTenant } from '@/components/provider/TenantProvider';
+import { PlusCircle, Trash2 } from 'react-feather';
 
 /*
 	User flow when click 'Add New'
 	01. This current / AddNewItem modal will open
 	02. By default selected store id already set
-	03. User click 'select product'
+	03. User click 'Add Product'
 	04. SelectProductToAddNew modal will open
-	05. When user clicked what product to add then
-	06. Back to AddNewItem modal
-	07. Confirm clicked request to server
+	05. User clicks a product row → added to queue, back to AddNewItem
+	06. Repeat steps 03-05 to add more products
+	07. Confirm All clicked → all queue items transferred simultaneously
 */
+
+type QueueItem = {
+	id: string;
+	itemId: number;
+	itemName: string;
+	quantity: number;
+	stocks: number;
+};
+
 export function AddNewItem({
 	storeList,
 	currentSelectedStoreId,
 	loading,
-	onNewTransferItem,
+	onNewTransferItems,
 }: {
 	storeList: Store[];
 	currentSelectedStoreId: number;
 	loading: boolean;
-	onNewTransferItem: (transferStockRequest: TransferStockRequest, itemName: string) => void;
+	onNewTransferItems: (items: Array<{ req: TransferStockRequest; itemName: string }>) => Promise<number[]>;
 }) {
 	const tenantCtx = useTenant();
 	const formState = useFormState();
 	const [selectedStoreId, setSelectedStoreId] = useState(currentSelectedStoreId);
-	const [changedProduct, setChangedProduct] = useState<{ value: string; label: string } | null>(null);
-	const [isOpenAddNewItem, setIsOpenAddItem] = useState(false);
+	const [queue, setQueue] = useState<QueueItem[]>([]);
+	const [isOpenProductPicker, setIsOpenProductPicker] = useState(false);
 	const currentSelectedStore: Store | undefined = storeList.find(s => s.id === currentSelectedStoreId);
+	const navigatingToPicker = useRef(false);
+	const selectionMade = useRef(false);
 
-	const handleOnNewTransferItem = () => {
+	// Reset queue when modal is closed, but NOT when closing to navigate to the product picker
+	useEffect(() => {
+		const modal = document.getElementById('add-units');
+		const reset = () => {
+			if (navigatingToPicker.current) {
+				navigatingToPicker.current = false;
+				return;
+			}
+			setQueue([]);
+		};
+		modal?.addEventListener('hidden.bs.modal', reset);
+		return () => modal?.removeEventListener('hidden.bs.modal', reset);
+	}, []);
+
+	// Reopen AddNewItem when product picker is dismissed without a selection (Cancel / X)
+	useEffect(() => {
+		const picker = document.getElementById('select-product-to-add-new');
+		const handleHidden = () => {
+			if (selectionMade.current) {
+				selectionMade.current = false;
+				return;
+			}
+			openBootstrapModal('#add-units');
+		};
+		picker?.addEventListener('hidden.bs.modal', handleHidden);
+		return () => picker?.removeEventListener('hidden.bs.modal', handleHidden);
+	}, []);
+
+	const addToQueue = (itemId: number, itemName: string, stocks: number) => {
+		setQueue(prev => {
+			const existing = prev.find(item => item.itemId === itemId);
+			if (existing) {
+				return prev.map(item =>
+					item.itemId === itemId
+						? { ...item, quantity: Math.min(item.quantity + 1, item.stocks) }
+						: item
+				);
+			}
+			return [...prev, { id: crypto.randomUUID(), itemId, itemName, quantity: 1, stocks }];
+		});
+	};
+
+	const updateQuantity = (id: string, value: string) => {
+		setQueue(prev =>
+			prev.map(item => {
+				if (item.id !== id) return item;
+				const qty = Math.min(Math.max(1, Number(value) || 1), item.stocks);
+				return { ...item, quantity: qty };
+			})
+		);
+	};
+
+	const removeFromQueue = (id: string) => {
+		setQueue(prev => prev.filter(item => item.id !== id));
+	};
+
+	const handleConfirmAll = async () => {
 		if (tenantCtx.data.selectedTenantId === 0) {
 			formState.setError({ message: 'You are not under any tenant mode. Please make sure the tenant is selected' });
 			return;
@@ -46,21 +113,24 @@ export function AddNewItem({
 			formState.setError({ message: 'Please select target store first' });
 			return;
 		}
-		if (itemId === null) return;
+		if (queue.length === 0) return;
 
-		// Callback from parameter. Execute when the confirm button clicked
-		onNewTransferItem(
-			{
-				itemId,
-				quantity: 1,
-				storeId: selectedStoreId,
-				tenantId: tenantCtx.data.selectedTenantId,
-			},
-			changedProduct!.label,
+		const failedItemIds = await onNewTransferItems(
+			queue.map(item => ({
+				req: {
+					itemId: item.itemId,
+					quantity: item.quantity,
+					storeId: selectedStoreId,
+					tenantId: tenantCtx.data.selectedTenantId,
+				},
+				itemName: item.itemName,
+			}))
 		);
-	};
 
-	const itemId = convertTo.number(changedProduct?.value ?? '');
+		if (failedItemIds.length > 0) {
+			setQueue(prev => prev.filter(item => failedItemIds.includes(item.itemId)));
+		}
+	};
 
 	return (
 		<>
@@ -100,69 +170,93 @@ export function AddNewItem({
 						</div>
 						<form>
 							<div className="modal-body">
-								<div className="row">
-									<div className="col-lg-12">
-										<div className="mb-3">
-											<label className="form-label">
-												Select Store <span className="text-danger ms-1">*</span>
-											</label>
-											<Select
-												classNamePrefix="react-select"
-												options={storeList.map(s => ({ label: s.name, value: s.id }))}
-												placeholder="Choose"
-												tabSelectsValue
-												defaultValue={
-													currentSelectedStore !== undefined
-														? { label: currentSelectedStore.name, value: currentSelectedStore.id }
-														: undefined
-												}
-												onChange={e => setSelectedStoreId(e?.value ?? currentSelectedStoreId)}
-											/>
-										</div>
-									</div>
-									<div className="col-lg-12">
-										{/* <div className="search-form mb-0">
-											<label className="form-label">
-												Product <span className="text-danger ms-1">*</span>
-											</label>
-											<AsyncSelect
-												className="react-select"
-												loadOptions={loadProducts}
-												placeholder="Select"
-												name={formName.item}
-												components={{ DropdownIndicator: null }}
-												onChange={e => setChangedProduct({ label: e?.label ?? '', value: e?.value ?? '' })}
-											/>
-											<p>
-												Product names are case-sensitive. Before adding a new item to the current store, please make
-												sure at least 1 unit is available in the warehouse.
-											</p>
-										</div> */}
+								<div className="mb-3">
+									<label className="form-label">
+										Select Store <span className="text-danger ms-1">*</span>
+									</label>
+									<Select
+										classNamePrefix="react-select"
+										options={storeList.map(s => ({ label: s.name, value: s.id }))}
+										placeholder="Choose"
+										tabSelectsValue
+										defaultValue={
+											currentSelectedStore !== undefined
+												? { label: currentSelectedStore.name, value: currentSelectedStore.id }
+												: undefined
+										}
+										onChange={e => setSelectedStoreId(e?.value ?? currentSelectedStoreId)}
+									/>
+								</div>
 
-										<label className="form-label">
-											Select product to add new<span className="text-danger ms-1">*</span>
-										</label>
-										<div className="page-btn">
-											<button
-												className="btn border text-secondary w-100"
-												type="button"
-												data-bs-toggle="modal"
-												data-bs-target="#select-product-to-add-new"
-												onClick={() => {
-													// Triggers the fetch / fetch the product when select product modal is show
-													setIsOpenAddItem(true);
+								<div>
+									<label className="form-label">
+										Products <span className="text-danger ms-1">*</span>
+									</label>
 
-													// Close add unit for a moment, later will return
-													// AddNewItem -> SelectProductToAddNew -> AddNewItem
-													closeBootstrapModal('#add-units');
-												}}
-											>
-												{changedProduct === null ? 'select product' : changedProduct.label}
-											</button>
+									{queue.length === 0 ? (
+										<p className="text-muted small mb-2">No products added yet. Click &quot;Add Product&quot; to begin.</p>
+									) : (
+										<div style={{ maxHeight: '240px', overflowY: 'auto' }} className="mb-2">
+											<table className="table table-sm table-bordered align-middle mb-0">
+												<thead className="table-light">
+													<tr>
+														<th>Product Name</th>
+														<th style={{ width: '8rem' }}>Quantity</th>
+														<th style={{ width: '3rem' }}></th>
+													</tr>
+												</thead>
+												<tbody>
+													{queue.map(item => (
+														<tr key={item.id}>
+															<td className="text-truncate" style={{ maxWidth: '180px' }}>{item.itemName}</td>
+															<td>
+																<input
+																	type="number"
+																	className="form-control form-control-sm"
+																	value={item.quantity}
+																	min={1}
+																	max={item.stocks}
+																	disabled={loading}
+																	onChange={e => updateQuantity(item.id, e.target.value)}
+																/>
+																<small className="text-muted">Max: {item.stocks}</small>
+															</td>
+															<td className="text-center">
+																<button
+																	type="button"
+																	className="btn btn-sm btn-outline-danger"
+																	disabled={loading}
+																	onClick={() => removeFromQueue(item.id)}
+																	title="Remove"
+																>
+																	<Trash2 size={13} />
+																</button>
+															</td>
+														</tr>
+													))}
+												</tbody>
+											</table>
 										</div>
-									</div>
+									)}
+
+									<button
+										type="button"
+										className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
+										disabled={loading}
+										data-bs-toggle="modal"
+										data-bs-target="#select-product-to-add-new"
+										onClick={() => {
+											navigatingToPicker.current = true;
+											setIsOpenProductPicker(true);
+											closeBootstrapModal('#add-units');
+										}}
+									>
+										<PlusCircle size={13} />
+										Add Product
+									</button>
 								</div>
 							</div>
+
 							<div className="modal-footer">
 								<button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal">
 									Cancel
@@ -170,10 +264,10 @@ export function AddNewItem({
 								<button
 									className="btn btn-primary"
 									type="button"
-									disabled={itemId === null || loading}
-									onClick={() => handleOnNewTransferItem()}
+									disabled={queue.length === 0 || loading}
+									onClick={handleConfirmAll}
 								>
-									{loading ? 'Please wait...' : 'Confirm'}
+									{loading ? 'Please wait...' : `Confirm All (${queue.length})`}
 								</button>
 							</div>
 						</form>
@@ -183,10 +277,11 @@ export function AddNewItem({
 
 			<SelectProductToAddNew
 				tenantId={tenantCtx.data.selectedTenantId}
-				isModalOpen={isOpenAddNewItem}
-				onSelected={(itemId, itemName) => {
-					setChangedProduct({ value: itemId.toString(), label: itemName });
-					setIsOpenAddItem(false);
+				isModalOpen={isOpenProductPicker}
+				onSelected={(itemId, itemName, stocks) => {
+					selectionMade.current = true;
+					addToQueue(itemId, itemName, stocks);
+					setIsOpenProductPicker(false);
 					openBootstrapModal('#add-units');
 				}}
 			/>

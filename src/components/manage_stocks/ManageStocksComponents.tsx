@@ -53,6 +53,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 
 	// Async actions
 	const handleTransferItem = useManageStocksStore(s => s.handleTransferItem);
+	const handleTransferItems = useManageStocksStore(s => s.handleTransferItems);
 	const handleOnConfirmWithdraw = useManageStocksStore(s => s.handleConfirmWithdraw);
 	const handleOnConfirmEdit = useManageStocksStore(s => s.handleConfirmEdit);
 
@@ -381,8 +382,8 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 				storeList={storeCtx.data.storeList}
 				currentSelectedStoreId={selectedStore?.id ?? 0}
 				loading={isFetching || isLoading}
-				onNewTransferItem={(req, name) =>
-					handleTransferItem(req, name, selectedStore?.name ?? '', token, queryClient, isFetching)
+				onNewTransferItems={items =>
+					handleTransferItems(items, selectedStore?.name ?? '', token, queryClient, isFetching)
 				}
 			/>
 		</>
