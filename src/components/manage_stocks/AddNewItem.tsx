@@ -15,9 +15,10 @@ import { PlusCircle, Trash2 } from 'react-feather';
 	02. By default selected store id already set
 	03. User click 'Add Product'
 	04. SelectProductToAddNew modal will open
-	05. User clicks a product row → added to queue, back to AddNewItem
-	06. Repeat steps 03-05 to add more products
-	07. Confirm All clicked → all queue items transferred simultaneously
+	05. User checks one or more product rows (selections persist across pages)
+	06. User clicks 'Add Selected' → all checked items added to queue, back to AddNewItem
+	07. Repeat steps 03-06 to add more products
+	08. Confirm All clicked → all queue items transferred simultaneously
 */
 
 type QueueItem = {
@@ -278,9 +279,9 @@ export function AddNewItem({
 			<SelectProductToAddNew
 				tenantId={tenantCtx.data.selectedTenantId}
 				isModalOpen={isOpenProductPicker}
-				onSelected={(itemId, itemName, stocks) => {
+				onSelected={(items) => {
 					selectionMade.current = true;
-					addToQueue(itemId, itemName, stocks);
+					items.forEach(({ itemId, itemName, stocks }) => addToQueue(itemId, itemName, stocks));
 					setIsOpenProductPicker(false);
 					openBootstrapModal('#add-units');
 				}}
