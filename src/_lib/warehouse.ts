@@ -166,6 +166,50 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 	}
 }
 
+type NewItemPayload = { item_name: string; stocks: number; base_price: number };
+
+export async function createItems(
+	tenantId: number,
+	items: NewItemPayload[]
+): Promise<HTTPResult<ItemDef[]>> {
+	const auth = await getAuth();
+	if (auth === null) {
+		const isSuccess = await signOut();
+		if (isSuccess.result) return { result: null, error: null };
+		return { result: null, error: 'Unexpected error while submitting the form.' };
+	}
+
+	try {
+		const userCookies = await cookies();
+		const requestInit: RequestInit = {
+			method: 'POST',
+			credentials: 'include',
+			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			body: JSON.stringify({ items }),
+		};
+		const response = await fetch(
+			serverRoutes.createWarehouseItem.replace('<tenantId>', tenantId.toString()),
+			requestInit
+		);
+
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = { code: response.status, status: 'error', message: response.statusText };
+			}
+			return { result: null, error: body.message };
+		}
+
+		const body: HTTPSuccessResponse<{ items: ItemDef[] }> = await response.json();
+		return { result: body.data.items, error: null };
+	} catch (error: unknown) {
+		if (error instanceof Error) return { result: null, error: error.message };
+		return { result: null, error: 'Unexpected error: ' + error };
+	}
+}
+
 export async function getItemFindById(itemId: number | null, tenantId: number | null): Promise<HTTPResult<ItemDef>> {
 	/*
 		If redirect() called, then we don't need to return anything

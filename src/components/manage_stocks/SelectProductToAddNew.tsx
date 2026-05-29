@@ -1,10 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { Input, Pagination } from 'antd';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Item } from '@/_classes/Item';
 import { ItemDef } from '@/_interface/ItemDef';
 import { getActiveWarehouseItem } from '@/_lib/warehouse';
+
+type SelectedEntry = { itemName: string; stocks: number };
 
 export function SelectProductToAddNew({
 	tenantId,
@@ -13,12 +15,17 @@ export function SelectProductToAddNew({
 }: {
 	tenantId: number;
 	isModalOpen: boolean;
-	onSelected: (itemId: number, itemName: string) => void;
+	onSelected: (items: Array<{ itemId: number; itemName: string; stocks: number }>) => void;
 }) {
 	const [nameQuery, setNameQuery] = useState('');
 	const [appliedQuery, setAppliedQuery] = useState('');
 	const [page, setPage] = useState(1);
+	const [selectedItems, setSelectedItems] = useState<Map<number, SelectedEntry>>(new Map());
 	const limit = 10;
+
+	useEffect(() => {
+		if (isModalOpen) setSelectedItems(new Map());
+	}, [isModalOpen]);
 
 	const warehouseItemQuery = useQuery({
 		queryKey: ['warehouse', tenantId, page, appliedQuery],
@@ -46,6 +53,28 @@ export function SelectProductToAddNew({
 	const applyFilters = () => {
 		setPage(1);
 		setAppliedQuery(nameQuery);
+	};
+
+	const toggleItem = (item: Item) => {
+		setSelectedItems(prev => {
+			const next = new Map(prev);
+			if (next.has(item.id)) {
+				next.delete(item.id);
+			} else {
+				next.set(item.id, { itemName: item.itemName, stocks: item.stocks });
+			}
+			return next;
+		});
+	};
+
+	const handleConfirm = () => {
+		onSelected(
+			Array.from(selectedItems.entries()).map(([itemId, { itemName, stocks }]) => ({
+				itemId,
+				itemName,
+				stocks,
+			})),
+		);
 	};
 
 	return (
@@ -84,25 +113,47 @@ export function SelectProductToAddNew({
 												<table className="table table-hover mb-0">
 													<thead>
 														<tr>
+															<th style={{ width: '2.5rem' }}></th>
 															<th>ID</th>
 															<th>Product Name</th>
+															<th>Stock</th>
 														</tr>
 													</thead>
 													<tbody>
-														{paddedItems.real.map(item => (
-															<tr
-																key={item.id}
-																role="button"
-																style={{ cursor: 'pointer' }}
-																data-bs-dismiss="modal"
-																onClick={() => onSelected(item.id, item.itemName)}
-															>
-																<td>{item.id}</td>
-																<td>{item.itemName}</td>
-															</tr>
-														))}
+														{paddedItems.real.map(item => {
+															const outOfStock = item.stocks === 0;
+															const isSelected = selectedItems.has(item.id);
+															return (
+																<tr
+																	key={item.id}
+																	role={outOfStock ? undefined : 'button'}
+																	style={{
+																		cursor: outOfStock ? 'not-allowed' : 'pointer',
+																		opacity: outOfStock ? 0.45 : 1,
+																		backgroundColor: isSelected ? 'var(--bs-primary-bg-subtle, #cfe2ff)' : undefined,
+																	}}
+																	onClick={outOfStock ? undefined : () => toggleItem(item)}
+																>
+																	<td className="text-center" onClick={e => e.stopPropagation()}>
+																		<input
+																			type="checkbox"
+																			checked={isSelected}
+																			disabled={outOfStock}
+																			onChange={() => toggleItem(item)}
+																		/>
+																	</td>
+																	<td>{item.id}</td>
+																	<td>{item.itemName}</td>
+																	<td>
+																		{outOfStock ? <span className="badge bg-danger">Out of stock</span> : item.stocks}
+																	</td>
+																</tr>
+															);
+														})}
 														{paddedItems.placeholders.map(p => (
 															<tr key={p.id} style={{ pointerEvents: 'none' }}>
+																<td>&nbsp;</td>
+																<td>&nbsp;</td>
 																<td>&nbsp;</td>
 																<td>&nbsp;</td>
 															</tr>
@@ -116,7 +167,11 @@ export function SelectProductToAddNew({
 							</div>
 
 							{!warehouseItemQuery.isLoading && items.length > 0 && (
-								<p className="text-center text-muted small mb-2">Click a row to select the product</p>
+								<p className="text-center text-muted small mb-2">
+									{selectedItems.size > 0
+										? `${selectedItems.size} product${selectedItems.size > 1 ? 's' : ''} selected`
+										: 'Click a row to select products'}
+								</p>
 							)}
 
 							{!warehouseItemQuery.isLoading && (
@@ -132,8 +187,17 @@ export function SelectProductToAddNew({
 						</div>
 
 						<div className="modal-footer">
-							<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+							<button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal">
 								Cancel
+							</button>
+							<button
+								type="button"
+								className="btn btn-primary"
+								disabled={selectedItems.size === 0}
+								data-bs-dismiss="modal"
+								onClick={handleConfirm}
+							>
+								Add Selected ({selectedItems.size})
 							</button>
 						</div>
 					</form>
