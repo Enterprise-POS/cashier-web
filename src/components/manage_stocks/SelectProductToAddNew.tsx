@@ -73,7 +73,7 @@ export function SelectProductToAddNew({
 				itemId,
 				itemName,
 				stocks,
-			}))
+			})),
 		);
 	};
 
@@ -134,10 +134,7 @@ export function SelectProductToAddNew({
 																	}}
 																	onClick={outOfStock ? undefined : () => toggleItem(item)}
 																>
-																	<td
-																		className="text-center"
-																		onClick={e => e.stopPropagation()}
-																	>
+																	<td className="text-center" onClick={e => e.stopPropagation()}>
 																		<input
 																			type="checkbox"
 																			checked={isSelected}
@@ -148,9 +145,7 @@ export function SelectProductToAddNew({
 																	<td>{item.id}</td>
 																	<td>{item.itemName}</td>
 																	<td>
-																		{outOfStock
-																			? <span className="badge bg-danger">Out of stock</span>
-																			: item.stocks}
+																		{outOfStock ? <span className="badge bg-danger">Out of stock</span> : item.stocks}
 																	</td>
 																</tr>
 															);
@@ -192,7 +187,7 @@ export function SelectProductToAddNew({
 						</div>
 
 						<div className="modal-footer">
-							<button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+							<button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal">
 								Cancel
 							</button>
 							<button
