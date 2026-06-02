@@ -7,6 +7,7 @@ import { getStores } from '@/_lib/store';
 import { Constants } from '@/components/core/data/constant';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { InputState } from '@/components/store/editStoreInfoStore';
+import { StoreDef } from '@/_interface/StoreDef';
 
 export type StoreProviderState = {
 	selectedStoreId: number;
@@ -25,7 +26,7 @@ export type StoreContextType = {
 	getCurrentTenantId: () => number;
 
 	// Any change here will not affect the database
-	editStore: (v: InputState, storeId: number) => void;
+	editStore: (v: StoreDef, storeId: number) => void;
 };
 
 const initialState: StoreProviderState = {
@@ -77,18 +78,10 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 		return tenantCtx.selectedTenantId;
 	}
 
-	function editStore(updatedStore: InputState, storeId: number) {
+	function editStore(storeDef: StoreDef, storeId: number) {
 		setStoreState(val => ({
 			...val,
-			storeList: val.storeList.map(store =>
-				store.id === storeId
-					? store
-							.copy()
-							.setName(updatedStore.storeName)
-							.setAddress(updatedStore.address)
-							.setPhoneNumber(updatedStore.phoneNumber)
-					: store,
-			),
+			storeList: val.storeList.map(store => (store.id === storeId ? new Store(storeDef) : store)),
 		}));
 	}
 

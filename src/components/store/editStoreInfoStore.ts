@@ -45,7 +45,7 @@ export const useEditStoreInfoStore = create<EditStoreInfoStore>((set, get) => ({
 		const inputType = { storeName, phoneNumber, address };
 
 		try {
-			const { error } = await editStore(tenantId, storeId, inputType);
+			const { error, result } = await editStore(tenantId, storeId, inputType);
 
 			if (error !== null) {
 				formState.setError({ message: error });
@@ -55,7 +55,7 @@ export const useEditStoreInfoStore = create<EditStoreInfoStore>((set, get) => ({
 			set({ _initialState: { storeName, phoneNumber, address } });
 
 			// update store provider (storeList)
-			storeCtx.editStore(inputType, storeId);
+			storeCtx.editStore(result!, storeId);
 
 			formState.setSuccess({ message: 'Store information updated successfully.' });
 		} catch (e) {

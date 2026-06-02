@@ -32,19 +32,4 @@ export class Store {
 			updated_at: this.updatedAt.toISOString(),
 		});
 	}
-
-	setName(name: string): Store {
-		this.name = name;
-		return this;
-	}
-
-	setPhoneNumber(phoneNumber: string): Store {
-		this.phoneNumber = phoneNumber;
-		return this;
-	}
-
-	setAddress(address: string): Store {
-		this.address = address;
-		return this;
-	}
 }
