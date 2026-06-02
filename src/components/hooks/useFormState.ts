@@ -1,31 +1,34 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useFormState() {
 	const [isFormLoading, setFormLoading] = useState(false);
 
-	// Success Toast/UI
-	// It could be anything not only for toast
 	const [showSuccessToast, setShowSuccessToast] = useState(false);
 	const [successMessage, setSuccessMessage] = useState('');
 
-	// Error Toast
 	const [errorMessage, setErrorMessage] = useState('');
 	const [showErrorToast, setShowErrorToast] = useState(false);
 
-	// Timeout ref
 	const timeoutRef = useRef<NodeJS.Timeout>(undefined);
+
+	// Cleanup on unmount
+	useEffect(() => {
+		return () => {
+			if (timeoutRef.current !== undefined) clearTimeout(timeoutRef.current);
+		};
+	}, []);
 
 	function setError({ message }: { message: string }) {
 		setShowErrorToast(true);
 		setShowSuccessToast(false);
 		setErrorMessage(message);
 
-		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
-		timeoutRef.current = setTimeout(async () => {
+		if (timeoutRef.current !== undefined) clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(() => {
 			setShowErrorToast(false);
 			setShowSuccessToast(false);
 			setErrorMessage('');
-		}, 10000); // 10s
+		}, 10000);
 	}
 
 	function setSuccess({ message }: { message: string }) {
@@ -33,16 +36,19 @@ export function useFormState() {
 		setShowSuccessToast(true);
 		setSuccessMessage(message);
 
-		if (timeoutRef !== undefined) clearTimeout(timeoutRef.current);
-		timeoutRef.current = setTimeout(async () => {
+		if (timeoutRef.current !== undefined) clearTimeout(timeoutRef.current);
+		timeoutRef.current = setTimeout(() => {
 			setShowErrorToast(false);
 			setShowSuccessToast(false);
-			setSuccessMessage('');
-		}, 10000); // 10s
+			setSuccessMessage(''); // ✅ was missing
+		}, 10000);
 	}
 
 	function setState({ success, error }: { success?: boolean; error?: boolean }) {
-		if (success !== undefined && error !== undefined) throw new Error('[DEV] wrong operation');
+		if (success !== undefined && error !== undefined)
+			throw new Error('[DEV] wrong operation: cannot set both success and error');
+		if (success === undefined && error === undefined)
+			throw new Error('[DEV] wrong operation: must provide either success or error');
 
 		if (success !== undefined) {
 			setShowSuccessToast(success);

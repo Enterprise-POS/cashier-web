@@ -6,13 +6,14 @@ import { Store } from '@/_classes/Store';
 import { getStores } from '@/_lib/store';
 import { Constants } from '@/components/core/data/constant';
 import { useTenant } from '@/components/provider/TenantProvider';
+import { InputState } from '@/components/store/editStoreInfoStore';
 
 export type StoreProviderState = {
 	selectedStoreId: number;
 	storeList: Store[];
 };
 
-type StoreContextType = {
+export type StoreContextType = {
 	data: StoreProviderState;
 	isStateLoading: boolean;
 
@@ -22,6 +23,9 @@ type StoreContextType = {
 	// setStoreState: (state: SetStateAction<StoreProviderState>) => void; // internal use
 
 	getCurrentTenantId: () => number;
+
+	// Any change here will not affect the database
+	editStore: (v: InputState, storeId: number) => void;
 };
 
 const initialState: StoreProviderState = {
@@ -73,6 +77,26 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 		return tenantCtx.selectedTenantId;
 	}
 
+	function editStore(updatedStore: InputState, storeId: number) {
+		setStoreState(val => ({
+			...val,
+			storeList: val.storeList.map(store =>
+				store.id === storeId
+					? new Store({
+							id: store.id,
+							name: updatedStore.storeName,
+							address: updatedStore.address,
+							phone_number: updatedStore.phoneNumber,
+							is_active: store.isActive,
+							tenant_id: store.tenantId,
+							created_at: store.createdAt.toISOString(),
+							updated_at: store.updatedAt.toISOString(),
+						})
+					: store,
+			),
+		}));
+	}
+
 	// When this page first open then this effect will run to fetch immediately user tenant
 	// Will not re fetch when the user logout and login again.
 	// The refetch for this case handled by HeaderFloatingMenu.tsx,
@@ -92,7 +116,9 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 	}, [tenantCtx.selectedTenantId]); // When the selected tenant change then the store will definitely different
 
 	return (
-		<StoreContext.Provider value={{ data, isStateLoading, refetchGetStores, setCurrentStore, getCurrentTenantId }}>
+		<StoreContext.Provider
+			value={{ data, isStateLoading, refetchGetStores, setCurrentStore, getCurrentTenantId, editStore }}
+		>
 			{children}
 		</StoreContext.Provider>
 	);

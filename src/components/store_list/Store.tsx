@@ -2,8 +2,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Delete, Edit, MoreVertical } from 'react-feather';
 
-import { all_routes as routes } from '@/components/core/data/all_routes';
 import { Store as _Store } from '@/_classes/Store';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 
 export default function Store({ store, onDeleteButton }: { store: _Store; onDeleteButton: (store: _Store) => void }) {
 	return (
@@ -11,10 +11,11 @@ export default function Store({ store, onDeleteButton }: { store: _Store; onDele
 			<div className="card">
 				<div className="card-body">
 					<div className="d-flex align-items-start justify-content-between mb-2">
-						<div className="form-check form-check-md">
+						{/* <div className="form-check form-check-md">
 							<input className="form-check-input" type="checkbox" />
-						</div>
-						<div>
+						</div> */}
+						<div className="ms-4"></div>
+						<div className="">
 							<Link href={routes.employeedetails} className="avatar avatar-xl avatar-rounded border p-1 rounded-circle">
 								<Image
 									width={60}
@@ -30,12 +31,12 @@ export default function Store({ store, onDeleteButton }: { store: _Store; onDele
 								<MoreVertical style={{ scale: 0.9 }} className="text-gray" />
 							</Link>
 							<ul className="dropdown-menu dropdown-menu-end ">
-								{/* <li>
-									<Link href={routes.editemployee} className="dropdown-item">
+								<li>
+									<Link href={routes.editStoreInfo} className="dropdown-item confirm-text mb-0">
 										<Edit className="me-2" style={{ width: '16px' }} />
 										Edit
 									</Link>
-								</li> */}
+								</li>
 								<li>
 									<Link
 										href="#"
@@ -62,10 +63,14 @@ export default function Store({ store, onDeleteButton }: { store: _Store; onDele
 							{store.isActive ? 'Active' : 'InActive'}
 						</span>
 					</div>
-					<div className="d-flex align-items-center justify-content-between bg-light rounded p-3">
+					<div className="d-flex flex-column justify-content-between bg-light rounded p-3 gap-3">
 						<div className="text-start">
 							<h6 className="mb-1">Created at</h6>
 							<p>{store.createdAt.toLocaleString()}</p>
+						</div>
+						<div className="text-start">
+							<h6 className="mb-1">Last update</h6>
+							<p>{store.updatedAt.toLocaleString()}</p>
 						</div>
 					</div>
 				</div>
