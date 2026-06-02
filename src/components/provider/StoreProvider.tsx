@@ -6,7 +6,6 @@ import { Store } from '@/_classes/Store';
 import { getStores } from '@/_lib/store';
 import { Constants } from '@/components/core/data/constant';
 import { useTenant } from '@/components/provider/TenantProvider';
-import { InputState } from '@/components/store/editStoreInfoStore';
 import { StoreDef } from '@/_interface/StoreDef';
 
 export type StoreProviderState = {
@@ -26,7 +25,7 @@ export type StoreContextType = {
 	getCurrentTenantId: () => number;
 
 	// Any change here will not affect the database
-	editStore: (v: StoreDef, storeId: number) => void;
+	editStore: (v: StoreDef) => void;
 };
 
 const initialState: StoreProviderState = {
