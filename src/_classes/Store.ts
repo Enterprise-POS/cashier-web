@@ -19,4 +19,32 @@ export class Store {
 		this.updatedAt = def.updated_at !== undefined ? new Date(def.updated_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 		this.tenantId = def.tenant_id;
 	}
+
+	copy(): Store {
+		return new Store({
+			id: this.id,
+			name: this.name,
+			address: this.address,
+			phone_number: this.phoneNumber,
+			is_active: this.isActive,
+			tenant_id: this.tenantId,
+			created_at: this.createdAt.toISOString(),
+			updated_at: this.updatedAt.toISOString(),
+		});
+	}
+
+	setName(name: string): Store {
+		this.name = name;
+		return this;
+	}
+
+	setPhoneNumber(phoneNumber: string): Store {
+		this.phoneNumber = phoneNumber;
+		return this;
+	}
+
+	setAddress(address: string): Store {
+		this.address = address;
+		return this;
+	}
 }

@@ -82,16 +82,11 @@ function StoreProvider({ children }: { children: React.ReactNode }) {
 			...val,
 			storeList: val.storeList.map(store =>
 				store.id === storeId
-					? new Store({
-							id: store.id,
-							name: updatedStore.storeName,
-							address: updatedStore.address,
-							phone_number: updatedStore.phoneNumber,
-							is_active: store.isActive,
-							tenant_id: store.tenantId,
-							created_at: store.createdAt.toISOString(),
-							updated_at: store.updatedAt.toISOString(),
-						})
+					? store
+							.copy()
+							.setName(updatedStore.storeName)
+							.setAddress(updatedStore.address)
+							.setPhoneNumber(updatedStore.phoneNumber)
 					: store,
 			),
 		}));
