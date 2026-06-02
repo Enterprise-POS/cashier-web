@@ -1,13 +1,13 @@
 import { QueryClient } from '@tanstack/react-query';
 import { TablePaginationConfig } from 'antd';
+import { SorterResult } from 'antd/es/table/interface';
 import { create } from 'zustand';
 
+import { StoreStockV2 } from '@/_classes/StoreStock';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { editStoreStock } from '@/_lib/store_stock';
 import { closeBootstrapModal } from '@/_lib/utils';
 import { SortBy } from '@/components/core/data/constant';
-import { SorterResult } from 'antd/es/table/interface.js';
-import { StoreStockV2 } from '@/_classes/StoreStock.js';
 
 const INITIAL_PAGINATION: TablePaginationConfig = {
 	current: 1,

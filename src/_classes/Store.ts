@@ -5,12 +5,18 @@ export class Store {
 	name: string;
 	isActive: boolean;
 	tenantId: number;
+	updatedAt: Date;
 	createdAt: Date;
+	address: string;
+	phoneNumber: string;
 	constructor(def: StoreDef) {
 		this.id = def.id;
 		this.name = def.name;
 		this.isActive = def.is_active;
+		this.address = def.address ?? '';
+		this.phoneNumber = def.phone_number ?? '';
 		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
+		this.updatedAt = def.updated_at !== undefined ? new Date(def.updated_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 		this.tenantId = def.tenant_id;
 	}
 }

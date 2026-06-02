@@ -106,6 +106,7 @@ export const all_routes: { [key: string]: RouteLink } = {
 	categoryList: '/category_list',
 	subcategories: '/sub_categories',
 	editProduct: '<tenantId>/edit_product/<itemId>',
+	editStoreInfo: '/edit_store_info',
 	expenselist: '/expense_list',
 	expensecategory: '/expense_category',
 	calendars: '/calendar',

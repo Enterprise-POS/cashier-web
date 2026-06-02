@@ -6,11 +6,12 @@ import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { StoreDef } from '@/_interface/StoreDef';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
+import { InputState } from '@/components/store/editStoreInfoStore';
 
 export async function getStores(
 	tenantId: number,
 	page: number,
-	limit: number
+	limit: number,
 ): Promise<HTTPResult<{ count: number; storeDefs: StoreDef[] }>> {
 	const params = new URLSearchParams({
 		limit: limit.toString(),
@@ -29,7 +30,7 @@ export async function getStores(
 
 		const response = await fetch(
 			`${serverRoutes.getStores.replace('<tenantId>', tenantId.toString())}${paramsString}`,
-			requestInit
+			requestInit,
 		);
 		if (!response.ok) {
 			let body: ErrorResponse;
@@ -189,6 +190,64 @@ export async function setStoreActivate(tenantId: number, storeId: number, setInt
 
 		// Accepted 202
 		return { result: null, error: null };
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			console.error(error);
+			return { result: null, error: error.message };
+		}
+
+		console.error(error);
+		return { result: null, error: 'Unknown error' };
+	}
+}
+
+export async function editStore(tenantId: number, storeId: number, inp: InputState): Promise<HTTPResult<StoreDef>> {
+	try {
+		const reqBody = {
+			store_id: storeId,
+			name: inp.storeName,
+			address: inp.address,
+			phone_number: inp.phoneNumber,
+		};
+
+		const userCookies = await cookies();
+
+		const requestInit: RequestInit = {
+			method: 'PUT',
+			credentials: 'include',
+			headers: { Cookie: userCookies.toString(), 'Content-Type': 'application/json' },
+			body: JSON.stringify(reqBody),
+		};
+
+		const response = await fetch(serverRoutes.editStore.replace('<tenantId>', tenantId.toString()), requestInit);
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = {
+					code: response.status,
+					status: 'error',
+					message: `[DEV] Fatal error while parsing message: ${response.statusText}`,
+				};
+			}
+
+			switch (response.status) {
+				case 400:
+				case 401:
+				case 403:
+					return { result: null, error: body.message };
+				default:
+					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
+					return { result: null, error: body.message };
+			}
+		}
+
+		// Accepted 200
+		const responseBody: HTTPSuccessResponse<{ edited_store: StoreDef }> = await response.json();
+		const result = responseBody.data.edited_store;
+
+		return { result, error: null };
 	} catch (error: unknown) {
 		if (error instanceof Error) {
 			console.error(error);
