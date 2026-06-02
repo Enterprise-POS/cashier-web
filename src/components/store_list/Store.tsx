@@ -4,8 +4,10 @@ import { Delete, Edit, MoreVertical } from 'react-feather';
 
 import { Store as _Store } from '@/_classes/Store';
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import { useStore } from '@/components/provider/StoreProvider';
 
 export default function Store({ store, onDeleteButton }: { store: _Store; onDeleteButton: (store: _Store) => void }) {
+	const storeCtx = useStore();
 	return (
 		<div className="col-xxl-3 col-xl-4 col-lg-6 col-md-6">
 			<div className="card">
@@ -16,7 +18,7 @@ export default function Store({ store, onDeleteButton }: { store: _Store; onDele
 						</div> */}
 						<div className="ms-4"></div>
 						<div className="">
-							<Link href={routes.employeedetails} className="avatar avatar-xl avatar-rounded border p-1 rounded-circle">
+							<Link href="#" className="avatar avatar-xl avatar-rounded border p-1 rounded-circle">
 								<Image
 									width={60}
 									height={60}
@@ -32,7 +34,11 @@ export default function Store({ store, onDeleteButton }: { store: _Store; onDele
 							</Link>
 							<ul className="dropdown-menu dropdown-menu-end ">
 								<li>
-									<Link href={routes.editStoreInfo} className="dropdown-item confirm-text mb-0">
+									<Link
+										href={routes.editStoreInfo}
+										className="dropdown-item confirm-text mb-0"
+										onClick={() => storeCtx.setCurrentStore(store.id)}
+									>
 										<Edit className="me-2" style={{ width: '16px' }} />
 										Edit
 									</Link>
