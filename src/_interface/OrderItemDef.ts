@@ -8,4 +8,5 @@ export interface OrderItemDef {
 	subtotal: number;
 	store_id: number;
 	tenant_id: number;
+	payment_type: string;
 }

@@ -9,6 +9,7 @@ export class OrderItem {
 	subTotal: number;
 	storeId: number;
 	tenantId: number;
+	paymentType: string;
 	createdAt: Date;
 	constructor(def: OrderItemDef) {
 		this.id = def.id;
@@ -19,6 +20,7 @@ export class OrderItem {
 		this.subTotal = def.subtotal;
 		this.storeId = def.store_id;
 		this.tenantId = def.tenant_id;
+		this.paymentType = def.payment_type;
 
 		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 	}

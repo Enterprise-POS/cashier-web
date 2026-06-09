@@ -95,6 +95,10 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 									{formatIDR(orderItem.purchasedPrice - orderItem.totalAmount)}
 								</p>
 							</div>
+							<div className="d-flex justify-content-between align-items-center mb-2 pe-3">
+								<p className="mb-0">Payment Type</p>
+								<p className="text-dark fw-medium mb-2">{orderItem.paymentType}</p>
+							</div>
 							{/* <p className="fs-12">Amount in Words : Dollar Five thousand Seven Seventy Five</p> */}
 						</div>
 					</div>

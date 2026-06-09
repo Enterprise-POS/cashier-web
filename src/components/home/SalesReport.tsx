@@ -68,6 +68,11 @@ export default function SalesReport() {
 			render: (id: number, orderItem: OrderItem) => formatIDR(orderItem.purchasedPrice - orderItem.totalAmount),
 		},
 		{
+			title: 'Payment Type',
+			dataIndex: 'paymentType',
+			sorter: (a: OrderItem, b: OrderItem) => a.paymentType.localeCompare(b.paymentType),
+		},
+		{
 			title: 'Date',
 			dataIndex: 'createdAt',
 			sorter: (a: OrderItem, b: OrderItem) => a.createdAt.getTime() - b.createdAt.getTime(),

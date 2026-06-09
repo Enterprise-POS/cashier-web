@@ -60,21 +60,21 @@ export default function ReportFilters() {
 					<form onSubmit={e => e.preventDefault()}>
 						<div className="row align-items-end g-3 mb-3">
 							<div className="col-md-5">
-								<label className="form-label">Choose Date</label>
+								<label className="form-label">Date Range</label>
 								<div className="date-picker-centered" style={{ height: '38px' }}>
 									<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
 										<RangePicker
 											value={dateRange}
 											showTime={{ format: 'HH:mm' }}
-											format="YYYY-MM-DD HH:mm"
+											format="DD/MM/YYYY HH:mm"
 											onChange={(dates, dateString) => {
-												if (dates) onEvent(new OnSetDateRange([dates[0], dates[1]], dateString));
+												if (dates) {
+													onEvent(new OnSetDateRange([dates[0], dates[1]], dateString));
+													onEvent(new OnTagSelect(QuickFilterTag.Custom, false));
+												}
 											}}
 											disabled={isStateLoading || isExporting}
-											onOk={v => {
-												onEvent(new OnDateRangeOk(v));
-												onEvent(new OnTagSelect(QuickFilterTag.Custom, false));
-											}}
+											onOk={v => onEvent(new OnDateRangeOk(v))}
 											className="h-100 w-100"
 										/>
 									</ConfigProvider>
