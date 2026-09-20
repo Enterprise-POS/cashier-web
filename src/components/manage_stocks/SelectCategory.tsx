@@ -17,12 +17,11 @@ export function SelectCategory({
 }) {
 	const categoriesQuery = useQuery({
 		queryKey: ['categories', tenantId],
-		queryFn: () => getCategories(tenantId, 1, 10, ''),
+		queryFn: () => getCategories(tenantId, 1, 100, ''),
 		enabled: tenantId !== 0 && isModalOpen,
 		staleTime: 1000 * 60 * 5, // cache for 5 min
 	});
 
-	// console.log(categoriesQuery);
 	const categories = useMemo(() => {
 		return categoriesQuery.isSuccess
 			? categoriesQuery.data.result!.categoryDefs.map((def: CategoryDef) => new Category(def))

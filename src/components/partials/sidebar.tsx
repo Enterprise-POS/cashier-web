@@ -297,7 +297,7 @@ export default function Sidebar() {
 							</ul>
 						</li>
 						<li className="submenu-open">
-							<h6 className="submenu-hdr">Inventory</h6>
+							<h6 className="submenu-hdr">Warehouse</h6>
 							<ul>
 								<li className={routes.productList === pathname ? 'active' : ''}>
 									<Link href={routes.productList}>
@@ -368,7 +368,7 @@ export default function Sidebar() {
 							</ul>
 						</li>
 						<li className="submenu-open">
-							<h6 className="submenu-hdr">Stock</h6>
+							<h6 className="submenu-hdr">Stores</h6>
 							<ul>
 								<li className={routes.storeList === pathname ? 'active' : ''}>
 									<Link href={routes.storeList}>

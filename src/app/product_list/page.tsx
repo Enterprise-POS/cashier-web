@@ -2,18 +2,26 @@ import Link from 'next/link';
 import { Download } from 'react-feather';
 
 import { all_routes as routes } from '@/components/core/data/all_routes';
+import { Constants } from '@/components/core/data/constant';
 import Brand from '@/components/inventory/brand';
 import Footer from '@/components/partials/footer';
 import ProductList from '@/components/product_list/ProductList';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 import RefreshIcon from '@/components/tooltip-content/refresh';
 import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 export default async function ProductListComponent({
 	searchParams,
 }: {
 	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+	// Check if user logged in
+	const cookieStore = await cookies();
+	const token = cookieStore.get(Constants.CookieKey.enterprisePOS)?.value ?? '';
+	if (token === '') return redirect(routes.login);
+
 	const param = await searchParams;
 	const limit = Number(param.limit) || 10; // By default it's 10 warehouse items per page
 	const page = Number(param.page) || 1;
@@ -46,7 +54,7 @@ export default async function ProductListComponent({
 						</Link>
 					</div>
 				</div>
-				<ProductList limit={limit} page={page} />
+				<ProductList limit={limit} page={page} token={token} />
 				<Brand />
 			</div>
 			<Footer />

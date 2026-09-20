@@ -4,22 +4,30 @@ import Link from 'next/link';
 import { startTransition, useEffect, useOptimistic, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
 
-import { Item } from '@/_classes/Item';
+import { CategoryWithItem } from '@/_classes/Item';
 import { Tenant } from '@/_classes/Tenant';
+import { CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { HTTPResult } from '@/_interface/HTTPResult';
-import { ItemDef, StockType } from '@/_interface/ItemDef';
+import { StockType } from '@/_interface/ItemDef';
+import { getCategoryWithItems } from '@/_lib/client_category';
 import { formatIDR } from '@/_lib/utils';
-import { getActiveWarehouseItem, setItemActivate } from '@/_lib/warehouse';
+import { setItemActivate } from '@/_lib/warehouse';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useFormState } from '@/components/hooks/useFormState';
+import { SelectCategory } from '@/components/manage_stocks/SelectCategory';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
 
-export default function ProductList({ limit, page }: { limit: number; page: number }) {
+export default function ProductList({ limit, page, token }: { limit: number; page: number; token: string }) {
 	const { data, isStateLoading: isUseTenantLoading } = useTenant();
 	const [isComponentLoading, setComponentLoading] = useState(false);
 	const [isMounted, setIsMounted] = useState(false);
 	const [search, setSearch] = useState('');
+	const [selectedCategory, setSelectedCategory] = useState<{ categoryId: number; categoryName: string }>({
+		categoryId: 0,
+		categoryName: 'unselected',
+	});
+	const [isSelectCategoryModalOpen, setCategoryModal] = useState(false);
 	const [pagination, setPagination] = useState<TablePaginationConfig>({
 		current: 1,
 		pageSize: 10,
@@ -27,9 +35,9 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		responsive: true,
 	});
 
-	const [warehouseItems, setWarehouseItems] = useState<Item[]>([]);
+	const [warehouseItems, setWarehouseItems] = useState<CategoryWithItem[]>([]);
 	const [currentDeleteModalData, setCurrentDeleteModalData] = useState<{ itemId: number; name: string } | null>(null);
-	const [optimisticItems, optimisticDelete] = useOptimistic(warehouseItems, (currItems: Item[], itemId) => {
+	const [optimisticItems, optimisticDelete] = useOptimistic(warehouseItems, (currItems: CategoryWithItem[], itemId) => {
 		return currItems.filter(item => item.id !== itemId);
 	});
 
@@ -42,39 +50,48 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		{
 			title: 'ID',
 			dataIndex: 'itemId',
-			sorter: (a: Item, b: Item) => a.itemId - b.itemId,
+			sorter: (a: CategoryWithItem, b: CategoryWithItem) => a.itemId - b.itemId,
 		},
 		{
 			title: 'Product',
 			dataIndex: 'itemName',
-			render: (itemName: string, item: Item) => (
+			render: (itemName: string, item: CategoryWithItem) => (
 				<Tooltip title={itemName}>
 					<Link href={routes.editProduct.replace('<itemId>', item.id.toString())}>{itemName}</Link>
 				</Tooltip>
 			),
-			sorter: (a: Item, b: Item) => a.itemName.length - b.itemName.length,
+			sorter: (a: CategoryWithItem, b: CategoryWithItem) => a.itemName.length - b.itemName.length,
 		},
+		// {
+		// 	title: 'Unit',
+		// 	dataIndex: 'unit',
+		// 	sorter: (a: CategoryWithItem, b: CategoryWithItem) => a.unit.length - b.unit.length,
+		// },
 		{
-			title: 'Unit',
-			dataIndex: 'unit',
-			sorter: (a: Item, b: Item) => a.unit.length - b.unit.length,
+			title: 'Category',
+			dataIndex: 'categoryName',
+			// 1. Define the unique categories the user can select from
+			filters: [
+				{ text: 'Electronics', value: 'Electronics' },
+				{ text: 'Clothing', value: 'Clothing' },
+				{ text: 'Home', value: 'Home' },
+			],
+			// 2. Filter the rows based on the user's selection
+			onFilter: (value: string, record: { text: string; value: string }) => console.log(value, record),
 		},
 		{
 			title: 'Stocks',
 			dataIndex: 'stocks',
-			sorter: (a: Item, b: Item) => a.stocks - b.stocks,
 			render: (stocks: number) => stocks,
 		},
 		{
 			title: 'Base Price',
 			dataIndex: 'basePrice',
-			sorter: (a: Item, b: Item) => a.basePrice - b.basePrice,
 			render: (basePrice: number) => formatIDR(basePrice),
 		},
 		{
 			title: 'T/U',
 			dataIndex: 'stockType',
-			sorter: (a: Item, b: Item) => a.stockType.length - b.stockType.length,
 			render: (stockType: StockType) => (
 				<Tooltip
 					title={
@@ -95,27 +112,13 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		{
 			title: 'Created At',
 			dataIndex: 'createdAt',
-			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
+			sorter: (a: CategoryWithItem, b: CategoryWithItem) => a.createdAt.getTime() - b.createdAt.getTime(),
 			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
-
-		// {
-		// 	title: 'Created By',
-		// 	dataIndex: 'createdby',
-		// 	render: (text: any, record: any) => (
-		// 		<span className="userimgname">
-		// 			<Link href="/profile" className="product-img">
-		// 				<img alt="" src={record.img} />
-		// 			</Link>
-		// 			<Link href="/profile">{text}</Link>
-		// 		</span>
-		// 	),
-		// 	sorter: (a: any, b: any) => a.createdby.length - b.createdby.length,
-		// },
 		{
 			title: 'Action',
 			dataIndex: 'itemId',
-			render: (itemId: number, item: Item) => (
+			render: (itemId: number, item: CategoryWithItem) => (
 				<div className="action-table-data">
 					<div className="edit-delete-action">
 						{/* <Link className="me-2 p-2" href={routes.productdetails}>
@@ -141,7 +144,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					</div>
 				</div>
 			),
-			sorter: (a: Item, b: Item) => a.createdAt.getTime() - b.createdAt.getTime(),
+			sorter: (a: CategoryWithItem, b: CategoryWithItem) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 	];
 
@@ -150,16 +153,12 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 		try {
 			setComponentLoading(true);
 			if (selectedTenant !== undefined) {
-				const { result, error }: HTTPResult<{ itemDefs: ItemDef[]; count: number }> = await getActiveWarehouseItem(
-					selectedTenant.id,
-					limit,
-					page,
-					nameQuery,
-				);
+				const { result, error }: HTTPResult<{ items: CategoryWithItemDef[]; count: number }> =
+					await getCategoryWithItems(page, limit, nameQuery, selectedTenant.id, token);
 				if (error !== null) {
 					formState.setError({ message: error });
 				} else {
-					setWarehouseItems(() => result!.itemDefs.map(itemDef => new Item(itemDef)));
+					setWarehouseItems(() => result!.items.map(categoryWithItemDef => new CategoryWithItem(categoryWithItemDef)));
 					setPagination({ current: page, pageSize: limit, total: result!.count });
 				}
 			} else {
@@ -258,8 +257,8 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 			</div>
 
 			<div className="card table-list-card">
-				<div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
-					<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3">
+				<div className="card-header gap-3 d-flex align-items-center flex-wrap row-gap-3">
+					<div className="search-set">
 						<Input.Search
 							placeholder="Search items..."
 							allowClear
@@ -269,8 +268,18 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 								setPagination(prev => ({ ...prev, current: 1 })); // reset to page 1
 							}}
 						/>
-						{/* NOT YET IMPLEMENTED: sort by category */}
-						{/* <div className="dropdown me-2">
+					</div>
+					<div className="page-btn">
+						<button
+							className="btn border text-secondary"
+							data-bs-toggle="modal"
+							data-bs-target="#select-category"
+							onClick={() => setCategoryModal(true)}
+						>
+							{selectedCategory.categoryId === 0 ? 'Select Category' : `Category: ${selectedCategory.categoryName}`}
+						</button>
+					</div>
+					{/* <div className="dropdown me-2">
 							<Link
 								href="#"
 								className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -302,7 +311,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							</ul>
 						</div>
 						<CategoryDropdown /> */}
-						{/* <div className="dropdown me-2">
+					{/* <div className="dropdown me-2">
 						<Link
 							href="#"
 							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -333,7 +342,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							</li>
 						</ul>
 					</div> */}
-						{/* <div className="dropdown">
+					{/* <div className="dropdown">
 						<Link
 							href="#"
 							className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center"
@@ -369,7 +378,6 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 							</li>
 						</ul>
 					</div> */}
-					</div>
 				</div>
 				{/* <div className="table-top">
               <div className="search-set">
@@ -498,7 +506,7 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
             </div> */}
 				{/* /Filter */}
 				<div className="table-responsive">
-					<Table<Item>
+					<Table<CategoryWithItem>
 						rowKey={'itemId'}
 						columns={columns}
 						dataSource={dataSource}
@@ -556,6 +564,15 @@ export default function ProductList({ limit, page }: { limit: number; page: numb
 					</div>
 				</div>
 			</div>
+
+			<SelectCategory
+				tenantId={selectedTenant?.id ?? 0}
+				isModalOpen={isSelectCategoryModalOpen}
+				onSelected={(categoryId, categoryName) => {
+					setCategoryModal(false);
+					setSelectedCategory({ categoryId, categoryName });
+				}}
+			/>
 		</>
 	);
 }
