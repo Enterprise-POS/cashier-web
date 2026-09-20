@@ -53,7 +53,7 @@ export default function ProfileSettings() {
 													Basic Information
 												</h6>
 											</div>
-											<div className="profile-pic-upload">
+											{/* <div className="profile-pic-upload">
 												<div className="profile-pic">
 													<span>
 														<i className="ti ti-circle-plus mb-1 fs-16" /> Add Image
@@ -72,36 +72,12 @@ export default function ProfileSettings() {
 														</span>
 													</div>
 												</div>
-											</div>
+											</div> */}
 											<div className="row mb-3">
 												<div className="col-md-4">
 													<div className="mb-3">
 														<label className="form-label">
-															First Name <span className="text-danger">*</span>
-														</label>
-														<input type="text" className="form-control" />
-													</div>
-												</div>
-												<div className="col-md-4">
-													<div className="mb-3">
-														<label className="form-label">
-															Last Name <span className="text-danger">*</span>
-														</label>
-														<input type="text" className="form-control" />
-													</div>
-												</div>
-												<div className="col-md-4">
-													<div className="mb-3">
-														<label className="form-label">
 															User Name <span className="text-danger">*</span>
-														</label>
-														<input type="text" className="form-control" />
-													</div>
-												</div>
-												<div className="col-md-4">
-													<div className="mb-3">
-														<label className="form-label">
-															Phone Number <span className="text-danger">*</span>
 														</label>
 														<input type="text" className="form-control" />
 													</div>
@@ -115,15 +91,15 @@ export default function ProfileSettings() {
 													</div>
 												</div>
 											</div>
-											<div className="card-title-head">
+											{/* <div className="card-title-head">
 												<h6 className="fs-16 fw-bold mb-3">
 													<span className="fs-16 me-2">
 														<i className="ti ti-map-pin" />
 													</span>
 													Address Information
 												</h6>
-											</div>
-											<div className="row">
+											</div> */}
+											{/* <div className="row">
 												<div className="col-md-12">
 													<div className="mb-3">
 														<label className="form-label">
@@ -164,7 +140,7 @@ export default function ProfileSettings() {
 														<input type="text" className="form-control" />
 													</div>
 												</div>
-											</div>
+											</div> */}
 											<div className="text-end settings-bottom-btn mt-0">
 												<button type="button" className="btn btn-secondary me-2">
 													Cancel

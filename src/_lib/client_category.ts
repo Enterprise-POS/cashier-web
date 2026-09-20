@@ -3,6 +3,7 @@ import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { server_routes } from '@/components/core/data/server_routes';
+import type { ProductListSort } from '@/components/store/productListStore';
 
 export async function getCategoryWithItems(
 	page: number | null,
@@ -10,12 +11,24 @@ export async function getCategoryWithItems(
 	nameQuery: string,
 	tenantId: number,
 	token: string,
+	categoryId: number = 0,
+	sort: ProductListSort | null = null,
 ): Promise<HTTPResult<{ items: CategoryWithItemDef[]; count: number }>> {
 	try {
-		const reqBody = {
+		const reqBody: {
+			page: number | null;
+			limit: number | null;
+			name_query: string;
+			category_id: number;
+			sort?: ProductListSort;
+		} = {
 			page: page,
 			limit: limit,
+			name_query: nameQuery,
+			category_id: categoryId,
 		};
+
+		if (sort !== null) reqBody.sort = sort;
 
 		const requestInit: RequestInit = {
 			method: 'POST',
