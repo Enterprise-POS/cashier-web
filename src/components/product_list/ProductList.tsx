@@ -2,7 +2,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { ConfigProvider, Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
 
 import { CategoryWithItem } from '@/_classes/Item';
@@ -12,8 +12,8 @@ import { formatIDR } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
-import { useProductListStore } from '@/components/store/productListStore';
 import type { ProductListSortColumn } from '@/components/store/productListStore';
+import { useProductListStore } from '@/components/store/productListStore';
 import { useProductCategoriesQuery, useProductListQuery } from './useProductListQuery';
 
 export default function ProductList({ limit, page, token }: { limit: number; page: number; token: string }) {
@@ -21,7 +21,7 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 	const { data, isStateLoading: isUseTenantLoading } = useTenant();
 	const [isMounted, setIsMounted] = useState(false);
 	const [currentDeleteModalData, setCurrentDeleteModalData] = useState<{ itemId: number; name: string } | null>(null);
-	const routePaginationRef = useRef<{ page: number; limit: number } | null>(null);
+	//const routePaginationRef = useRef<{ page: number; limit: number } | null>(null);
 
 	const pagination = useProductListStore(s => s.pagination);
 	const nameQuery = useProductListStore(s => s.nameQuery);
@@ -107,8 +107,6 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 		{
 			title: 'ID',
 			dataIndex: 'itemId',
-			//sorter: true,
-			//sortOrder: getSortOrder('item_id'),
 		},
 		{
 			title: 'Product',

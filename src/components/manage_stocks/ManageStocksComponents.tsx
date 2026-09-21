@@ -52,7 +52,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	const applyFilters = useManageStocksStore(s => s.applyFilters);
 
 	// Async actions
-	const handleTransferItem = useManageStocksStore(s => s.handleTransferItem);
+	//const handleTransferItem = useManageStocksStore(s => s.handleTransferItem);
 	const handleTransferItems = useManageStocksStore(s => s.handleTransferItems);
 	const handleOnConfirmWithdraw = useManageStocksStore(s => s.handleConfirmWithdraw);
 	const handleOnConfirmEdit = useManageStocksStore(s => s.handleConfirmEdit);
@@ -70,7 +70,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	const columns = [
 		{
 			title: 'ID',
-			dataIndex: 'id',
+			dataIndex: 'itemId',
 			sorter: (a: StoreStockV2, b: StoreStockV2) => a.id - b.id,
 		},
 		{
