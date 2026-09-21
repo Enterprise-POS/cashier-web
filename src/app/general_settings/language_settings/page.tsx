@@ -51,7 +51,7 @@ export default function LanguageSettings() {
 								<div className="card flex-fill mb-0 w-50">
 									<div className="card-header d-flex align-items-center justify-content-between flex-wrap row-gap-3">
 										<h4>Language</h4>
-										<div className="page-btn d-flex align-items-center ms-0">
+										{/* <div className="page-btn d-flex align-items-center ms-0">
 											<div className="select-language">
 												<Select classNamePrefix="react-select" options={languageOptions} placeholder="Choose" />
 											</div>
@@ -63,31 +63,13 @@ export default function LanguageSettings() {
 											>
 												Add Translation
 											</Link>
-										</div>
+										</div> */}
 									</div>
 									<div className="card-body pb-0">
 										<div className="row">
 											<div className="col-lg-12">
 												<div className="card table-list-card">
 													<div className="card-body language-search">
-														<div className="table-top">
-															<div className="search-set">
-																<div className="search-input">
-																	<span className="btn-searchset">
-																		<i className="ti ti-search fs-14 feather-search" />
-																	</span>
-																	<input type="text" className="form-control" placeholder="search" />
-																</div>
-															</div>
-															<div className="search-path">
-																<div className="d-flex align-items-center">
-																	<Link className="btn btn-secondary" href="#">
-																		<i data-feather="filter" className="filter-icon" />
-																		Import Sample
-																	</Link>
-																</div>
-															</div>
-														</div>
 														<div className="table-responsive no-pagination">
 															<table className="table datatable">
 																<thead className="thead-light">
@@ -186,12 +168,12 @@ export default function LanguageSettings() {
 																			</div>
 																		</td> */}
 																	</tr>
-																	<tr>
+																	{/* <tr>
 																		<td>
-																			{/* <label className="checkboxs">
+																			<label className="checkboxs">
 																				<input type="checkbox" />
 																				<span className="checkmarks" />
-																			</label> */}
+																			</label>
 																		</td>
 																		<td>
 																			<div className="language-name d-flex align-items-center">
@@ -206,68 +188,19 @@ export default function LanguageSettings() {
 																			</div>
 																		</td>
 																		<td>ja</td>
-																		{/* <td>
-																			<div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-																				<input type="checkbox" id="user2" className="check" defaultChecked />
-																				<label htmlFor="user2" className="checktoggle" />
-																			</div>
-																		</td> */}
-																		{/* <td>
-																			<div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-																				<input type="checkbox" id="users2" className="check" defaultChecked />
-																				<label htmlFor="users2" className="checktoggle" />
-																			</div>
-																		</td> */}
-																		{/* <td>2045</td> */}
-																		{/* <td>2045</td> */}
-																		{/* <td>
-																			<div className="d-flex align-items-center">
-																				<div className="circle-progress" data-value={70}>
-																					<span className="progress-left">
-																						<span className="progress-bar border-cyan" />
-																					</span>
-																					<span className="progress-right">
-																						<span className="progress-bar border-cyan" />
-																					</span>
-																				</div>
-																				<div className="progress-value ms-2">70%</div>
-																			</div>
-																		</td> */}
 																		<td>
 																			<div className="status-toggle modal-status d-flex justify-content-between align-items-center">
 																				<input type="checkbox" id="status2" className="check" defaultChecked />
 																				<label htmlFor="status2" className="checktoggle" />
 																			</div>
 																		</td>
-																		{/* <td className="action-table-data">
-																			<div className="edit-delete-action">
-																				<Link
-																					href={routes.languagesettingsweb}
-																					className="btn border text-dark bg-white me-2"
-																				>
-																					Web
-																				</Link>
-																				<Link href="#" className="btn border text-dark bg-white me-2">
-																					App
-																				</Link>
-																				<Link href="#" className="btn border text-dark bg-white me-2">
-																					Admin
-																				</Link>
-																				<Link href="#" className="me-2 language-import">
-																					<i data-feather="download" className="feather-download" />
-																				</Link>
-																				<Link href="#">
-																					<i data-feather="trash-2" className="feather-trash-2" />
-																				</Link>
-																			</div>
-																		</td> */}
-																	</tr>
-																	<tr>
+																	</tr> */}
+																	{/* <tr>
 																		<td>
-																			{/* <label className="checkboxs">
+																			<label className="checkboxs">
 																				<input type="checkbox" />
 																				<span className="checkmarks" />
-																			</label> */}
+																			</label>
 																		</td>
 																		<td>
 																			<div className="language-name d-flex align-items-center">
@@ -282,62 +215,13 @@ export default function LanguageSettings() {
 																			</div>
 																		</td>
 																		<td>id</td>
-																		{/* <td>
-																			<div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-																				<input type="checkbox" id="user3" className="check" defaultChecked />
-																				<label htmlFor="user3" className="checktoggle" />
-																			</div>
-																		</td> */}
-																		{/* <td>
-																			<div className="status-toggle modal-status d-flex justify-content-between align-items-center">
-																				<input type="checkbox" id="users3" className="check" defaultChecked />
-																				<label htmlFor="users3" className="checktoggle" />
-																			</div>
-																		</td> */}
-																		{/* <td>2245</td> */}
-																		{/* <td>295</td> */}
-																		{/* <td>
-																			<div className="d-flex align-items-center">
-																				<div className="circle-progress" data-value={50}>
-																					<span className="progress-left">
-																						<span className="progress-bar border-purple" />
-																					</span>
-																					<span className="progress-right">
-																						<span className="progress-bar border-purple" />
-																					</span>
-																				</div>
-																				<div className="progress-value ms-2">50%</div>
-																			</div>
-																		</td> */}
 																		<td>
 																			<div className="status-toggle modal-status d-flex justify-content-between align-items-center">
 																				<input type="checkbox" id="status3" className="check" defaultChecked />
 																				<label htmlFor="status3" className="checktoggle" />
 																			</div>
 																		</td>
-																		{/* <td className="action-table-data">
-																			<div className="edit-delete-action">
-																				<Link
-																					href={routes.languagesettingsweb}
-																					className="btn border text-dark bg-white me-2"
-																				>
-																					Web
-																				</Link>
-																				<Link href="#" className="btn border text-dark bg-white me-2">
-																					App
-																				</Link>
-																				<Link href="#" className="btn border text-dark bg-white me-2">
-																					Admin
-																				</Link>
-																				<Link href="#" className="me-2 language-import">
-																					<i data-feather="download" className="feather-download" />
-																				</Link>
-																				<Link href="#">
-																					<i data-feather="trash-2" className="feather-trash-2" />
-																				</Link>
-																			</div>
-																		</td> */}
-																	</tr>
+																	</tr> */}
 																</tbody>
 															</table>
 														</div>
@@ -371,13 +255,6 @@ export default function LanguageSettings() {
 									<div className="card">
 										<div className="card-body">
 											<div className="table-top">
-												<div className="search-set">
-													<div className="search-input">
-														<span className="btn-searchset">
-															<i className="ti ti-search fs-14 feather-search" />
-														</span>
-													</div>
-												</div>
 												<div className="d-flex align-items-center">
 													<div className="back-btn">
 														<Link href={all_routes.languageSettings} className="btn btn-secondary me-3">

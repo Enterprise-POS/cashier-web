@@ -26,6 +26,7 @@ export const server_routes = {
 	// category
 	getCategories: `${baseURL}/${apiVersion}/categories/<tenantId>`, // GET
 	addCategory: `${baseURL}/${apiVersion}/categories/create/<tenantId>`, // POST
+	getCategoriesWithItems: `${baseURL}/${apiVersion}/categories/category_with_items/<tenantId>`, // POST
 	updateCategory: `${baseURL}/${apiVersion}/categories/update/<tenantId>`, // PUT
 	deleteCategory: `${baseURL}/${apiVersion}/categories/<tenantId>`, // DELETE
 	registerCategory: `${baseURL}/${apiVersion}/categories/register/<tenantId>`, // DELETE

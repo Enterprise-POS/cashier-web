@@ -3,6 +3,7 @@ export const AllowedColumn = {
 	// future:
 	// price: 'price',
 	// name: 'item_name',
+	itemName: 'item_name',
 } as const; // no override
 export type ColumnName = (typeof AllowedColumn)[keyof typeof AllowedColumn];
 

@@ -37,7 +37,7 @@ export class CategoryWithItem extends Item {
 			item_id: def.item_id,
 			item_name: def.item_name,
 			stocks: def.stocks,
-			created_at: '',
+			created_at: def.warehouse_created_at,
 			is_active: 0,
 			stock_type: def.stock_type,
 			base_price: def.base_price,

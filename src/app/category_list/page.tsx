@@ -5,7 +5,6 @@ import Link from 'next/link';
 import CategoryList from '@/components/category_list/CategoryList';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
-import { default as RefreshIcon, default as TooltipIcons } from '@/components/tooltip-content/refresh';
 
 export default function Page() {
 	return (
@@ -20,8 +19,6 @@ export default function Page() {
 							</div>
 						</div>
 						<ul className="table-top-head">
-							<TooltipIcons />
-							<RefreshIcon />
 							<CollapseIcon />
 						</ul>
 						<div className="page-btn">

@@ -75,6 +75,7 @@ export function ItemDetails({
 						stock_type: v.stockType,
 						base_price: inpBasePrice,
 						tenant_id: selectedTenant.id,
+						warehouse_created_at: new Date().toString(),
 					}),
 			);
 		} catch (err) {

@@ -2,7 +2,7 @@ import { Constants } from '@/components/core/data/constant';
 import ManageStocksComponents from '@/components/manage_stocks/ManageStocksComponents';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
-import RefreshIcon from '@/components/tooltip-content/refresh';
+import RefreshIcon from '@/components/tooltip-content/RefreshIcon';
 import { cookies } from 'next/headers';
 
 import { PlusCircle } from 'react-feather';
@@ -34,7 +34,7 @@ export default async function ManageStock() {
 							</div>
 						</div>
 						<ul className="table-top-head">
-							<RefreshIcon />
+							<RefreshIcon queryKey={['storeStocks']} />
 							<CollapseIcon />
 						</ul>
 

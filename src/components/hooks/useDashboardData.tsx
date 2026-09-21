@@ -1,6 +1,6 @@
 // hooks/useHomeDashboardQueries.ts
 import { useQuery } from '@tanstack/react-query';
-import { orderItemSalesReport, orderItemGetSearch } from '@/_lib/new_order_item';
+import { orderItemSalesReport, orderItemGetSearch } from '@/_lib/client_order_item';
 import { DateFilter } from '@/_interface/DateFilter';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
