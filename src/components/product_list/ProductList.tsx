@@ -1,6 +1,6 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
+import { ConfigProvider, Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
@@ -13,7 +13,7 @@ import { all_routes as routes } from '@/components/core/data/all_routes';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { useProductListStore } from '@/components/store/productListStore';
-import type { ProductListSort, ProductListSortColumn } from '@/components/store/productListStore';
+import type { ProductListSortColumn } from '@/components/store/productListStore';
 import { useProductCategoriesQuery, useProductListQuery } from './useProductListQuery';
 
 export default function ProductList({ limit, page, token }: { limit: number; page: number; token: string }) {
@@ -203,22 +203,36 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 		},
 	];
 
-	useEffect(() => {
-		const previousRoutePagination = routePaginationRef.current;
-		if (previousRoutePagination?.page === page && previousRoutePagination.limit === limit) return;
+	/*
+		What: Copies page / limit props (from the URL) into the store's pagination.
+		Why: So navigating via URL updates the table.
+		Guard: A ref (routePaginationRef) stops it from looping, since it also depends on pagination.
+		useEffect(() => {
+			const previousRoutePagination = routePaginationRef.current;
+			if (previousRoutePagination?.page === page && previousRoutePagination.limit === limit) return;
 
+		console.log(page, limit);
 		routePaginationRef.current = { page, limit };
 		setPagination({ ...pagination, current: page, pageSize: limit });
 	}, [limit, page, pagination, setPagination]);
+	*/
 
+	/*
+		What: When the product query returns a new total count, saves it into pagination.total.
+		Why: Powers the <Pagination> component's page count.
+	*/
 	useEffect(() => {
 		if (pagination.total === total) return;
 		setPagination({ ...pagination, total });
-	}, [pagination, setPagination, total]);
+	}, [total]);
 
+	/*
+		What: If the product query fails, pushes the error message into the store.
+		Why: Triggers the red error toast in the UI.
+	*/
 	useEffect(() => {
 		if (productListQuery.isError) setError((productListQuery.error as Error).message);
-	}, [productListQuery.isError, productListQuery.error, setError]);
+	}, [productListQuery.isError]);
 
 	useEffect(() => setIsMounted(true), []);
 
@@ -303,17 +317,19 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 				</div>
 
 				<div className="table-responsive">
-					<Table<CategoryWithItem>
-						rowKey={'itemId'}
-						columns={columns}
-						dataSource={products}
-						pagination={false}
-						loading={{
-							spinning: isTableLoading,
-							indicator: <SectionLoading />,
-						}}
-						onChange={handleTableChange}
-					/>
+					<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
+						<Table<CategoryWithItem>
+							rowKey={'itemId'}
+							columns={columns}
+							dataSource={products}
+							pagination={false}
+							loading={{
+								spinning: isTableLoading,
+								indicator: <SectionLoading />,
+							}}
+							onChange={handleTableChange}
+						/>
+					</ConfigProvider>
 				</div>
 
 				<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">

@@ -20,15 +20,14 @@ export async function getCategoryWithItems(
 			limit: number | null;
 			name_query: string;
 			category_id: number;
-			sort?: ProductListSort;
+			filters: ProductListSort[];
 		} = {
-			page: page,
-			limit: limit,
+			page,
+			limit,
 			name_query: nameQuery,
 			category_id: categoryId,
+			filters: sort ? [sort] : [],
 		};
-
-		if (sort !== null) reqBody.sort = sort;
 
 		const requestInit: RequestInit = {
 			method: 'POST',

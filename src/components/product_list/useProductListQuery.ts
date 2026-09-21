@@ -33,6 +33,7 @@ export function useProductListQuery(token: string, tenantId: number) {
 			),
 		select: (data: HTTPResult<{ items: CategoryWithItemDef[]; count: number }>) => {
 			if (data.error) throw new Error(data.error);
+
 			return {
 				products: data.result!.items.map(def => new CategoryWithItem(def)),
 				total: data.result!.count,

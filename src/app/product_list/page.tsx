@@ -7,8 +7,7 @@ import Brand from '@/components/inventory/brand';
 import Footer from '@/components/partials/footer';
 import ProductList from '@/components/product_list/ProductList';
 import CollapseIcon from '@/components/tooltip-content/collapse';
-import RefreshIcon from '@/components/tooltip-content/refresh';
-import TooltipIcons from '@/components/tooltip-content/tooltipIcons';
+import RefreshIcon from '@/components/tooltip-content/RefreshIcon';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -37,8 +36,7 @@ export default async function ProductListComponent({
 						</div>
 					</div>
 					<ul className="table-top-head">
-						<TooltipIcons />
-						<RefreshIcon />
+						<RefreshIcon queryKey={['productList']} />
 						<CollapseIcon />
 					</ul>
 					<div className="page-btn">
@@ -47,12 +45,12 @@ export default async function ProductListComponent({
 							Add New Product
 						</Link>
 					</div>
-					<div className="page-btn import">
+					{/* <div className="page-btn import">
 						<Link href="#" className="btn btn-secondary color" data-bs-toggle="modal" data-bs-target="#view-notes">
 							<Download className="feather me-2" />
 							Import Product
 						</Link>
-					</div>
+					</div> */}
 				</div>
 				<ProductList limit={limit} page={page} token={token} />
 				<Brand />
