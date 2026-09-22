@@ -17,7 +17,7 @@ export default function OverviewCards() {
 						<div className="ms-2">
 							<p className="fw-medium mb-1">Cash-in</p>
 							<div>
-								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumPurchasedPrice) : '-'}</h3>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumPurchasedPriceSuccess) : '-'}</h3>
 							</div>
 						</div>
 					</div>
@@ -30,9 +30,9 @@ export default function OverviewCards() {
 							<i className="ti ti-align-box-bottom-left-filled fs-24" />
 						</span>
 						<div className="ms-2">
-							<p className="fw-medium mb-1">Gross Sales</p>
+							<p className="fw-medium mb-1">Profit</p>
 							<div>
-								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumTotalAmount) : '-'}</h3>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumProfit) : '-'}</h3>
 							</div>
 						</div>
 					</div>
@@ -45,9 +45,9 @@ export default function OverviewCards() {
 							<i className="ti ti-moneybag fs-24" />
 						</span>
 						<div className="ms-2">
-							<p className="fw-medium mb-1">Change</p>
+							<p className="fw-medium mb-1">Revenue</p>
 							<div>
-								<h3>{reportResult !== undefined ? formatIDR(reportResult.getChanges()) : '-'}</h3>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumRevenueSuccess) : '-'}</h3>
 							</div>
 						</div>
 					</div>

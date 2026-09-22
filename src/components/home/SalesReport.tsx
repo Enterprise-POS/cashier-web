@@ -11,6 +11,8 @@ import {
 	OnClickRefreshBtn,
 } from '@/_classes/HomeDashboardEvent';
 import { OrderItem } from '@/_classes/OrderItem';
+import { PaymentStatus } from '@/_interface/PaymentStatus';
+import { PaymentType } from '@/_interface/PaymentType';
 import dayjs from '@/_lib/dayjs';
 import { formatIDR } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
@@ -66,6 +68,16 @@ export default function SalesReport() {
 			dataIndex: 'id',
 			sorter: (a: OrderItem, b: OrderItem) => a.purchasedPrice - a.totalAmount - (b.purchasedPrice - b.totalAmount),
 			render: (id: number, orderItem: OrderItem) => formatIDR(orderItem.purchasedPrice - orderItem.totalAmount),
+		},
+		{
+			title: 'Payment Status',
+			dataIndex: 'paymentStatus',
+			render: (status: string | PaymentStatus) => PaymentStatus[status as keyof typeof PaymentStatus],
+		},
+		{
+			title: 'Method',
+			dataIndex: 'paymentType',
+			render: (type: PaymentType) => type,
 		},
 		{
 			title: 'Date',

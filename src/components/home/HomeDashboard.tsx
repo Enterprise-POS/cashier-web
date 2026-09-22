@@ -1,5 +1,7 @@
+import BestSeller from '@/components/home/BestSeller';
 import OverviewCards from '@/components/home/OverviewCards';
 import ReportFilters from '@/components/home/ReportFilters';
+import SalesAnalytics from '@/components/home/SalesAnalytics';
 import SalesReport from '@/components/home/SalesReport';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
@@ -23,6 +25,10 @@ export default function HomeDashboard({ name }: { name: string }) {
 				</div>
 
 				<OverviewCards />
+				<div className="row">
+					<BestSeller />
+					<SalesAnalytics />
+				</div>
 				<ReportFilters />
 				<SalesReport />
 			</div>
