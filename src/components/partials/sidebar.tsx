@@ -48,13 +48,13 @@ export default function Sidebar() {
 		<div className={`sidebar ${hideSidebar ? 'sidebar-hide' : ''}`} id="sidebar">
 			{/* <!-- Logo --> */}
 			<div className="sidebar-logo">
-				<Link href="/" className="logo logo-normal">
+				<Link href="/" className="logo logo-normal link-to-page-btn">
 					{/* <Image src="/favicon.png" alt="Img" width={30} height={30} /> */}
 				</Link>
-				<Link href="/" className="logo logo-white">
+				<Link href="/" className="logo logo-white link-to-page-btn">
 					<Image src="/favicon.png" alt="Img" width={30} height={30} />
 				</Link>
-				<Link href="/" className="logo-small">
+				<Link href="/" className="logo-small link-to-page-btn">
 					<Image src="/favicon.png" alt="Img" width={30} height={30} />
 				</Link>
 				<a id="toggle_btn" href="#">
@@ -149,7 +149,7 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Main</h6>
 							<ul>
 								<li className={routes.index === pathname ? 'active' : ''}>
-									<Link href={routes.index}>
+									<Link href={routes.index} className="link-to-page-btn">
 										<i className="ti ti-home fs-16 me-2"></i>
 										<span>Home</span>
 									</Link>
@@ -300,13 +300,13 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Warehouse</h6>
 							<ul>
 								<li className={routes.productList === pathname ? 'active' : ''}>
-									<Link href={routes.productList}>
+									<Link href={routes.productList} className="link-to-page-btn">
 										<i className="ti ti-box fs-16 me-2"></i>
 										<span>Products</span>
 									</Link>
 								</li>
 								<li className={routes.addProduct === pathname ? 'active' : ''}>
-									<Link href={routes.addProduct}>
+									<Link href={routes.addProduct} className="link-to-page-btn">
 										<i className="ti ti-table-plus fs-16 me-2"></i>
 										<span>Create Product</span>
 									</Link>
@@ -324,7 +324,7 @@ export default function Sidebar() {
 									</Link>
 								</li> */}
 								<li className={routes.categoryList === pathname ? 'active' : ''}>
-									<Link href={routes.categoryList}>
+									<Link href={routes.categoryList} className="link-to-page-btn">
 										<i className="ti ti-list-details fs-16 me-2"></i>
 										<span>Category</span>
 									</Link>
@@ -371,19 +371,19 @@ export default function Sidebar() {
 							<h6 className="submenu-hdr">Stores</h6>
 							<ul>
 								<li className={routes.storeList === pathname ? 'active' : ''}>
-									<Link href={routes.storeList}>
+									<Link href={routes.storeList} className="link-to-page-btn">
 										<i className="ti ti-home fs-16 me-2"></i>
 										<span>Store List</span>
 									</Link>
 								</li>
 								<li className={routes.manageStocks === pathname ? 'active' : ''}>
-									<Link href={routes.manageStocks}>
+									<Link href={routes.manageStocks} className="link-to-page-btn">
 										<i className="ti ti-stack-3 fs-16 me-2"></i>
 										<span>Manage Stocks</span>
 									</Link>
 								</li>
 								<li className={routes.editStoreProducts === pathname ? 'active' : ''}>
-									<Link href={routes.editStoreProducts}>
+									<Link href={routes.editStoreProducts} className="link-to-page-btn">
 										<i className="ti ti-stairs-up fs-16 me-2"></i>
 										<span>Edit Store Products</span>
 									</Link>
@@ -623,7 +623,7 @@ export default function Sidebar() {
 									</Link> */}
 								</li>
 								<li className={routes.tenantMembers === pathname ? 'active' : ''}>
-									<Link href={routes.tenantMembers}>
+									<Link href={routes.tenantMembers} className="link-to-page-btn">
 										<i className="ti ti-archive fs-16 me-2"></i>
 										<span>Tenant Members</span>
 									</Link>
@@ -1248,6 +1248,7 @@ export default function Sidebar() {
 								</li> */}
 								<li>
 									<Link
+										className="link-to-page-btn"
 										href={routes.login}
 										onClick={event => {
 											event.preventDefault();
