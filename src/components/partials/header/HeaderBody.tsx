@@ -2,10 +2,11 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Layout } from 'react-feather';
 
+import { signOut } from '@/_lib/action';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import TenantFloatingMenu from '@/components/partials/header/TenantFloatingMenu';
 
@@ -14,7 +15,23 @@ const excludedPathnames = [routes.login, routes.register];
 export default function HeaderBody({ children }: { children: React.ReactNode }) {
 	const pathname = usePathname();
 	const [searchInput, setSearchInput] = useState('');
+	const [whileSigningOut, setWhileSigningOut] = useState(false);
 	const searchInputRef = useRef<HTMLInputElement>(null);
+	const router = useRouter();
+
+	async function handleSignOut() {
+		if (whileSigningOut) return;
+		setWhileSigningOut(true);
+
+		const { result, error } = await signOut();
+		if (error !== null) {
+			setWhileSigningOut(false);
+			throw new Error(error);
+		} else {
+			router.push('/login');
+			router.refresh();
+		}
+	}
 
 	useEffect(() => {
 		function isInputFocused() {
@@ -453,10 +470,10 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 				{/* <!-- /Header Menu --> */}
 
 				{/* <!-- Mobile Menu --> */}
-				<div className="dropdown mobile-user-menu">
-					<a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+				<div className="dropdown mobile-user-menu three-dots">
+					<Link href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
 						<i className="fa fa-ellipsis-v"></i>
-					</a>
+					</Link>
 					<div className="dropdown-menu dropdown-menu-right">
 						{/* <a className="dropdown-item" href="profile.html">
 							My Profile
@@ -464,7 +481,14 @@ export default function HeaderBody({ children }: { children: React.ReactNode }) 
 						{/* <a className="dropdown-item" href="general-settings.html">
 							Settings
 						</a> */}
-						<a className="dropdown-item" href="signin.html">
+						<a
+							className="dropdown-item"
+							href={routes.login}
+							onClick={event => {
+								event.preventDefault();
+								handleSignOut();
+							}}
+						>
 							Logout
 						</a>
 					</div>

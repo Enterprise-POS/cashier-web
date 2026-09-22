@@ -29,7 +29,23 @@ $(document).ready(function () {
 		return false;
 	});
 
+	// When user click the 3 bullets at right side, then no reason to open the sidebar
+	$('.three-dots').on('click', function () {
+		$('html').removeClass('menu-opened');
+		$wrapper.removeClass('slide-nav');
+		$('.sidebar-overlay').removeClass('opened');
+		$('#task_window').removeClass('opened');
+	});
+
 	$('.sidebar-overlay').on('click', function () {
+		$('html').removeClass('menu-opened');
+		$wrapper.removeClass('slide-nav');
+		$('.sidebar-overlay').removeClass('opened');
+		$('#task_window').removeClass('opened');
+	});
+
+	// When user change page, then close the sidebar
+	$('.link-to-page-btn').on('click', function () {
 		$('html').removeClass('menu-opened');
 		$(this).removeClass('opened');
 		$wrapper.removeClass('slide-nav');
@@ -498,7 +514,7 @@ $(document).ready(function () {
 					'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
 				},
 			},
-			booking_range
+			booking_range,
 		);
 
 		booking_range(start, end);
@@ -617,7 +633,7 @@ $(document).ready(function () {
 				complete: function () {
 					$this.text(this.countNum);
 				},
-			}
+			},
 		);
 	});
 
@@ -830,7 +846,7 @@ $(document).ready(function () {
 		} else {
 			$this.closest('.tabs_wrapper').find('ul.tabs li, .tabs_container .tab_content').removeClass('active');
 			$('.tabs_container .tab_content[data-tab="' + $theTab + '"], ul.tabs li[id="' + $theTab + '"]').addClass(
-				'active'
+				'active',
 			);
 		}
 	});

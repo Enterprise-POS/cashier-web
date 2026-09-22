@@ -9,7 +9,7 @@ export default function SalesAnalytics() {
 	const showLoading = isLoading || !reportResult;
 
 	return (
-		<div className="col-md-12 col-lg-8 col-sm-12 col-12 d-flex">
+		<div className="col-xl-8 d-flex">
 			<div className="card flex-fill flex-fill">
 				<div className="card-header d-flex justify-content-between align-items-center">
 					<h5 className="card-title mb-0">Sales Analytics</h5>

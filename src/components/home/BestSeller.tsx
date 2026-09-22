@@ -14,7 +14,7 @@ export default function BestSeller() {
 	const items = reportResult?.topItemsByProfit ?? [];
 
 	return (
-		<div className="col-sm-12 col-md-12 col-xl-4 d-flex">
+		<div className="col-xl-4 d-flex">
 			<div className="card flex-fill w-100 mb-4">
 				<div className="card-header d-flex justify-content-between align-items-center">
 					<h4 className="card-title mb-0">Best Seller</h4>
