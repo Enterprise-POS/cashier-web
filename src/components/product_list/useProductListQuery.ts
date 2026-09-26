@@ -6,6 +6,7 @@ import { CategoryDef, CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { getCategories } from '@/_lib/category';
 import { getCategoryWithItems } from '@/_lib/client_category';
+import { Constants } from '@/components/core/data/constant';
 import { useProductListStore } from '@/components/store/productListStore';
 
 export function useProductListQuery(token: string, tenantId: number) {
@@ -13,7 +14,7 @@ export function useProductListQuery(token: string, tenantId: number) {
 
 	return useQuery({
 		queryKey: [
-			'productList',
+			Constants.ReactQueryKey.productList,
 			tenantId,
 			pagination.current,
 			pagination.pageSize,
@@ -42,13 +43,13 @@ export function useProductListQuery(token: string, tenantId: number) {
 		enabled: tenantId !== 0,
 		staleTime: 0,
 		refetchOnWindowFocus: false,
-		refetchOnReconnect: false,
+		refetchOnReconnect: true,
 	});
 }
 
 export function useProductCategoriesQuery(tenantId: number) {
 	return useQuery({
-		queryKey: ['productCategories', tenantId],
+		queryKey: [Constants.ReactQueryKey.productCategories, tenantId],
 		queryFn: () => getCategories(tenantId, 1, 100, ''),
 		select: (data: HTTPResult<{ categoryDefs: CategoryDef[]; count: number }>) => {
 			if (data.error) throw new Error(data.error);
@@ -57,6 +58,6 @@ export function useProductCategoriesQuery(tenantId: number) {
 		enabled: tenantId !== 0,
 		staleTime: 1000 * 60 * 5,
 		refetchOnWindowFocus: false,
-		refetchOnReconnect: false,
+		refetchOnReconnect: true,
 	});
 }

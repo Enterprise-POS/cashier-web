@@ -2,7 +2,6 @@ import AddProductForm from '@/components/add_product/AddProductForm';
 import { all_routes } from '@/components/core/data/all_routes';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
-import RefreshIcon from '@/components/tooltip-content/refresh';
 
 import Link from 'next/link';
 import { ArrowLeft } from 'react-feather';
@@ -22,7 +21,6 @@ export default function AddProductComponent() {
 							</div>
 						</div>
 						<ul className="table-top-head">
-							<RefreshIcon />
 							<CollapseIcon />
 							<li>
 								<div className="page-btn">

@@ -4,7 +4,7 @@ import { CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
-import { ItemDef } from '@/_interface/ItemDef';
+import { ItemDef, StockType } from '@/_interface/ItemDef';
 import { signOut } from '@/_lib/action';
 import { getAuth } from '@/_lib/auth';
 import { convertTo } from '@/_lib/utils';
@@ -18,7 +18,7 @@ export async function getActiveWarehouseItem(
 	tenantId: number,
 	limit: number,
 	page: number,
-	nameQuery: string
+	nameQuery: string,
 ): Promise<HTTPResult<{ itemDefs: ItemDef[]; count: number }>> {
 	const params = new URLSearchParams({
 		limit: limit.toString(),
@@ -36,7 +36,7 @@ export async function getActiveWarehouseItem(
 	};
 	const response = await fetch(
 		serverRoutes.getActiveWarehouseItem.replace('<tenantId>', tenantId.toString()) + paramsString,
-		requestInit
+		requestInit,
 	);
 	if (!response.ok) {
 		let body: ErrorResponse;
@@ -126,7 +126,7 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 		};
 		const response = await fetch(
 			serverRoutes.createWarehouseItem.replace('<tenantId>', tenantId!.toString()),
-			requestInit
+			requestInit,
 		);
 		if (!response.ok) {
 			let body: ErrorResponse;
@@ -166,12 +166,9 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 	}
 }
 
-type NewItemPayload = { item_name: string; stocks: number; base_price: number };
+type NewItemPayload = { item_name: string; stocks: number; base_price: number; stock_type: StockType };
 
-export async function createItems(
-	tenantId: number,
-	items: NewItemPayload[]
-): Promise<HTTPResult<ItemDef[]>> {
+export async function createItems(tenantId: number, items: NewItemPayload[]): Promise<HTTPResult<ItemDef[]>> {
 	const auth = await getAuth();
 	if (auth === null) {
 		const isSuccess = await signOut();
@@ -189,7 +186,7 @@ export async function createItems(
 		};
 		const response = await fetch(
 			serverRoutes.createWarehouseItem.replace('<tenantId>', tenantId.toString()),
-			requestInit
+			requestInit,
 		);
 
 		if (!response.ok) {
@@ -228,7 +225,7 @@ export async function getItemFindById(itemId: number | null, tenantId: number | 
 		};
 		const response = await fetch(
 			serverRoutes.warehouseItemFindById.replace('<tenantId>', tenantId!.toString()),
-			requestInit
+			requestInit,
 		);
 		if (!response.ok) {
 			let body: ErrorResponse;
@@ -327,7 +324,7 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 		};
 		const response = await fetch(
 			serverRoutes.editWarehouseItem.replace('<tenantId>', tenantId!.toString()),
-			requestInit
+			requestInit,
 		);
 
 		if (!response.ok) {
@@ -392,7 +389,7 @@ export async function setItemActivate(itemId: number, tenantId: number, setInto:
 
 		const response = await fetch(
 			serverRoutes.warehouseSetActivate.replace('<tenantId>', tenantId.toString()),
-			requestInit
+			requestInit,
 		);
 
 		if (!response.ok) {
@@ -440,7 +437,7 @@ export async function findCompleteById(itemId: number, tenantId: number): Promis
 		};
 		const response = await fetch(
 			serverRoutes.warehouseItemFindCompleteById.replace('<tenantId>', tenantId!.toString()),
-			requestInit
+			requestInit,
 		);
 
 		if (!response.ok) {

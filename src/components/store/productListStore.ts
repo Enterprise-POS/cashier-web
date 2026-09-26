@@ -4,6 +4,7 @@ import { create } from 'zustand';
 
 import { QueryFilter } from '@/_interface/QueryFilter';
 import { setItemActivate } from '@/_lib/warehouse';
+import { Constants } from '@/components/core/data/constant';
 
 const INITIAL_PAGINATION: TablePaginationConfig = {
 	current: 1,
@@ -140,7 +141,7 @@ export const useProductListStore = create<ProductListStore>((set, get) => ({
 				return;
 			}
 
-			queryClient.invalidateQueries({ queryKey: ['productList'] });
+			queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.productList] });
 			setSuccess(`${itemName} removed`);
 		} catch (e) {
 			setError(`Unexpected error: ${(e as Error).message}`);

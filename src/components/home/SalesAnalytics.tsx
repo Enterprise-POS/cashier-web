@@ -1,12 +1,12 @@
 'use client';
 
+import { DailyTrendDef } from '@/_interface/ReportResultDef';
 import DailyTrendChart from '@/components/home/DailyTrendCharts';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
 
 export default function SalesAnalytics() {
 	const { reportResult, isLoading } = useHomeDashboard();
-
-	const showLoading = isLoading || !reportResult;
+	const dailyTrendDef: DailyTrendDef[] = reportResult?.dailyTrend ?? [];
 
 	return (
 		<div className="col-xl-8 d-flex">
@@ -46,7 +46,7 @@ export default function SalesAnalytics() {
 					</div> */}
 				</div>
 				<div className="card-body pt-1 pb-0">
-					{showLoading ? <SalesAnalyticsSkeleton /> : <DailyTrendChart report={reportResult} />}
+					{isLoading ? <SalesAnalyticsSkeleton /> : <DailyTrendChart dailyTrend={dailyTrendDef} />}
 				</div>
 			</div>
 		</div>

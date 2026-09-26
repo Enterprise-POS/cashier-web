@@ -36,7 +36,7 @@ export default async function ProductListComponent({
 						</div>
 					</div>
 					<ul className="table-top-head">
-						<RefreshIcon queryKey={['productList']} />
+						<RefreshIcon queryKey={[Constants.ReactQueryKey.productList]} />
 						<CollapseIcon />
 					</ul>
 					<div className="page-btn">

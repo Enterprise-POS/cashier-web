@@ -8,6 +8,8 @@ import { useFormState } from '@/components/hooks/useFormState';
 import { SelectProductToAddNew } from '@/components/manage_stocks/SelectProductToAddNew';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { PlusCircle, Trash2 } from 'react-feather';
+import { StockType } from '@/_interface/ItemDef';
+import { Tooltip } from 'antd';
 
 /*
 	User flow when click 'Add New'
@@ -27,6 +29,7 @@ type QueueItem = {
 	itemName: string;
 	quantity: number;
 	stocks: number;
+	stockType: StockType;
 };
 
 export function AddNewItem({
@@ -77,17 +80,15 @@ export function AddNewItem({
 		return () => picker?.removeEventListener('hidden.bs.modal', handleHidden);
 	}, []);
 
-	const addToQueue = (itemId: number, itemName: string, stocks: number) => {
+	const addToQueue = (itemId: number, itemName: string, stocks: number, stockType: StockType) => {
 		setQueue(prev => {
 			const existing = prev.find(item => item.itemId === itemId);
 			if (existing) {
 				return prev.map(item =>
-					item.itemId === itemId
-						? { ...item, quantity: Math.min(item.quantity + 1, item.stocks) }
-						: item
+					item.itemId === itemId ? { ...item, quantity: Math.min(item.quantity + 1, item.stocks) } : item,
 				);
 			}
-			return [...prev, { id: crypto.randomUUID(), itemId, itemName, quantity: 1, stocks }];
+			return [...prev, { id: crypto.randomUUID(), itemId, itemName, quantity: 1, stocks, stockType }];
 		});
 	};
 
@@ -97,7 +98,7 @@ export function AddNewItem({
 				if (item.id !== id) return item;
 				const qty = Math.min(Math.max(1, Number(value) || 1), item.stocks);
 				return { ...item, quantity: qty };
-			})
+			}),
 		);
 	};
 
@@ -125,7 +126,7 @@ export function AddNewItem({
 					tenantId: tenantCtx.data.selectedTenantId,
 				},
 				itemName: item.itemName,
-			}))
+			})),
 		);
 
 		if (failedItemIds.length > 0) {
@@ -195,7 +196,9 @@ export function AddNewItem({
 									</label>
 
 									{queue.length === 0 ? (
-										<p className="text-muted small mb-2">No products added yet. Click &quot;Add Product&quot; to begin.</p>
+										<p className="text-muted small mb-2">
+											No products added yet. Click &quot;Add Product&quot; to begin.
+										</p>
 									) : (
 										<div style={{ maxHeight: '240px', overflowY: 'auto' }} className="mb-2">
 											<table className="table table-sm table-bordered align-middle mb-0">
@@ -208,20 +211,39 @@ export function AddNewItem({
 												</thead>
 												<tbody>
 													{queue.map(item => (
-														<tr key={item.id}>
-															<td className="text-truncate" style={{ maxWidth: '180px' }}>{item.itemName}</td>
-															<td>
-																<input
-																	type="number"
-																	className="form-control form-control-sm"
-																	value={item.quantity}
-																	min={1}
-																	max={item.stocks}
-																	disabled={loading}
-																	onChange={e => updateQuantity(item.id, e.target.value)}
-																/>
-																<small className="text-muted">Max: {item.stocks}</small>
+														<tr key={item.id} className="bg-soft-info border-color">
+															<td className={`text-truncate`} style={{ maxWidth: '180px' }}>
+																{item.itemName}
 															</td>
+															{item.stockType === StockType.TRACKED ? (
+																<td>
+																	<input
+																		type="number"
+																		className="form-control form-control-sm"
+																		value={item.quantity}
+																		min={1}
+																		max={item.stocks}
+																		disabled={loading}
+																		onChange={e => updateQuantity(item.id, e.target.value)}
+																	/>
+																	<small className="text-muted">Max: {item.stocks}</small>
+																</td>
+															) : (
+																<td className="table-secondary border-0">
+																	<Tooltip title="(U) Unlimited type item. Will not affect the store stock.">
+																		<div>
+																			<input
+																				type="text"
+																				className="form-control form-control-sm text-center"
+																				value={0}
+																				disabled
+																				readOnly
+																			/>
+																			<small className="text-muted">Max: -</small>
+																		</div>
+																	</Tooltip>
+																</td>
+															)}
 															<td className="text-center">
 																<button
 																	type="button"
@@ -279,9 +301,9 @@ export function AddNewItem({
 			<SelectProductToAddNew
 				tenantId={tenantCtx.data.selectedTenantId}
 				isModalOpen={isOpenProductPicker}
-				onSelected={(items) => {
+				onSelected={items => {
 					selectionMade.current = true;
-					items.forEach(({ itemId, itemName, stocks }) => addToQueue(itemId, itemName, stocks));
+					items.forEach(({ itemId, itemName, stocks, stockType }) => addToQueue(itemId, itemName, stocks, stockType));
 					setIsOpenProductPicker(false);
 					openBootstrapModal('#add-units');
 				}}

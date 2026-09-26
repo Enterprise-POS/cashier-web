@@ -1,16 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import { Tooltip } from 'antd';
 
 import { formatIDR } from '@/_lib/utils';
-import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useHomeDashboard } from '@/components/provider/HomeDashboardProvider';
-import { Tooltip } from 'antd';
 
 export default function BestSeller() {
 	const { reportResult, isLoading } = useHomeDashboard();
 
-	const showLoading = isLoading || !reportResult;
 	const items = reportResult?.topItemsByProfit ?? [];
 
 	return (
@@ -26,7 +23,7 @@ export default function BestSeller() {
 					<div className="table-responsive best-seller-scroll" style={{ maxHeight: 400, overflowY: 'auto' }}>
 						<table className="table table-borderless best-seller mb-0">
 							<tbody>
-								{showLoading ? (
+								{isLoading ? (
 									<BestSellerSkeletonRows />
 								) : items.length === 0 ? (
 									<tr>

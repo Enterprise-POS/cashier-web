@@ -23,10 +23,22 @@ const LocalStorageKey = {
 	currentSelectedStore: 'current-selected-store',
 };
 
+export const ReactQueryKey = {
+	salesReport: 'salesReport',
+	orderItems: 'orderItems',
+	editStockInfo: 'editStockInfo',
+	storeStocks: 'storeStocks',
+	categories: 'categories',
+	warehouse: 'warehouse',
+	productList: 'productList',
+	productCategories: 'productCategories',
+};
+
 export const Constants = {
 	CookieKey,
 	HeaderKey,
 	LocalStorageKey,
+	ReactQueryKey,
 };
 
 export const StatusCode = {

@@ -8,6 +8,7 @@ import { TransferStockRequest } from '@/_interface/TransferStock';
 import { WithdrawProductFromStoreRequestValue } from '@/_interface/WithdrawProductFromStoreRequestBody';
 import { transferStockToStoreStock, transferStockToWarehouse, withdrawStoreStock } from '@/_lib/store_stock';
 import { closeBootstrapModal } from '@/_lib/utils';
+import { Constants } from '@/components/core/data/constant';
 
 const INITIAL_PAGINATION: TablePaginationConfig = {
 	current: 1,
@@ -190,7 +191,7 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 			}
 
 			setNameQuery('');
-			queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
+			queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.storeStocks] });
 			setSuccess(`${itemName} successfully added to ${selectedStoreName}`);
 			closeBootstrapModal('#add-units [data-bs-dismiss="modal"]');
 		} catch (e) {
@@ -216,14 +217,12 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 
 			if (successCount > 0) {
 				setNameQuery('');
-				queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
+				queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.storeStocks] });
 			}
 
 			if (failed.length > 0) {
 				const failedNames = failed.map(f => f.itemName).join(', ');
-				const prefix = successCount > 0
-					? `${successCount} of ${items.length} added to ${selectedStoreName}. `
-					: '';
+				const prefix = successCount > 0 ? `${successCount} of ${items.length} added to ${selectedStoreName}. ` : '';
 				setError(`${prefix}Failed to add: ${failedNames}`);
 				return failed.map(f => f.itemId);
 			}
@@ -257,7 +256,7 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 			} else {
 				setSuccess('Product edited successfully');
 				// Invalidate to refetch fresh data
-				queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
+				queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.storeStocks] });
 			}
 		} catch (e) {
 			const error = e as Error;
@@ -279,7 +278,7 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 				setError(error);
 			} else {
 				setSuccess(`${body.itemName} is successfully withdrawn`);
-				queryClient.invalidateQueries({ queryKey: ['storeStocks'] });
+				queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.storeStocks] });
 			}
 		} catch (e) {
 			const error = e as Error;

@@ -7,7 +7,7 @@ import { StoreStockV2 } from '@/_classes/StoreStock';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { editStoreStock } from '@/_lib/store_stock';
 import { closeBootstrapModal } from '@/_lib/utils';
-import { SortBy } from '@/components/core/data/constant';
+import { Constants, SortBy } from '@/components/core/data/constant';
 
 const INITIAL_PAGINATION: TablePaginationConfig = {
 	current: 1,
@@ -108,7 +108,7 @@ export const useEditStockInfoStore = create<EditStockInfoStore>((set, get) => ({
 			}
 
 			setSuccess('Edited successfully');
-			queryClient.invalidateQueries({ queryKey: ['editStockInfo'] });
+			queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.editStockInfo] });
 			closeBootstrapModal('#edit-units [data-bs-dismiss="modal"]');
 		} catch (e) {
 			setError(`Unexpected error: ${(e as Error).message}`);

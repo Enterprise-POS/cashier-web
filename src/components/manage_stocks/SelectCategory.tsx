@@ -1,9 +1,10 @@
 import Link from 'next/link';
 
-import { getCategories } from '@/_lib/category';
-import { useQuery } from '@tanstack/react-query';
 import { Category } from '@/_classes/Category';
 import { CategoryDef } from '@/_interface/CategoryDef';
+import { getCategories } from '@/_lib/category';
+import { Constants } from '@/components/core/data/constant';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 export function SelectCategory({
@@ -16,7 +17,7 @@ export function SelectCategory({
 	onSelected: (categoryId: number, categoryName: string) => void;
 }) {
 	const categoriesQuery = useQuery({
-		queryKey: ['categories', tenantId],
+		queryKey: [Constants.ReactQueryKey.categories, tenantId],
 		queryFn: () => getCategories(tenantId, 1, 100, ''),
 		enabled: tenantId !== 0 && isModalOpen,
 		staleTime: 1000 * 60 * 5, // cache for 5 min

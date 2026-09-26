@@ -1,26 +1,33 @@
 'use client';
 
-import { Tenant } from '@/_classes/Tenant';
-import { createItems } from '@/_lib/warehouse';
-import { useFormState } from '@/components/hooks/useFormState';
-import { useTenant } from '@/components/provider/TenantProvider';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { PlusCircle, Trash2 } from 'react-feather';
+
+import { Tenant } from '@/_classes/Tenant';
+import { StockType } from '@/_interface/ItemDef';
+import { createItems } from '@/_lib/warehouse';
+import { Constants } from '@/components/core/data/constant';
+import { useFormState } from '@/components/hooks/useFormState';
+import { useTenant } from '@/components/provider/TenantProvider';
 
 type ProductRow = {
 	id: string;
 	productName: string;
 	stocks: string;
 	basePrice: string;
+	stockType: StockType;
 };
 
 function makeRow(): ProductRow {
-	return { id: crypto.randomUUID(), productName: '', stocks: '', basePrice: '' };
+	return { id: crypto.randomUUID(), productName: '', stocks: '', basePrice: '', stockType: StockType.TRACKED };
 }
 
 export default function AddProductForm() {
 	const formState = useFormState();
 	const { data } = useTenant();
+	const queryClient: QueryClient = useQueryClient();
+
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
 
 	const [rows, setRows] = useState<ProductRow[]>(() => [makeRow()]);
@@ -33,6 +40,10 @@ export default function AddProductForm() {
 
 	const updateRow = useCallback((id: string, field: keyof Omit<ProductRow, 'id'>, value: string) => {
 		setRows(prev => prev.map(r => (r.id === id ? { ...r, [field]: value } : r)));
+	}, []);
+
+	const updateStockType = useCallback((id: string, value: StockType) => {
+		setRows(prev => prev.map(r => (r.id === id ? { ...r, stockType: value } : r)));
 	}, []);
 
 	const handleClear = useCallback(() => setRows([makeRow()]), []);
@@ -58,6 +69,7 @@ export default function AddProductForm() {
 			item_name: r.productName.trim(),
 			stocks: r.stocks === '' ? 0 : Number(r.stocks),
 			base_price: r.basePrice === '' ? 0 : Number(r.basePrice),
+			stock_type: r.stockType,
 		}));
 
 		formState.setFormLoading(true);
@@ -66,6 +78,8 @@ export default function AddProductForm() {
 			if (error !== null) {
 				formState.setError({ message: error });
 			} else {
+				console.log(queryClient);
+				queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
 				const count = (result ?? []).length;
 				formState.setSuccess({ message: `${count} product${count > 1 ? 's' : ''} created successfully.` });
 				handleClear();
@@ -117,9 +131,12 @@ export default function AddProductForm() {
 						<thead className="table-light">
 							<tr>
 								<th style={{ width: '3rem' }}>No</th>
-								<th>Product Name <span className="text-danger">*</span></th>
+								<th>
+									Product Name <span className="text-danger">*</span>
+								</th>
 								<th style={{ width: '12rem' }}>Quantity</th>
 								<th style={{ width: '14rem' }}>Base Price</th>
+								<th style={{ width: '14rem' }}>Stock Type</th>
 								<th style={{ width: '4rem' }}></th>
 							</tr>
 						</thead>
@@ -159,6 +176,21 @@ export default function AddProductForm() {
 											onChange={e => updateRow(row.id, 'basePrice', e.target.value)}
 										/>
 									</td>
+									<td>
+										<select
+											className="form-select form-select-sm"
+											disabled={formState.state.isFormLoading}
+											value={row.stockType}
+											onChange={e => updateStockType(row.id, e.target.value as StockType)}
+										>
+											<option className="text-gray" value={StockType.TRACKED}>
+												(T) Tracked
+											</option>
+											<option className="text-gray" value={StockType.UNLIMITED}>
+												(U) Unlimited
+											</option>
+										</select>
+									</td>
 									<td className="text-center">
 										<button
 											type="button"
@@ -175,7 +207,7 @@ export default function AddProductForm() {
 						</tbody>
 						<tfoot>
 							<tr>
-								<td colSpan={5}>
+								<td colSpan={6}>
 									<button
 										type="button"
 										className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
@@ -192,7 +224,12 @@ export default function AddProductForm() {
 				</div>
 
 				<div className="d-flex align-items-center justify-content-end mb-4 gap-2">
-					<button type="button" className="btn btn-secondary" disabled={formState.state.isFormLoading} onClick={handleClear}>
+					<button
+						type="button"
+						className="btn btn-secondary"
+						disabled={formState.state.isFormLoading}
+						onClick={handleClear}
+					>
 						Clear
 					</button>
 					<button

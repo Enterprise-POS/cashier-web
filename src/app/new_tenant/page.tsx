@@ -3,7 +3,6 @@ import { Metadata } from 'next';
 import { getAuth } from '@/_lib/auth';
 import NewTenantForm from '@/components/form/NewTenantForm';
 import CollapseIcon from '@/components/tooltip-content/collapse';
-import RefreshIcon from '@/components/tooltip-content/refresh';
 
 export const metadata: Metadata = {
 	title: 'New Tenant',
@@ -22,7 +21,6 @@ export default async function Page() {
 						<h6>By creating new tenant you are the owner for new tenant</h6>
 					</div>
 					<ul className="table-top-head">
-						<RefreshIcon />
 						<CollapseIcon />
 					</ul>
 				</div>
