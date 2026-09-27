@@ -9,6 +9,7 @@ import { StockType } from '@/_interface/ItemDef';
 import { createItems } from '@/_lib/warehouse';
 import { Constants } from '@/components/core/data/constant';
 import { useFormState } from '@/components/hooks/useFormState';
+import { useCategoriesQuery } from '@/components/product_list/useProductListQuery';
 import { useTenant } from '@/components/provider/TenantProvider';
 
 type ProductRow = {
@@ -17,10 +18,18 @@ type ProductRow = {
 	stocks: string;
 	basePrice: string;
 	stockType: StockType;
+	categoryId: string;
 };
 
 function makeRow(): ProductRow {
-	return { id: crypto.randomUUID(), productName: '', stocks: '', basePrice: '', stockType: StockType.TRACKED };
+	return {
+		id: crypto.randomUUID(),
+		productName: '',
+		stocks: '',
+		basePrice: '',
+		categoryId: 'none',
+		stockType: StockType.TRACKED,
+	};
 }
 
 export default function AddProductForm() {
@@ -29,6 +38,10 @@ export default function AddProductForm() {
 	const queryClient: QueryClient = useQueryClient();
 
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
+	const tenantId = selectedTenant?.id ?? 0;
+
+	// Get cached query if available, if not immediately fetch it
+	const categoriesQuery = useCategoriesQuery(tenantId);
 
 	const [rows, setRows] = useState<ProductRow[]>(() => [makeRow()]);
 
@@ -40,10 +53,6 @@ export default function AddProductForm() {
 
 	const updateRow = useCallback((id: string, field: keyof Omit<ProductRow, 'id'>, value: string) => {
 		setRows(prev => prev.map(r => (r.id === id ? { ...r, [field]: value } : r)));
-	}, []);
-
-	const updateStockType = useCallback((id: string, value: StockType) => {
-		setRows(prev => prev.map(r => (r.id === id ? { ...r, stockType: value } : r)));
 	}, []);
 
 	const handleClear = useCallback(() => setRows([makeRow()]), []);
@@ -70,6 +79,7 @@ export default function AddProductForm() {
 			stocks: r.stocks === '' ? 0 : Number(r.stocks),
 			base_price: r.basePrice === '' ? 0 : Number(r.basePrice),
 			stock_type: r.stockType,
+			category_id: r.categoryId,
 		}));
 
 		formState.setFormLoading(true);
@@ -78,11 +88,12 @@ export default function AddProductForm() {
 			if (error !== null) {
 				formState.setError({ message: error });
 			} else {
-				console.log(queryClient);
-				queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
 				const count = (result ?? []).length;
 				formState.setSuccess({ message: `${count} product${count > 1 ? 's' : ''} created successfully.` });
 				handleClear();
+
+				// Will make the product list refetch with fresh data include with new added data
+				queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
 			}
 		} catch (e: unknown) {
 			console.warn(e);
@@ -136,6 +147,7 @@ export default function AddProductForm() {
 								</th>
 								<th style={{ width: '12rem' }}>Quantity</th>
 								<th style={{ width: '14rem' }}>Base Price</th>
+								<th style={{ width: '14rem' }}>Categories</th>
 								<th style={{ width: '14rem' }}>Stock Type</th>
 								<th style={{ width: '4rem' }}></th>
 							</tr>
@@ -179,9 +191,26 @@ export default function AddProductForm() {
 									<td>
 										<select
 											className="form-select form-select-sm"
+											disabled={formState.state.isFormLoading || categoriesQuery.isError}
+											value={'none'}
+											onChange={e => updateRow(row.id, 'categoryId', e.target.value)}
+										>
+											<option className="text-gray" value={'none'}>
+												-
+											</option>
+											{categoriesQuery.data?.map(category => (
+												<option key={category.id} className="text-gray" value={category.id}>
+													{category.categoryName}
+												</option>
+											))}
+										</select>
+									</td>
+									<td>
+										<select
+											className="form-select form-select-sm"
 											disabled={formState.state.isFormLoading}
 											value={row.stockType}
-											onChange={e => updateStockType(row.id, e.target.value as StockType)}
+											onChange={e => updateRow(row.id, 'stockType', e.target.value)}
 										>
 											<option className="text-gray" value={StockType.TRACKED}>
 												(T) Tracked

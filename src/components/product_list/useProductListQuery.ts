@@ -8,6 +8,7 @@ import { getCategories } from '@/_lib/category';
 import { getCategoryWithItems } from '@/_lib/client_category';
 import { Constants } from '@/components/core/data/constant';
 import { useProductListStore } from '@/components/store/productListStore';
+import { minutes } from '@/components/core/utils/timeMillis';
 
 export function useProductListQuery(token: string, tenantId: number) {
 	const { pagination, appliedNameQuery, appliedCategoryId, appliedSort } = useProductListStore();
@@ -47,16 +48,16 @@ export function useProductListQuery(token: string, tenantId: number) {
 	});
 }
 
-export function useProductCategoriesQuery(tenantId: number) {
+export function useCategoriesQuery(tenantId: number) {
 	return useQuery({
-		queryKey: [Constants.ReactQueryKey.productCategories, tenantId],
+		queryKey: [Constants.ReactQueryKey.categories, tenantId],
 		queryFn: () => getCategories(tenantId, 1, 100, ''),
 		select: (data: HTTPResult<{ categoryDefs: CategoryDef[]; count: number }>) => {
 			if (data.error) throw new Error(data.error);
 			return data.result!.categoryDefs.map(def => new Category(def));
 		},
 		enabled: tenantId !== 0,
-		staleTime: 1000 * 60 * 5,
+		staleTime: minutes(5),
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: true,
 	});
