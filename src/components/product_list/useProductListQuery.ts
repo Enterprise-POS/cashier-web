@@ -6,9 +6,9 @@ import { CategoryDef, CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { getCategories } from '@/_lib/category';
 import { getCategoryWithItems } from '@/_lib/client_category';
+import { minutes } from '@/_lib/utils';
 import { Constants } from '@/components/core/data/constant';
 import { useProductListStore } from '@/components/store/productListStore';
-import { minutes } from '@/components/core/utils/timeMillis';
 
 export function useProductListQuery(token: string, tenantId: number) {
 	const { pagination, appliedNameQuery, appliedCategoryId, appliedSort } = useProductListStore();

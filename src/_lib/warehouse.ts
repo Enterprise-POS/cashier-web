@@ -166,7 +166,13 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 	}
 }
 
-type NewItemPayload = { item_name: string; stocks: number; base_price: number; stock_type: StockType };
+type NewItemPayload = {
+	item_name: string;
+	stocks: number;
+	base_price: number;
+	stock_type: StockType;
+	category_id: number;
+};
 
 export async function createItems(tenantId: number, items: NewItemPayload[]): Promise<HTTPResult<ItemDef[]>> {
 	const auth = await getAuth();

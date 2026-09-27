@@ -6,6 +6,7 @@ import { PlusCircle, Trash2 } from 'react-feather';
 
 import { Tenant } from '@/_classes/Tenant';
 import { StockType } from '@/_interface/ItemDef';
+import { convertTo } from '@/_lib/utils';
 import { createItems } from '@/_lib/warehouse';
 import { Constants } from '@/components/core/data/constant';
 import { useFormState } from '@/components/hooks/useFormState';
@@ -76,10 +77,10 @@ export default function AddProductForm() {
 
 		const items = rows.map(r => ({
 			item_name: r.productName.trim(),
-			stocks: r.stocks === '' ? 0 : Number(r.stocks),
-			base_price: r.basePrice === '' ? 0 : Number(r.basePrice),
+			stocks: convertTo.number(r.stocks),
+			base_price: convertTo.number(r.basePrice),
 			stock_type: r.stockType,
-			category_id: r.categoryId,
+			category_id: convertTo.number(r.categoryId),
 		}));
 
 		formState.setFormLoading(true);

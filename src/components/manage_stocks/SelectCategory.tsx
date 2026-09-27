@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { Category } from '@/_classes/Category';
 import { CategoryDef } from '@/_interface/CategoryDef';
 import { getCategories } from '@/_lib/category';
+import { minutes } from '@/_lib/utils';
 import { Constants } from '@/components/core/data/constant';
-import { minutes } from '@/components/core/utils/timeMillis';
 import { useQuery } from '@tanstack/react-query';
 
 const LIMIT_CATEGORIES = 100;
