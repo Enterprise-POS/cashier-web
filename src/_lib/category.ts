@@ -16,7 +16,7 @@ export async function getCategories(
 	tenantId: number,
 	page: number,
 	limit: number,
-	nameQuery: string
+	nameQuery: string,
 ): Promise<HTTPResult<{ categoryDefs: CategoryDef[]; count: number }>> {
 	const params = new URLSearchParams({
 		tenantId: tenantId.toString(),
@@ -34,7 +34,7 @@ export async function getCategories(
 
 	const response = await fetch(
 		serverRoutes.getCategories.replace('<tenantId>', tenantId.toString()) + paramsString,
-		requestInit
+		requestInit,
 	);
 	if (!response.ok) {
 		let body: ErrorResponse;

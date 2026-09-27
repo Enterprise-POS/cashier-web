@@ -3,7 +3,7 @@ import { QueryFilter, SortState } from '@/_interface/QueryFilter';
 export const convertTo = {
 	number: (v: unknown) => {
 		const value = Number(v);
-		return isNaN(value) ? null : value;
+		return isNaN(value) ? 0 : value;
 	},
 };
 
@@ -61,3 +61,8 @@ export function convertQueryFilters(queryFilters: QueryFilter[]): string {
 export function buildQueryFilters(sorts: SortState[]): QueryFilter[] {
 	return sorts.map(sort => ({ column: sort.column, ascending: sort.ascending }));
 }
+
+export const seconds = (n: number) => n * 1000;
+export const minutes = (n: number) => n * 60 * 1000;
+export const hours = (n: number) => n * 60 * 60 * 1000;
+export const days = (n: number) => n * 24 * 60 * 60 * 1000;

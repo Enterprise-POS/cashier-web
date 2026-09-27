@@ -1,27 +1,50 @@
 'use client';
 
-import { Tenant } from '@/_classes/Tenant';
-import { createItems } from '@/_lib/warehouse';
-import { useFormState } from '@/components/hooks/useFormState';
-import { useTenant } from '@/components/provider/TenantProvider';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { PlusCircle, Trash2 } from 'react-feather';
+
+import { Tenant } from '@/_classes/Tenant';
+import { StockType } from '@/_interface/ItemDef';
+import { registerCategory } from '@/_lib/client_category';
+import { convertTo } from '@/_lib/utils';
+import { createItems } from '@/_lib/warehouse';
+import { Constants } from '@/components/core/data/constant';
+import { useFormState } from '@/components/hooks/useFormState';
+import { useCategoriesQuery } from '@/components/product_list/useProductListQuery';
+import { useTenant } from '@/components/provider/TenantProvider';
+import { RegisterCategory } from '@/_interface/RequestBody.js';
 
 type ProductRow = {
 	id: string;
 	productName: string;
 	stocks: string;
 	basePrice: string;
+	stockType: StockType;
+	categoryId: string;
 };
 
 function makeRow(): ProductRow {
-	return { id: crypto.randomUUID(), productName: '', stocks: '', basePrice: '' };
+	return {
+		id: crypto.randomUUID(),
+		productName: '',
+		stocks: '',
+		basePrice: '',
+		categoryId: 'none',
+		stockType: StockType.TRACKED,
+	};
 }
 
-export default function AddProductForm() {
+export default function AddProductForm({ token }: { token: string }) {
 	const formState = useFormState();
 	const { data } = useTenant();
+	const queryClient: QueryClient = useQueryClient();
+
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
+	const tenantId = selectedTenant?.id ?? 0;
+
+	// Get cached query if available, if not immediately fetch it
+	const categoriesQuery = useCategoriesQuery(tenantId);
 
 	const [rows, setRows] = useState<ProductRow[]>(() => [makeRow()]);
 
@@ -41,7 +64,6 @@ export default function AddProductForm() {
 		e.preventDefault();
 		if (formState.state.isFormLoading) return;
 
-		const tenantId = selectedTenant?.id;
 		if (!tenantId) {
 			formState.setError({ message: 'No tenant selected.' });
 			return;
@@ -56,22 +78,55 @@ export default function AddProductForm() {
 
 		const items = rows.map(r => ({
 			item_name: r.productName.trim(),
-			stocks: r.stocks === '' ? 0 : Number(r.stocks),
-			base_price: r.basePrice === '' ? 0 : Number(r.basePrice),
+			stocks: convertTo.number(r.stocks),
+			base_price: convertTo.number(r.basePrice),
+			stock_type: r.stockType,
+			category_id: convertTo.number(r.categoryId),
 		}));
 
 		formState.setFormLoading(true);
 		try {
-			const { result, error } = await createItems(tenantId, items);
-			if (error !== null) {
-				formState.setError({ message: error });
-			} else {
-				const count = (result ?? []).length;
-				formState.setSuccess({ message: `${count} product${count > 1 ? 's' : ''} created successfully.` });
-				handleClear();
+			const { result: createItemsRes, error: createItemsErr } = await createItems(tenantId, items);
+
+			if (createItemsErr !== null || createItemsRes === null) {
+				formState.setError({ message: createItemsErr ?? 'Failed to create products.' });
+				return;
 			}
+
+			if (createItemsRes.length !== rows.length) {
+				console.error('createItems response length mismatch', { expected: rows.length, got: createItemsRes.length });
+				formState.setError({ message: 'Unexpected response from server while creating products.' });
+				return;
+			}
+
+			const tobeRegisterCategory: RegisterCategory = { tobe_registers: [] };
+			rows.forEach((row, i) => {
+				const categoryId = convertTo.number(row.categoryId);
+				if (categoryId > 0) {
+					const { item_id } = createItemsRes[i];
+					tobeRegisterCategory.tobe_registers.push({ item_id, category_id: categoryId });
+				}
+			});
+
+			let categoryWarning: string | null = null;
+			if (tobeRegisterCategory.tobe_registers.length > 0) {
+				const { error: registerCategoryErr } = await registerCategory(tenantId, token, tobeRegisterCategory);
+				if (registerCategoryErr !== null) {
+					categoryWarning = ` (category assignment failed: ${registerCategoryErr})`;
+				}
+			}
+
+			const count = createItemsRes.length;
+			formState.setSuccess({
+				message: `${count} product${count > 1 ? 's' : ''} created successfully.${categoryWarning ?? ''}`,
+			});
+			handleClear();
+
+			queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
 		} catch (e: unknown) {
-			console.warn(e);
+			const error = e as Error;
+			console.error(error);
+			formState.setError({ message: error.message ?? 'Unexpected error while creating products.' });
 		} finally {
 			formState.setFormLoading(false);
 		}
@@ -117,9 +172,13 @@ export default function AddProductForm() {
 						<thead className="table-light">
 							<tr>
 								<th style={{ width: '3rem' }}>No</th>
-								<th>Product Name <span className="text-danger">*</span></th>
+								<th>
+									Product Name <span className="text-danger">*</span>
+								</th>
 								<th style={{ width: '12rem' }}>Quantity</th>
 								<th style={{ width: '14rem' }}>Base Price</th>
+								<th style={{ width: '14rem' }}>Category</th>
+								<th style={{ width: '14rem' }}>Stock Type</th>
 								<th style={{ width: '4rem' }}></th>
 							</tr>
 						</thead>
@@ -159,6 +218,38 @@ export default function AddProductForm() {
 											onChange={e => updateRow(row.id, 'basePrice', e.target.value)}
 										/>
 									</td>
+									<td>
+										<select
+											className="form-select form-select-sm"
+											disabled={formState.state.isFormLoading || categoriesQuery.isError}
+											value={row.categoryId}
+											onChange={e => updateRow(row.id, 'categoryId', e.target.value)}
+										>
+											<option className="text-gray" value={'none'}>
+												-
+											</option>
+											{categoriesQuery.data?.map(category => (
+												<option key={category.id} className="text-gray" value={category.id}>
+													{category.categoryName}
+												</option>
+											))}
+										</select>
+									</td>
+									<td>
+										<select
+											className="form-select form-select-sm"
+											disabled={formState.state.isFormLoading}
+											value={row.stockType}
+											onChange={e => updateRow(row.id, 'stockType', e.target.value)}
+										>
+											<option className="text-gray" value={StockType.TRACKED}>
+												(T) Tracked
+											</option>
+											<option className="text-gray" value={StockType.UNLIMITED}>
+												(U) Unlimited
+											</option>
+										</select>
+									</td>
 									<td className="text-center">
 										<button
 											type="button"
@@ -175,7 +266,7 @@ export default function AddProductForm() {
 						</tbody>
 						<tfoot>
 							<tr>
-								<td colSpan={5}>
+								<td colSpan={7}>
 									<button
 										type="button"
 										className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
@@ -192,7 +283,12 @@ export default function AddProductForm() {
 				</div>
 
 				<div className="d-flex align-items-center justify-content-end mb-4 gap-2">
-					<button type="button" className="btn btn-secondary" disabled={formState.state.isFormLoading} onClick={handleClear}>
+					<button
+						type="button"
+						className="btn btn-secondary"
+						disabled={formState.state.isFormLoading}
+						onClick={handleClear}
+					>
 						Clear
 					</button>
 					<button

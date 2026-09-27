@@ -46,22 +46,22 @@ export default function SalesReport() {
 			sorter: (a: OrderItem, b: OrderItem) => a.id - b.id,
 		},
 		{
-			title: 'Purchased Price',
+			title: 'Cash-in',
 			dataIndex: 'purchasedPrice',
 			sorter: (a: OrderItem, b: OrderItem) => a.purchasedPrice - b.purchasedPrice,
 			render: (purchasedPrice: number) => formatIDR(purchasedPrice),
 		},
+		// {
+		// 	title: 'Sub Total',
+		// 	dataIndex: 'subTotal',
+		// 	sorter: (a: OrderItem, b: OrderItem) => a.subTotal - b.subTotal,
+		// 	render: (subTotal: number) => formatIDR(subTotal),
+		// },
 		{
-			title: 'Sub Total',
-			dataIndex: 'subTotal',
-			sorter: (a: OrderItem, b: OrderItem) => a.subTotal - b.subTotal,
-			render: (subTotal: number) => formatIDR(subTotal),
-		},
-		{
-			title: 'Gross Sales',
-			dataIndex: 'subTotal',
+			title: 'Revenue',
+			dataIndex: 'totalAmount',
 			sorter: (a: OrderItem, b: OrderItem) => a.totalAmount - b.totalAmount,
-			render: (subTotal: number) => formatIDR(subTotal),
+			render: (totalAmount: number) => formatIDR(totalAmount),
 		},
 		{
 			title: 'Change',
@@ -84,7 +84,7 @@ export default function SalesReport() {
 			dataIndex: 'createdAt',
 			sorter: (a: OrderItem, b: OrderItem) => a.createdAt.getTime() - b.createdAt.getTime(),
 			render: (id: number, orderItem: OrderItem) =>
-				dayjs.utc(orderItem.createdAt).local().format('ddd D MMM, YYYY - h:mm A'),
+				dayjs.utc(orderItem.createdAt).local().format('ddd D MMM, YYYY - H:mm'),
 		},
 		{
 			title: 'Action',
@@ -133,13 +133,6 @@ export default function SalesReport() {
 							<Tooltip title="Refresh">
 								<Link href="#" onClick={() => onEvent(new OnClickRefreshBtn())}>
 									<i className="ti ti-refresh"></i>
-								</Link>
-							</Tooltip>
-						</li>
-						<li>
-							<Tooltip title="Print Report">
-								<Link href="#" data-bs-toggle="tooltip" data-bs-placement="top" title="Print">
-									<i className="ti ti-printer" />
 								</Link>
 							</Tooltip>
 						</li>

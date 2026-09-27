@@ -1,10 +1,12 @@
 // hooks/useHomeDashboardQueries.ts
-import { useQuery } from '@tanstack/react-query';
-import { orderItemSalesReport, orderItemGetSearch } from '@/_lib/client_order_item';
 import { DateFilter } from '@/_interface/DateFilter';
 import { HTTPResult } from '@/_interface/HTTPResult';
+import { OrderItemDef } from '@/_interface/OrderItemDef';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
-import { OrderItemDef } from '@/_interface/OrderItemDef.js';
+import { orderItemGetSearch, orderItemSalesReport } from '@/_lib/client_order_item';
+import { Constants } from '@/components/core/data/constant';
+
+import { useQuery } from '@tanstack/react-query';
 
 export function useDashboardData(
 	tenantId: number,
@@ -15,7 +17,7 @@ export function useDashboardData(
 	token: string,
 ) {
 	const salesQuery = useQuery({
-		queryKey: ['salesReport', tenantId, storeId, dateFilter],
+		queryKey: [Constants.ReactQueryKey.salesReport, tenantId, storeId, dateFilter],
 		queryFn: () => orderItemSalesReport(tenantId, storeId, dateFilter, token),
 		enabled: tenantId !== 0,
 		staleTime: 1000 * 60 * 5, // cache for 5 min
@@ -26,7 +28,7 @@ export function useDashboardData(
 	});
 
 	const orderItemsQuery = useQuery({
-		queryKey: ['orderItems', tenantId, storeId, page, pageSize, dateFilter],
+		queryKey: [Constants.ReactQueryKey.orderItems, tenantId, storeId, page, pageSize, dateFilter],
 		queryFn: () => orderItemGetSearch(tenantId, storeId, pageSize, page, dateFilter, token),
 		enabled: tenantId !== 0,
 		staleTime: 1000 * 60 * 5,

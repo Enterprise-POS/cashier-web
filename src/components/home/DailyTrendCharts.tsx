@@ -3,7 +3,6 @@
 import type { ApexAxisChartSeries, ApexOptions } from 'apexcharts';
 import dynamic from 'next/dynamic';
 
-import type { ReportResult } from '@/_classes/ReportResult';
 import type { DailyTrendDef } from '@/_interface/ReportResultDef';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -14,13 +13,7 @@ const PRIMARY_COLOR = '#FF9F43';
 const REVENUE_COLOR = '#28C76F';
 const COUNT_COLOR = '#4F46E5';
 
-interface DailyTrendChartProps {
-	report: ReportResult;
-}
-
-export default function DailyTrendChart({ report }: DailyTrendChartProps) {
-	const dailyTrend: DailyTrendDef[] = report.dailyTrend ?? [];
-
+export default function DailyTrendChart({ dailyTrend }: { dailyTrend: DailyTrendDef[] }) {
 	const categories = dailyTrend.map(d => d.date);
 	const amounts = dailyTrend.map(d => d.total_amount);
 	const revenue = dailyTrend.map(d => d.revenue);

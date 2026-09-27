@@ -1,7 +1,6 @@
 'use client';
-import { useIsFetching, useQueryClient } from '@tanstack/react-query';
+import { QueryKey, useIsFetching, useQueryClient } from '@tanstack/react-query';
 import { Tooltip } from 'antd';
-import { QueryKey } from '@tanstack/react-query';
 
 type RefreshIconProps = {
 	queryKey: QueryKey; // e.g. ['productList'] or ['productList', tenantId]

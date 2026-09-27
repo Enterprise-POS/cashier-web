@@ -7,7 +7,7 @@ import { getAllV2 } from '@/_lib/store_stock';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { useEditStockInfoStore } from '@/components/store/editStockInfoStore';
-import { SortBy } from '@/components/core/data/constant';
+import { Constants, SortBy } from '@/components/core/data/constant';
 
 export function useEditStockInfoQuery(token: string) {
 	const storeCtx = useStore();
@@ -19,7 +19,7 @@ export function useEditStockInfoQuery(token: string) {
 
 	return useQuery({
 		queryKey: [
-			'editStockInfo',
+			Constants.ReactQueryKey.editStockInfo,
 			tenantId,
 			storeId,
 			pagination.current,

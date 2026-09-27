@@ -1,4 +1,5 @@
 'use client';
+import { useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Info, LifeBuoy, PlusCircle } from 'react-feather';
@@ -11,6 +12,7 @@ import { StockType } from '@/_interface/ItemDef';
 import { registerCategory } from '@/_lib/category';
 import { hideBootstrapModal } from '@/_lib/utils';
 import { editWarehouseItem } from '@/_lib/warehouse';
+import { Constants } from '@/components/core/data/constant';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
@@ -26,6 +28,7 @@ export function ItemDetails({
 	categoryDefs: CategoryDef[];
 	token: string;
 }) {
+	const queryClient = useQueryClient();
 	const [isMounted, setIsMounted] = useState(false);
 	const { data, isStateLoading: loadingUserTenant } = useTenant();
 	const formState = useFormState();
@@ -64,9 +67,13 @@ export function ItemDetails({
 			// Success
 			formState.setSuccess({ message: 'Update success' });
 			setAddAndReduceCounter(0);
-			setCurrentItem(
-				v =>
-					new CategoryWithItem({
+
+			// When user back to product list, immediately the page is loaded with fresh data
+			queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
+
+			// Make the updated data instantly appear
+			// prettier-ignore
+			setCurrentItem(v => new CategoryWithItem({
 						category_id: changedCategory?.value ?? 0,
 						category_name: changedCategory?.label ?? '',
 						item_name: inpItemName,

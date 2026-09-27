@@ -1,10 +1,15 @@
 import Link from 'next/link';
+import { useMemo } from 'react';
 
-import { getCategories } from '@/_lib/category';
-import { useQuery } from '@tanstack/react-query';
 import { Category } from '@/_classes/Category';
 import { CategoryDef } from '@/_interface/CategoryDef';
-import { useMemo } from 'react';
+import { getCategories } from '@/_lib/category';
+import { minutes } from '@/_lib/utils';
+import { Constants } from '@/components/core/data/constant';
+import { useQuery } from '@tanstack/react-query';
+
+const LIMIT_CATEGORIES = 100;
+const PAGE_CATEGORIES = 1;
 
 export function SelectCategory({
 	tenantId,
@@ -16,10 +21,10 @@ export function SelectCategory({
 	onSelected: (categoryId: number, categoryName: string) => void;
 }) {
 	const categoriesQuery = useQuery({
-		queryKey: ['categories', tenantId],
-		queryFn: () => getCategories(tenantId, 1, 100, ''),
+		queryKey: [Constants.ReactQueryKey.categories, tenantId],
+		queryFn: () => getCategories(tenantId, PAGE_CATEGORIES, LIMIT_CATEGORIES, ''), // get page 1 with limit 100 categories, without querying category name
 		enabled: tenantId !== 0 && isModalOpen,
-		staleTime: 1000 * 60 * 5, // cache for 5 min
+		staleTime: minutes(5),
 	});
 
 	const categories = useMemo(() => {

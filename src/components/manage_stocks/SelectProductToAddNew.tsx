@@ -3,10 +3,11 @@ import { Input, Pagination } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Item } from '@/_classes/Item';
-import { ItemDef } from '@/_interface/ItemDef';
+import { ItemDef, StockType } from '@/_interface/ItemDef';
 import { getActiveWarehouseItem } from '@/_lib/warehouse';
+import { Constants } from '@/components/core/data/constant';
 
-type SelectedEntry = { itemName: string; stocks: number };
+type SelectedEntry = { itemName: string; stocks: number; stockType: StockType };
 
 export function SelectProductToAddNew({
 	tenantId,
@@ -15,7 +16,7 @@ export function SelectProductToAddNew({
 }: {
 	tenantId: number;
 	isModalOpen: boolean;
-	onSelected: (items: Array<{ itemId: number; itemName: string; stocks: number }>) => void;
+	onSelected: (items: Array<{ itemId: number; itemName: string; stocks: number; stockType: StockType }>) => void;
 }) {
 	const [nameQuery, setNameQuery] = useState('');
 	const [appliedQuery, setAppliedQuery] = useState('');
@@ -28,7 +29,7 @@ export function SelectProductToAddNew({
 	}, [isModalOpen]);
 
 	const warehouseItemQuery = useQuery({
-		queryKey: ['warehouse', tenantId, page, appliedQuery],
+		queryKey: [Constants.ReactQueryKey.warehouse, tenantId, page, appliedQuery],
 		queryFn: () => getActiveWarehouseItem(tenantId, limit, page, appliedQuery),
 		enabled: tenantId !== 0 && isModalOpen,
 		staleTime: 1000 * 60 * 5,
@@ -61,7 +62,7 @@ export function SelectProductToAddNew({
 			if (next.has(item.id)) {
 				next.delete(item.id);
 			} else {
-				next.set(item.id, { itemName: item.itemName, stocks: item.stocks });
+				next.set(item.id, { itemName: item.itemName, stocks: item.stocks, stockType: item.stockType });
 			}
 			return next;
 		});
@@ -69,10 +70,11 @@ export function SelectProductToAddNew({
 
 	const handleConfirm = () => {
 		onSelected(
-			Array.from(selectedItems.entries()).map(([itemId, { itemName, stocks }]) => ({
+			Array.from(selectedItems.entries()).map(([itemId, { itemName, stocks, stockType }]) => ({
 				itemId,
 				itemName,
 				stocks,
+				stockType,
 			})),
 		);
 	};

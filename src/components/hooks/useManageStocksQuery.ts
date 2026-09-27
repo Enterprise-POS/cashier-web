@@ -5,6 +5,7 @@ import { HTTPResult } from '@/_interface/HTTPResult';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { getAllV2 } from '@/_lib/store_stock';
 import { buildQueryFilters } from '@/_lib/utils';
+import { Constants } from '@/components/core/data/constant';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
@@ -19,7 +20,7 @@ export function useManageStocksQuery(token: string) {
 
 	return useQuery({
 		queryKey: [
-			'storeStocks',
+			Constants.ReactQueryKey.storeStocks,
 			tenantId,
 			storeId,
 			pagination.current,
