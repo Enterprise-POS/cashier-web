@@ -2,6 +2,8 @@ import { CategoryWithItemDef } from '@/_interface/CategoryDef';
 import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
+import { RegisterCategory } from '@/_interface/RequestBody';
+import { StatusCode } from '@/components/core/data/constant';
 import { server_routes } from '@/components/core/data/server_routes';
 import type { ProductListSort } from '@/components/store/productListStore';
 
@@ -73,5 +75,60 @@ export async function getCategoryWithItems(
 
 		console.error(error);
 		return { result: null, error: '[UNHANDLED ERROR] Unknown error' };
+	}
+}
+
+// Different from registerCategory from _lib/category.ts
+// This function only support the register and will not handle delete, update
+export async function registerCategory(
+	tenantId: number,
+	token: string,
+	itemsWithCategory: RegisterCategory,
+): Promise<HTTPResult<void>> {
+	const requestInit: RequestInit = {
+		method: 'POST',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify(itemsWithCategory),
+	};
+
+	try {
+		const response = await fetch(
+			server_routes.registerCategory.replace('<tenantId>', tenantId.toString()),
+			requestInit,
+		);
+
+		if (!response.ok) {
+			let body: ErrorResponse;
+			try {
+				body = await response.json();
+			} catch {
+				body = {
+					code: response.status,
+					status: 'error',
+					message: response.statusText.trim(),
+				};
+			}
+
+			switch (response.status) {
+				case StatusCode.UNAUTHORIZED:
+				case StatusCode.FORBIDDEN:
+				case StatusCode.BAD_REQUEST:
+					return { result: null, error: body.message };
+				default:
+					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
+					return { result: null, error: body.message };
+			}
+		}
+
+		// OK 202 - Request accepted
+		return { result: null, error: null };
+	} catch (e) {
+		const error = e as Error;
+		console.error(`Unexpected error from category.registerCategory. error: ${error.message}`);
+		return { result: null, error: error.message };
 	}
 }

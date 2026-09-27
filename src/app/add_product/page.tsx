@@ -1,13 +1,19 @@
 import AddProductForm from '@/components/add_product/AddProductForm';
-import { all_routes } from '@/components/core/data/all_routes';
+import { all_routes as routes } from '@/components/core/data/all_routes';
+import { Constants } from '@/components/core/data/constant';
 import Footer from '@/components/partials/footer';
 import CollapseIcon from '@/components/tooltip-content/collapse';
 
+import { cookies } from 'next/headers';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { ArrowLeft } from 'react-feather';
 
-export default function AddProductComponent() {
-	const route = all_routes;
+export default async function AddProductComponent() {
+	// Check if user logged in
+	const cookieStore = await cookies();
+	const token = cookieStore.get(Constants.CookieKey.enterprisePOS)?.value ?? '';
+	if (token === '') return redirect(routes.login);
 
 	return (
 		<>
@@ -24,7 +30,7 @@ export default function AddProductComponent() {
 							<CollapseIcon />
 							<li>
 								<div className="page-btn">
-									<Link href={route.productList} className="btn btn-secondary">
+									<Link href={routes.productList} className="btn btn-secondary">
 										<ArrowLeft className="me-2" />
 										Back to Product
 									</Link>
@@ -33,7 +39,7 @@ export default function AddProductComponent() {
 						</ul>
 					</div>
 					{/* /add */}
-					<AddProductForm />
+					<AddProductForm token={token} />
 					{/* /add */}
 				</div>
 				<Footer />

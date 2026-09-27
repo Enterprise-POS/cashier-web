@@ -6,12 +6,14 @@ import { PlusCircle, Trash2 } from 'react-feather';
 
 import { Tenant } from '@/_classes/Tenant';
 import { StockType } from '@/_interface/ItemDef';
+import { registerCategory } from '@/_lib/client_category';
 import { convertTo } from '@/_lib/utils';
 import { createItems } from '@/_lib/warehouse';
 import { Constants } from '@/components/core/data/constant';
 import { useFormState } from '@/components/hooks/useFormState';
 import { useCategoriesQuery } from '@/components/product_list/useProductListQuery';
 import { useTenant } from '@/components/provider/TenantProvider';
+import { RegisterCategory } from '@/_interface/RequestBody.js';
 
 type ProductRow = {
 	id: string;
@@ -33,7 +35,7 @@ function makeRow(): ProductRow {
 	};
 }
 
-export default function AddProductForm() {
+export default function AddProductForm({ token }: { token: string }) {
 	const formState = useFormState();
 	const { data } = useTenant();
 	const queryClient: QueryClient = useQueryClient();
@@ -62,7 +64,6 @@ export default function AddProductForm() {
 		e.preventDefault();
 		if (formState.state.isFormLoading) return;
 
-		const tenantId = selectedTenant?.id;
 		if (!tenantId) {
 			formState.setError({ message: 'No tenant selected.' });
 			return;
@@ -85,19 +86,47 @@ export default function AddProductForm() {
 
 		formState.setFormLoading(true);
 		try {
-			const { result, error } = await createItems(tenantId, items);
-			if (error !== null) {
-				formState.setError({ message: error });
-			} else {
-				const count = (result ?? []).length;
-				formState.setSuccess({ message: `${count} product${count > 1 ? 's' : ''} created successfully.` });
-				handleClear();
+			const { result: createItemsRes, error: createItemsErr } = await createItems(tenantId, items);
 
-				// Will make the product list refetch with fresh data include with new added data
-				queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
+			if (createItemsErr !== null || createItemsRes === null) {
+				formState.setError({ message: createItemsErr ?? 'Failed to create products.' });
+				return;
 			}
+
+			if (createItemsRes.length !== rows.length) {
+				console.error('createItems response length mismatch', { expected: rows.length, got: createItemsRes.length });
+				formState.setError({ message: 'Unexpected response from server while creating products.' });
+				return;
+			}
+
+			const tobeRegisterCategory: RegisterCategory = { tobe_registers: [] };
+			rows.forEach((row, i) => {
+				const categoryId = convertTo.number(row.categoryId);
+				if (categoryId > 0) {
+					const { item_id } = createItemsRes[i];
+					tobeRegisterCategory.tobe_registers.push({ item_id, category_id: categoryId });
+				}
+			});
+
+			let categoryWarning: string | null = null;
+			if (tobeRegisterCategory.tobe_registers.length > 0) {
+				const { error: registerCategoryErr } = await registerCategory(tenantId, token, tobeRegisterCategory);
+				if (registerCategoryErr !== null) {
+					categoryWarning = ` (category assignment failed: ${registerCategoryErr})`;
+				}
+			}
+
+			const count = createItemsRes.length;
+			formState.setSuccess({
+				message: `${count} product${count > 1 ? 's' : ''} created successfully.${categoryWarning ?? ''}`,
+			});
+			handleClear();
+
+			queryClient.refetchQueries({ queryKey: [Constants.ReactQueryKey.productList] });
 		} catch (e: unknown) {
-			console.warn(e);
+			const error = e as Error;
+			console.error(error);
+			formState.setError({ message: error.message ?? 'Unexpected error while creating products.' });
 		} finally {
 			formState.setFormLoading(false);
 		}
@@ -148,7 +177,7 @@ export default function AddProductForm() {
 								</th>
 								<th style={{ width: '12rem' }}>Quantity</th>
 								<th style={{ width: '14rem' }}>Base Price</th>
-								<th style={{ width: '14rem' }}>Categories</th>
+								<th style={{ width: '14rem' }}>Category</th>
 								<th style={{ width: '14rem' }}>Stock Type</th>
 								<th style={{ width: '4rem' }}></th>
 							</tr>
@@ -193,7 +222,7 @@ export default function AddProductForm() {
 										<select
 											className="form-select form-select-sm"
 											disabled={formState.state.isFormLoading || categoriesQuery.isError}
-											value={'none'}
+											value={row.categoryId}
 											onChange={e => updateRow(row.id, 'categoryId', e.target.value)}
 										>
 											<option className="text-gray" value={'none'}>
@@ -237,7 +266,7 @@ export default function AddProductForm() {
 						</tbody>
 						<tfoot>
 							<tr>
-								<td colSpan={6}>
+								<td colSpan={7}>
 									<button
 										type="button"
 										className="btn btn-sm btn-outline-primary d-flex align-items-center gap-1"
