@@ -40,6 +40,8 @@ export async function emailAndPasswordSignInAction(formData: FormData): Promise<
 			body: JSON.stringify(loginForm),
 		});
 
+		console.log('DEBUG', response);
+
 		if (!response.ok) {
 			// convert error response1
 			const body = await response.json();
