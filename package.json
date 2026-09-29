@@ -14,11 +14,12 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.21",
+    "@tanstack/react-query-devtools": "^5.104.0",
     "@types/prop-types": "^15.7.15",
     "antd": "^5.26.5",
     "apexcharts": "^7.5.1",
     "jose": "^6.0.12",
-    "next": "15.4.10",
+    "next": "^16.3.6",
     "prop-types": "^15.8.1",
     "react": "^19.2.1",
     "react-apexcharts": "^2.1.1",
