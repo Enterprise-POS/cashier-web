@@ -11,7 +11,7 @@ import { Constants } from '@/components/core/data/constant';
 import { useProductListStore } from '@/components/store/productListStore';
 
 export function useProductListQuery(token: string, tenantId: number) {
-	const { pagination, appliedNameQuery, appliedCategoryId, appliedSort } = useProductListStore();
+	const { pagination, appliedNameQuery, appliedCategoryId, appliedSorts } = useProductListStore();
 
 	return useQuery({
 		queryKey: [
@@ -21,7 +21,7 @@ export function useProductListQuery(token: string, tenantId: number) {
 			pagination.pageSize,
 			appliedNameQuery,
 			appliedCategoryId,
-			appliedSort,
+			appliedSorts,
 		],
 		queryFn: () =>
 			getCategoryWithItems(
@@ -31,7 +31,7 @@ export function useProductListQuery(token: string, tenantId: number) {
 				tenantId,
 				token,
 				appliedCategoryId,
-				appliedSort,
+				appliedSorts,
 			),
 		select: (data: HTTPResult<{ items: CategoryWithItemDef[]; count: number }>) => {
 			if (data.error) throw new Error(data.error);

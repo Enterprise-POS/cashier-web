@@ -14,7 +14,7 @@ export async function getCategoryWithItems(
 	tenantId: number,
 	token: string,
 	categoryId: number = 0,
-	sort: ProductListSort | null = null,
+	sorts: ProductListSort[] = [],
 ): Promise<HTTPResult<{ items: CategoryWithItemDef[]; count: number }>> {
 	try {
 		const reqBody: {
@@ -28,7 +28,7 @@ export async function getCategoryWithItems(
 			limit,
 			name_query: nameQuery,
 			category_id: categoryId,
-			filters: sort ? [sort] : [],
+			filters: sorts,
 		};
 
 		const requestInit: RequestInit = {

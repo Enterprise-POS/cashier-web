@@ -18,7 +18,7 @@ const INITIAL_CATEGORY = {
 	categoryName: 'unselected',
 };
 
-const INITIAL_SORT = null;
+const INITIAL_SORT: ProductListSort[] = [];
 
 type Category = {
 	categoryId: number;
@@ -42,10 +42,10 @@ type FeedbackState = {
 type FilterState = {
 	nameQuery: string;
 	selectedCategory: Category;
-	sort: ProductListSort | null;
+	sorts: ProductListSort[];
 	appliedNameQuery: string;
 	appliedCategoryId: number;
-	appliedSort: ProductListSort | null;
+	appliedSorts: ProductListSort[];
 };
 
 type ProductListActions = {
@@ -57,7 +57,7 @@ type ProductListActions = {
 	setPagination: (pagination: TablePaginationConfig) => void;
 	setNameQuery: (query: string) => void;
 	setSelectedCategory: (value: Category) => void;
-	applyTableChange: (category: Category, sort: ProductListSort | null) => void;
+	applyTableChange: (category: Category, sorts: ProductListSort[]) => void;
 	applyFilters: () => void;
 	resetFilters: () => void;
 	handleRemoveItem: (
@@ -82,10 +82,10 @@ export const useProductListStore = create<ProductListStore>((set, get) => ({
 
 	nameQuery: '',
 	selectedCategory: INITIAL_CATEGORY,
-	sort: INITIAL_SORT,
+	sorts: INITIAL_SORT,
 	appliedNameQuery: '',
 	appliedCategoryId: 0,
-	appliedSort: INITIAL_SORT,
+	appliedSorts: INITIAL_SORT,
 
 	setLoading: loading => set({ isLoading: loading }),
 	setError: message => set({ isError: true, isSuccess: false, errorMessage: message }),
@@ -96,23 +96,23 @@ export const useProductListStore = create<ProductListStore>((set, get) => ({
 	setPagination: pagination => set({ pagination }),
 	setNameQuery: query => set({ nameQuery: query }),
 	setSelectedCategory: value => set({ selectedCategory: value }),
-	applyTableChange: (category, sort) => {
+	applyTableChange: (category, sorts) => {
 		const { nameQuery } = get();
 		set({
 			selectedCategory: category,
-			sort,
+			sorts,
 			appliedNameQuery: nameQuery,
 			appliedCategoryId: category.categoryId,
-			appliedSort: sort,
+			appliedSorts: sorts,
 			pagination: { ...INITIAL_PAGINATION },
 		});
 	},
 	applyFilters: () => {
-		const { nameQuery, selectedCategory, sort } = get();
+		const { nameQuery, selectedCategory, sorts } = get();
 		set({
 			appliedNameQuery: nameQuery,
 			appliedCategoryId: selectedCategory.categoryId,
-			appliedSort: sort,
+			appliedSorts: [...sorts],
 			pagination: { ...INITIAL_PAGINATION },
 		});
 	},
@@ -120,10 +120,10 @@ export const useProductListStore = create<ProductListStore>((set, get) => ({
 		set({
 			nameQuery: '',
 			selectedCategory: INITIAL_CATEGORY,
-			sort: INITIAL_SORT,
+			sorts: INITIAL_SORT,
 			appliedNameQuery: '',
 			appliedCategoryId: 0,
-			appliedSort: INITIAL_SORT,
+			appliedSorts: INITIAL_SORT,
 			pagination: { ...INITIAL_PAGINATION },
 		}),
 
