@@ -1,6 +1,6 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
+import { ConfigProvider, Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -85,26 +85,32 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 
 	type TableSorter = Parameters<NonNullable<TableProps<StoreStockV2>['onChange']>>[2];
 
-	const getSortFromTable = (tableSorter: TableSorter): SortState | null => {
-		const activeSorter = Array.isArray(tableSorter)
-			? tableSorter.find(currentSorter => currentSorter.order !== undefined)
-			: tableSorter;
-		if (!activeSorter?.order) return null;
-
-		const fieldName = Array.isArray(activeSorter.field)
-			? activeSorter.field.at(0)?.toString()
-			: activeSorter.field?.toString();
-		const sortColumnMap: Record<string, SortState['column']> = {
-			itemName: 'item_name',
-			createdAt: 'created_at',
+	const getSortsFromTable = (tableSorter: TableSorter): SortState[] => {
+		const activeSorters = Array.isArray(tableSorter) ? tableSorter : [tableSorter];
+		const sortColumnMap: Record<string, { column: SortState['column']; priority: number }> = {
+			itemName: { column: 'item_name', priority: 2 },
+			createdAt: { column: 'created_at', priority: 1 },
 		};
-		const column = fieldName === undefined ? undefined : sortColumnMap[fieldName];
-		if (column === undefined) return null;
 
-		return {
-			column,
-			ascending: activeSorter.order === 'ascend',
-		};
+		return activeSorters
+			.flatMap(activeSorter => {
+				if (!activeSorter.order) return [];
+
+				const fieldName = Array.isArray(activeSorter.field)
+					? activeSorter.field.at(0)?.toString()
+					: activeSorter.field?.toString();
+				const sortColumn = fieldName === undefined ? undefined : sortColumnMap[fieldName];
+				if (sortColumn === undefined) return [];
+
+				return [
+					{
+						...sortColumn,
+						ascending: activeSorter.order === 'ascend',
+					},
+				];
+			})
+			.sort((a, b) => b.priority - a.priority)
+			.map(({ column, ascending }) => ({ column, ascending }));
 	};
 
 	const handleTableChange: TableProps<StoreStockV2>['onChange'] = (_pagination, filters, tableSorter) => {
@@ -116,7 +122,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 				: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
 					selectedCategory.categoryName);
 
-		applyTableChange({ categoryId, categoryName }, getSortFromTable(tableSorter));
+		applyTableChange({ categoryId, categoryName }, getSortsFromTable(tableSorter));
 	};
 
 	const columns: TableColumnsType<StoreStockV2> = [
@@ -127,7 +133,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 		{
 			title: 'Product',
 			dataIndex: 'itemName',
-			sorter: true,
+			sorter: { multiple: 2 },
 			sortOrder: getSortOrder('item_name'),
 		},
 		{
@@ -198,7 +204,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 		{
 			title: 'Created At',
 			dataIndex: 'createdAt',
-			sorter: true,
+			sorter: { multiple: 1 },
 			sortOrder: getSortOrder('created_at'),
 			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
@@ -354,14 +360,16 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 				</div>
 
 				<div className="custom-datatable-filter table-responsive">
-					<Table<StoreStockV2>
-						rowKey={'itemId'}
-						columns={columns}
-						dataSource={storeStocks}
-						pagination={false}
-						loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
-						onChange={handleTableChange}
-					/>
+					<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
+						<Table<StoreStockV2>
+							rowKey={'itemId'}
+							columns={columns}
+							dataSource={storeStocks}
+							pagination={false}
+							loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
+							onChange={handleTableChange}
+						/>
+					</ConfigProvider>
 				</div>
 
 				<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">
