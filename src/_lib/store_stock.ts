@@ -35,6 +35,8 @@ export async function getAllV2(
 		params.set('sort', sort);
 	}
 
+	console.log('SORT ', sort);
+
 	try {
 		const response = await fetch(url.href, {
 			credentials: 'include',
