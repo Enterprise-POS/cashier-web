@@ -4,6 +4,7 @@ import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { server_routes } from '@/components/core/data/server_routes';
 import { TransferStockRequest } from '@/_interface/TransferStock';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { convertQueryFilters, convertTo } from '@/_lib/utils';
 import { QueryFilter } from '@/_interface/QueryFilter';
 import {
@@ -52,15 +53,7 @@ export async function getAllV2(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[CLIENT ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		interface GetAllV2Response {
@@ -118,15 +111,7 @@ export async function transferStockToWarehouse(val: TransferStockRequest, token:
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		return { result: null, error: null };
@@ -172,15 +157,7 @@ export async function transferStockToStoreStock(val: TransferStockRequest, token
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		return { result: null, error: null };
@@ -242,15 +219,7 @@ export async function editStoreStock(formData: FormData, token: string): Promise
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		return { result: null, error: null };
@@ -298,15 +267,7 @@ export async function withdrawStoreStock(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 204

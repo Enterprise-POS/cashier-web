@@ -5,6 +5,7 @@ import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { StoreDef } from '@/_interface/StoreDef';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
 import { InputState } from '@/components/store/editStoreInfoStore';
 
@@ -44,15 +45,7 @@ export async function getStores(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// Maybe there are more information from the request
@@ -122,15 +115,7 @@ export async function createNewStore(storeName: string, tenantId: number): Promi
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const storeResponse: HTTPSuccessResponse<{ created_store: StoreDef }> = await response.json();
@@ -177,15 +162,7 @@ export async function setStoreActivate(tenantId: number, storeId: number, setInt
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// Accepted 202
@@ -232,15 +209,7 @@ export async function editStore(tenantId: number, storeId: number, inp: InputSta
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// Accepted 200

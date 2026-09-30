@@ -7,8 +7,8 @@ import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { EditItemCategory, RegisterCategory, UnregisterCategory } from '@/_interface/RequestBody';
 import { signOut } from '@/_lib/action';
 import { getAuth } from '@/_lib/auth';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { convertTo } from '@/_lib/utils';
-import { StatusCode } from '@/components/core/data/constant';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
 import { cookies } from 'next/headers';
 
@@ -48,15 +48,7 @@ export async function getCategories(
 			};
 		}
 
-		switch (response.status) {
-			case 400:
-			case 401:
-			case 403:
-				return { result: null, error: body.message };
-			default:
-				console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-				return { result: null, error: body.message };
-		}
+		return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 	}
 
 	const categoryResponse: HTTPSuccessResponse<{ categories: CategoryDef[]; count: number }> = await response.json();
@@ -112,17 +104,7 @@ export async function addCategory(formData: FormData): Promise<HTTPResult<Catego
 			};
 		}
 
-		switch (response.status) {
-			case StatusCode.UNAUTHORIZED:
-				return { result: null, error: body.message };
-			case StatusCode.FORBIDDEN:
-				return { result: null, error: body.message };
-			case StatusCode.BAD_REQUEST:
-				return { result: null, error: body.message };
-			default:
-				console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-				return { result: null, error: body.message };
-		}
+		return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 	}
 
 	const body: HTTPSuccessResponse<{ categories: CategoryDef[] }> = await response.json();
@@ -189,15 +171,7 @@ export async function editCategory(formData: FormData): Promise<HTTPResult<Categ
 			};
 		}
 
-		switch (response.status) {
-			case StatusCode.UNAUTHORIZED:
-			case StatusCode.FORBIDDEN:
-			case StatusCode.BAD_REQUEST:
-				return { result: null, error: body.message };
-			default:
-				console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-				return { result: null, error: body.message };
-		}
+		return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 	}
 
 	// 200 OK
@@ -247,15 +221,7 @@ export async function deleteCategory(tenantId: number, categoryId: number): Prom
 			};
 		}
 
-		switch (response.status) {
-			case StatusCode.UNAUTHORIZED:
-			case StatusCode.FORBIDDEN:
-			case StatusCode.BAD_REQUEST:
-				return { result: null, error: body.message };
-			default:
-				console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-				return { result: null, error: body.message };
-		}
+		return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 	}
 
 	// 204 NO CONTENT
@@ -353,15 +319,7 @@ export async function registerCategory(formData: FormData, initialCategoryId: nu
 				};
 			}
 
-			switch (response.status) {
-				case StatusCode.UNAUTHORIZED:
-				case StatusCode.FORBIDDEN:
-				case StatusCode.BAD_REQUEST:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// OK 202

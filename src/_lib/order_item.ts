@@ -8,6 +8,7 @@ import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { OrderItemDef } from '@/_interface/OrderItemDef';
 import { PurchasedItemDef } from '@/_interface/PurchasedItemDef';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
 
 export async function orderItemExportProfit(
@@ -44,15 +45,7 @@ export async function orderItemExportProfit(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const buffer = await response.arrayBuffer();
@@ -105,15 +98,7 @@ export async function orderItemFindById(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 Ok
@@ -161,15 +146,7 @@ export async function orderItemDeleteInvoice(orderItemId: number, tenantId: numb
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 Ok
