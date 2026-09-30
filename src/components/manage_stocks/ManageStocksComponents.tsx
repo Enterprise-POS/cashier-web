@@ -44,6 +44,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	// Action
 	const setPagination = useManageStocksStore(s => s.setPagination);
 	const setNameQuery = useManageStocksStore(s => s.setNameQuery);
+	const setError = useManageStocksStore(s => s.setError);
 	const clearError = useManageStocksStore(s => s.clearError);
 	const clearSuccess = useManageStocksStore(s => s.clearSuccess);
 	const resetFilters = useManageStocksStore(s => s.resetFilters);
@@ -62,7 +63,8 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	);
 
 	// TanStack handles fetching — auto-refetches when queryKey changes
-	const { data, isFetching } = useManageStocksQuery(token);
+	const manageStocksQuery = useManageStocksQuery(token);
+	const { data, isFetching } = manageStocksQuery;
 	const categoriesQuery = useCategoriesQuery(currentTenantId);
 	const storeStocks = data?.storeStocks ?? [];
 	const total = data?.total ?? 0;
@@ -237,6 +239,13 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	useEffect(() => {
 		if (total > 0) setPagination({ ...pagination, total });
 	}, [total]);
+
+	useEffect(() => {
+		if (manageStocksQuery.isError) {
+			const error = manageStocksQuery.error;
+			setError(error instanceof Error ? error.message : 'Failed to load store stocks');
+		}
+	}, [manageStocksQuery.isError]);
 
 	useEffect(() => setIsMounted(true), []);
 
