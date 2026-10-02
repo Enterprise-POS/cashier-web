@@ -5,6 +5,7 @@ import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { OrderItemDef } from '@/_interface/OrderItemDef';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
 import { OrderItemFindByIdReturnType } from '@/_lib/order_item';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { server_routes } from '@/components/core/data/server_routes';
 
 export async function orderItemSalesReport(
@@ -41,15 +42,7 @@ export async function orderItemSalesReport(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 Ok
@@ -106,15 +99,7 @@ export async function orderItemGetSearch(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 Ok
@@ -163,15 +148,7 @@ export async function orderItemFindById(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 Ok

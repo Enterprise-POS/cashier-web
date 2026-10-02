@@ -14,6 +14,7 @@ import { SignUpInput } from '@/_interface/SignUpInput';
 import { TenantDef } from '@/_interface/TenantDef';
 import { UserDef } from '@/_interface/UserDef';
 import { getAuth } from '@/_lib/auth';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { all_routes } from '@/components/core/data/all_routes';
 import { Constants } from '@/components/core/data/constant';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
@@ -40,19 +41,15 @@ export async function emailAndPasswordSignInAction(formData: FormData): Promise<
 			body: JSON.stringify(loginForm),
 		});
 
+		console.log('DEBUG', response);
+
 		if (!response.ok) {
 			// convert error response1
 			const body = await response.json();
 			if (body.message === undefined)
 				throw new Error('Unknown error, could not get response body, status code: ' + response.status);
 
-			switch (response.status) {
-				case 401:
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					throw new Error('Unknown error, could not get response body, status code: ' + response.status);
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body = await response.json();
@@ -121,12 +118,7 @@ export async function emailAndPasswordSignUpAction(formData: FormData): Promise<
 			if (body.message === undefined)
 				throw new Error('Unknown error, could not get response body, status code: ' + response.status);
 
-			switch (response.status) {
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					throw new Error('Unknown error, could not get response body, status code: ' + response.status);
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body = await response.json();
@@ -193,16 +185,7 @@ export async function getTenantWithUser(): Promise<HTTPResult<TenantDef[]>> {
 				};
 			}
 
-			switch (response.status) {
-				case 401:
-					console.warn('[UNAUTHORIZED] login required');
-					return { result: null, error: body.message };
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body: HTTPSuccessResponse<{ tenants: TenantDef[] }> = await response.json();
@@ -260,17 +243,7 @@ export async function newTenant(formData: FormData): Promise<HTTPResult<string>>
 				};
 			}
 
-			switch (response.status) {
-				case 401:
-					return { result: null, error: body.message };
-				case 403:
-					return { result: null, error: body.message };
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// Expected to get response 201
@@ -304,17 +277,7 @@ export async function getTenantMembers(tenantId: number): Promise<HTTPResult<Use
 				};
 			}
 
-			switch (response.status) {
-				case 401:
-					return { result: null, error: body.message };
-				case 403:
-					return { result: null, error: body.message };
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body = (await response.json()) as HTTPSuccessResponse<{ members: UserDef[] }>;
@@ -379,17 +342,7 @@ export async function addUserToTenant(formData: FormData): Promise<HTTPResult<bo
 				};
 			}
 
-			switch (response.status) {
-				case 401:
-					return { result: null, error: body.message };
-				case 403:
-					return { result: null, error: body.message };
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		return { result: true, error: null };
@@ -439,17 +392,7 @@ export async function removeMemberFromTenant(userId: number, tenantId: number): 
 				};
 			}
 
-			switch (response.status) {
-				case 401:
-					return { result: null, error: body.message };
-				case 403:
-					return { result: null, error: body.message };
-				case 400:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		revalidatePath(all_routes.tenantMembers);

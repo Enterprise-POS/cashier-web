@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { Input, Table, TablePaginationConfig } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ import { getCategories } from '@/_lib/category';
 import AddCategory from '@/components/category_list/AddCategory';
 import DeleteCategory from '@/components/category_list/DeleteCategory';
 import EditCategory from '@/components/category_list/EditCategory';
+import { Constants } from '@/components/core/data/constant';
 import { useFormState } from '@/components/hooks/useFormState';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useTenant } from '@/components/provider/TenantProvider';
@@ -33,6 +35,7 @@ export default function CategoryList() {
 		responsive: true,
 	});
 	const formState = useFormState();
+	const queryClient = useQueryClient();
 
 	// Stateless values
 	const selectedTenant: Tenant | undefined = data.tenantList.find(tenant => tenant.id === data.selectedTenantId);
@@ -79,6 +82,11 @@ export default function CategoryList() {
 			),
 		},
 	];
+
+	// Mark cached categories as stale
+	function invalidateCategoriesQuery() {
+		queryClient.invalidateQueries({ queryKey: [Constants.ReactQueryKey.categories, selectedTenant?.id] });
+	}
 
 	async function getData(page: number, limit: number) {
 		if (formState.state.isFormLoading) return;
@@ -198,20 +206,27 @@ export default function CategoryList() {
 			<EditCategory
 				tenantId={selectedTenant?.id}
 				tobeEditedCategory={tobeEditedCategory}
-				onEditedCategory={editedCategory =>
-					setCategories(prev => prev.map(c => (c.id === editedCategory.id ? editedCategory : c)))
-				}
+				onEditedCategory={editedCategory => {
+					setCategories(prev => prev.map(c => (c.id === editedCategory.id ? editedCategory : c)));
+					invalidateCategoriesQuery();
+				}}
 			/>
 			<DeleteCategory
 				tenantId={selectedTenant?.id}
 				tobeDeletedCategory={tobeDeletedCategory}
-				onDeletedCategory={id => setCategories(prev => prev.filter(c => c.id !== id))}
+				onDeletedCategory={id => {
+					setCategories(prev => prev.filter(c => c.id !== id));
+					invalidateCategoriesQuery();
+				}}
 			/>
 			<AddCategory
 				// By assigning key, we don't need to reset AddCategory state such as input state
 				key={selectedTenant?.id}
 				tenantId={selectedTenant?.id}
-				onAddCategory={(newCategory: Category) => setCategories(values => [...values, newCategory])}
+				onAddCategory={(newCategory: Category) => {
+					setCategories(values => [...values, newCategory]);
+					invalidateCategoriesQuery();
+				}}
 			/>
 		</>
 	);

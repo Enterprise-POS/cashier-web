@@ -11,7 +11,6 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
 				defaultOptions: {
 					queries: {
 						refetchOnWindowFocus: false,
-						refetchOnMount: false,
 					},
 				},
 			}),

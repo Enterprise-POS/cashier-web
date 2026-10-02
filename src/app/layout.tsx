@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Nunito } from 'next/font/google';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 import '@/assets/css/bootstrap.min.css';
 import '@/assets/plugins/fontawesome/css/all.min.css';
@@ -61,6 +62,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
 						<Header />
 						<StoreProvider>{children}</StoreProvider>
 					</TenantProvider>
+
+					<ReactQueryDevtools initialIsOpen={false} />
 				</QueryProvider>
 
 				<Script src="/assets/js/jquery-3.7.1.min.js" />

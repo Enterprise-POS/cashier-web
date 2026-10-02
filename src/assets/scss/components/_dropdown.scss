@@ -285,11 +285,11 @@
     }
   }
   &.dropmenu-light-primary {
-    background-color: rgba(var($secondary), 0.1);
+    background-color: rgba($secondary, 0.1);
     @include dropmenu-light-color($primary);
   }
   &.dropmenu-light-secondary {
-    background-color: rgba(var($secondary), 0.1);
+    background-color: rgba($secondary, 0.1);
     @include dropmenu-light-color($secondary);
   }
   &.dropmenu-light-info {

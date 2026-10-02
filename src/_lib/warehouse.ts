@@ -7,6 +7,7 @@ import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { ItemDef, StockType } from '@/_interface/ItemDef';
 import { signOut } from '@/_lib/action';
 import { getAuth } from '@/_lib/auth';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { convertTo } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { serverRoutes } from '@/components/core/data/serverRoutes';
@@ -50,17 +51,7 @@ export async function getActiveWarehouseItem(
 			};
 		}
 
-		switch (response.status) {
-			case 401:
-				return { result: null, error: body.message };
-			case 403:
-				return { result: null, error: body.message };
-			case 400:
-				return { result: null, error: body.message };
-			default:
-				console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-				return { result: null, error: body.message };
-		}
+		return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 	}
 
 	// 200
@@ -140,15 +131,7 @@ export async function createItem(formData: FormData): Promise<HTTPResult<ItemDef
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body: HTTPSuccessResponse<{ items: ItemDef[] }> = await response.json();
@@ -202,7 +185,7 @@ export async function createItems(tenantId: number, items: NewItemPayload[]): Pr
 			} catch {
 				body = { code: response.status, status: 'error', message: response.statusText };
 			}
-			return { result: null, error: body.message };
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body: HTTPSuccessResponse<{ items: ItemDef[] }> = await response.json();
@@ -245,16 +228,7 @@ export async function getItemFindById(itemId: number | null, tenantId: number | 
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.log(body);
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		const body: HTTPSuccessResponse<{ item: ItemDef }> = await response.json();
@@ -345,15 +319,7 @@ export async function editWarehouseItem(formData: FormData): Promise<HTTPResult<
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 202
@@ -410,15 +376,7 @@ export async function setItemActivate(itemId: number, tenantId: number, setInto:
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// ok
@@ -458,16 +416,7 @@ export async function findCompleteById(itemId: number, tenantId: number): Promis
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.log(body);
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 OK

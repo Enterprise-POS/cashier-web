@@ -283,6 +283,10 @@ export default function AddProductForm({ token }: { token: string }) {
 				</div>
 
 				<div className="d-flex align-items-center justify-content-end mb-4 gap-2">
+					<p className="align-self-start me-auto mb-0">
+						Name must start with a letter or number and can be up to 255 characters. You can use letters, numbers,
+						spaces and common punctuation and symbols (& - . , ' ( ) / % # $ € ¥ + © ® ™ °).
+					</p>
 					<button
 						type="button"
 						className="btn btn-secondary"

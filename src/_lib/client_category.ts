@@ -3,7 +3,7 @@ import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { RegisterCategory } from '@/_interface/RequestBody';
-import { StatusCode } from '@/components/core/data/constant';
+import { getUserFacingHttpError } from '@/_lib/httpError';
 import { server_routes } from '@/components/core/data/server_routes';
 import type { ProductListSort } from '@/components/store/productListStore';
 
@@ -14,7 +14,7 @@ export async function getCategoryWithItems(
 	tenantId: number,
 	token: string,
 	categoryId: number = 0,
-	sort: ProductListSort | null = null,
+	sorts: ProductListSort[] = [],
 ): Promise<HTTPResult<{ items: CategoryWithItemDef[]; count: number }>> {
 	try {
 		const reqBody: {
@@ -28,7 +28,7 @@ export async function getCategoryWithItems(
 			limit,
 			name_query: nameQuery,
 			category_id: categoryId,
-			filters: sort ? [sort] : [],
+			filters: sorts,
 		};
 
 		const requestInit: RequestInit = {
@@ -52,15 +52,7 @@ export async function getCategoryWithItems(
 				};
 			}
 
-			switch (response.status) {
-				case 400:
-				case 401:
-				case 403:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[UNHANDLED ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// 200 Ok
@@ -113,15 +105,7 @@ export async function registerCategory(
 				};
 			}
 
-			switch (response.status) {
-				case StatusCode.UNAUTHORIZED:
-				case StatusCode.FORBIDDEN:
-				case StatusCode.BAD_REQUEST:
-					return { result: null, error: body.message };
-				default:
-					console.error(`[SERVER ERROR] ${response.status}: ${body.message}`);
-					return { result: null, error: body.message };
-			}
+			return { result: null, error: getUserFacingHttpError(response.status, body.message) };
 		}
 
 		// OK 202 - Request accepted

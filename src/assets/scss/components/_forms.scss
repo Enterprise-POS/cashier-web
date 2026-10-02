@@ -84,19 +84,19 @@
     }
   }
   option:checked {
-    background-color: rgba(var($primary), 0.2);
+    background-color: rgba($primary, 0.2);
     color: $primary;
   }
   option:select {
-    background-color: rgba(var($primary), 0.2);
+    background-color: rgba($primary, 0.2);
     color: $primary;
   }
   option:hover {
-    background-color: rgba(var($primary), 0.2);
+    background-color: rgba($primary, 0.2);
     color: $primary;
   }
   option:focus {
-    background-color: rgba(var($primary), 0.2);
+    background-color: rgba($primary, 0.2);
     color: $primary;
   }
 }
@@ -285,7 +285,7 @@ fieldset:disabled .btn {
   border-color: $primary;
 }
 .form-select:focus {
-  border-color: rgba(var($primary), 0.5);
+  border-color: rgba($primary, 0.5);
   outline: 0;
   box-shadow: none;
 }
@@ -450,7 +450,7 @@ fieldset:disabled .btn {
   }
 
   &.on {
-    background-color: rgba(var($primary), 0.3);
+    background-color: rgba($primary, 0.3);
 
     span {
       background-color: $primary;

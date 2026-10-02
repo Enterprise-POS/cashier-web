@@ -9,7 +9,7 @@ const protectedFromSignedInUser = [routes.login, routes.register];
 const secretKey = process.env.JWT_S;
 const encodedKey = new TextEncoder().encode(secretKey);
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
 	// console.log('MIDDLEWARE', request.nextUrl.pathname);
 
 	try {
