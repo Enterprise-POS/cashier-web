@@ -26,7 +26,7 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 	const pagination = useProductListStore(s => s.pagination);
 	const nameQuery = useProductListStore(s => s.nameQuery);
 	const selectedCategory = useProductListStore(s => s.selectedCategory);
-	const sort = useProductListStore(s => s.sort);
+	const sorts = useProductListStore(s => s.sorts);
 	const isLoading = useProductListStore(s => s.isLoading);
 	const isError = useProductListStore(s => s.isError);
 	const isSuccess = useProductListStore(s => s.isSuccess);
@@ -62,33 +62,38 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 	);
 
 	const getSortOrder = (column: ProductListSortColumn) => {
-		if (sort?.column !== column) return null;
-		return sort.ascending ? 'ascend' : 'descend';
+		const sort = sorts.find(current => current.column === column);
+		return sort ? (sort.ascending ? 'ascend' : 'descend') : null;
 	};
 
 	type TableSorter = Parameters<NonNullable<TableProps<CategoryWithItem>['onChange']>>[2];
 
-	const getSortFromTable = (tableSorter: TableSorter) => {
-		const activeSorter = Array.isArray(tableSorter)
-			? tableSorter.find(currentSorter => currentSorter.order !== undefined)
-			: tableSorter;
-		if (!activeSorter?.order) return null;
-
-		const fieldName = Array.isArray(activeSorter.field)
-			? activeSorter.field.at(0)?.toString()
-			: activeSorter.field?.toString();
-
-		const sortColumnMap: Record<string, ProductListSortColumn> = {
-			itemName: 'item_name',
-			createdAt: 'created_at',
+	const getSortsFromTable = (tableSorter: TableSorter) => {
+		const activeSorters = Array.isArray(tableSorter) ? tableSorter : [tableSorter];
+		const sortColumnMap: Record<string, { column: ProductListSortColumn; priority: number }> = {
+			itemName: { column: 'item_name', priority: 2 },
+			createdAt: { column: 'created_at', priority: 1 },
 		};
-		const column = fieldName === undefined ? undefined : sortColumnMap[fieldName];
-		if (column === undefined) return null;
 
-		return {
-			column,
-			ascending: activeSorter.order === 'ascend',
-		};
+		return activeSorters
+			.flatMap(activeSorter => {
+				if (!activeSorter.order) return [];
+
+				const fieldName = Array.isArray(activeSorter.field)
+					? activeSorter.field.at(0)?.toString()
+					: activeSorter.field?.toString();
+				const sortColumn = fieldName === undefined ? undefined : sortColumnMap[fieldName];
+				if (sortColumn === undefined) return [];
+
+				return [
+					{
+						...sortColumn,
+						ascending: activeSorter.order === 'ascend',
+					},
+				];
+			})
+			.sort((a, b) => b.priority - a.priority)
+			.map(({ column, ascending }) => ({ column, ascending }));
 	};
 
 	const handleTableChange: TableProps<CategoryWithItem>['onChange'] = (_pagination, filters, tableSorter) => {
@@ -100,7 +105,7 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 				: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
 					selectedCategory.categoryName);
 
-		applyTableChange({ categoryId, categoryName }, getSortFromTable(tableSorter));
+		applyTableChange({ categoryId, categoryName }, getSortsFromTable(tableSorter));
 	};
 
 	const columns: TableColumnsType<CategoryWithItem> = [
@@ -122,7 +127,7 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 					</Link>
 				</Tooltip>
 			),
-			sorter: true,
+			sorter: { multiple: 2 },
 			sortOrder: getSortOrder('item_name'),
 		},
 		{
@@ -166,7 +171,7 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 		{
 			title: 'Created At',
 			dataIndex: 'createdAt',
-			sorter: true,
+			sorter: { multiple: 1 },
 			sortOrder: getSortOrder('created_at'),
 			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},

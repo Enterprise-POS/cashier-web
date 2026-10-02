@@ -67,7 +67,7 @@ type ManageStocksActions = {
 	// Filters
 	setNameQuery: (query: string) => void;
 	setSelectedCategory: (value: Category) => void;
-	setSort: (sort: SortState) => void;
+	applyTableChange: (category: Category, sorts: SortState[]) => void;
 	applyFilters: () => void;
 	resetFilters: () => void;
 
@@ -154,10 +154,16 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 	// Filter actions
 	setNameQuery: query => set({ nameQuery: query }),
 	setSelectedCategory: value => set({ selectedCategory: value }),
-	setSort: sort =>
-		set(state => ({
-			sorts: [...state.sorts.filter(s => s.column !== sort.column), sort],
-		})),
+	applyTableChange: (category, sorts) => {
+		set({
+			selectedCategory: category,
+			sorts,
+			appliedNameQuery: get().nameQuery,
+			appliedCategoryId: category.categoryId,
+			appliedSorts: sorts,
+			pagination: { ...INITIAL_PAGINATION },
+		});
+	},
 	applyFilters: () => {
 		const { nameQuery, selectedCategory, sorts } = get();
 		set({
@@ -172,6 +178,9 @@ export const useManageStocksStore = create<ManageStocksStore>((set, get) => ({
 			nameQuery: '',
 			selectedCategory: INITIAL_CATEGORY,
 			sorts: [INITIAL_SORT],
+			appliedNameQuery: '',
+			appliedCategoryId: 0,
+			appliedSorts: [INITIAL_SORT],
 			pagination: INITIAL_PAGINATION,
 		}),
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { Input, Pagination } from 'antd';
+import { Input, Pagination, Tooltip } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Item } from '@/_classes/Item';
@@ -118,12 +118,17 @@ export function SelectProductToAddNew({
 															<th style={{ width: '2.5rem' }}></th>
 															<th>ID</th>
 															<th>Product Name</th>
+															<th>
+																<Tooltip title="If the stock type is (U) Unlimited, add item stock will not take any affect">
+																	T/D
+																</Tooltip>
+															</th>
 															<th>Stock</th>
 														</tr>
 													</thead>
 													<tbody>
 														{paddedItems.real.map(item => {
-															const outOfStock = item.stocks === 0;
+															const outOfStock = item.stocks === 0 && item.stockType === StockType.TRACKED;
 															const isSelected = selectedItems.has(item.id);
 															return (
 																<tr
@@ -146,6 +151,7 @@ export function SelectProductToAddNew({
 																	</td>
 																	<td>{item.id}</td>
 																	<td>{item.itemName}</td>
+																	<td>{item.stockType.at(0)}</td>
 																	<td>
 																		{outOfStock ? <span className="badge bg-danger">Out of stock</span> : item.stocks}
 																	</td>

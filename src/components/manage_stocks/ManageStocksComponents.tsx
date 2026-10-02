@@ -1,22 +1,23 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input, Pagination, Table, Tooltip } from 'antd';
+import { ConfigProvider, Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Delete, Edit, HelpCircle } from 'react-feather';
 
 import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { StockType } from '@/_interface/ItemDef';
+import { SortState } from '@/_interface/QueryFilter';
 import { formatIDR } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
 import { useManageStocksQuery } from '@/components/hooks/useManageStocksQuery';
 import { AddNewItem } from '@/components/manage_stocks/AddNewItem';
 import { EditStoreStock } from '@/components/manage_stocks/EditStoreStock';
-import { SelectCategory } from '@/components/manage_stocks/SelectCategory';
 import WithdrawItemModal from '@/components/manage_stocks/WithdrawItemModal';
 import SectionLoading from '@/components/partials/SectionLoading';
+import { useCategoriesQuery } from '@/components/product_list/useProductListQuery';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
 
@@ -27,7 +28,6 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	const [isMounted, setIsMounted] = useState(false);
 	const [tobeEditStoreStock, setTobeEditStoreStock] = useState<StoreStockV2>();
 	const [tobeWithdrawStoreStock, setTobeWithdrawStoreStock] = useState<StoreStockV2>();
-	const [isSelectCategoryModalOpen, setCategoryModal] = useState(false);
 
 	// Only subscribe to what this component needs — no unnecessary re-renders
 	// Read value
@@ -39,17 +39,17 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	const errorMessage = useManageStocksStore(s => s.errorMessage);
 	const successMessage = useManageStocksStore(s => s.successMessage);
 	const selectedCategory = useManageStocksStore(s => s.selectedCategory);
-	const sorts = useManageStocksStore(s => s.sorts);
+	const appliedSorts = useManageStocksStore(s => s.appliedSorts);
 
 	// Action
-	const setSelectedCategory = useManageStocksStore(s => s.setSelectedCategory);
-	const setSort = useManageStocksStore(s => s.setSort);
 	const setPagination = useManageStocksStore(s => s.setPagination);
 	const setNameQuery = useManageStocksStore(s => s.setNameQuery);
+	const setError = useManageStocksStore(s => s.setError);
 	const clearError = useManageStocksStore(s => s.clearError);
 	const clearSuccess = useManageStocksStore(s => s.clearSuccess);
 	const resetFilters = useManageStocksStore(s => s.resetFilters);
 	const applyFilters = useManageStocksStore(s => s.applyFilters);
+	const applyTableChange = useManageStocksStore(s => s.applyTableChange);
 
 	// Async actions
 	//const handleTransferItem = useManageStocksStore(s => s.handleTransferItem);
@@ -63,26 +63,84 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	);
 
 	// TanStack handles fetching — auto-refetches when queryKey changes
-	const { data, isFetching } = useManageStocksQuery(token);
+	const manageStocksQuery = useManageStocksQuery(token);
+	const { data, isFetching } = manageStocksQuery;
+	const categoriesQuery = useCategoriesQuery(currentTenantId);
 	const storeStocks = data?.storeStocks ?? [];
 	const total = data?.total ?? 0;
 
-	const columns = [
+	const categoryFilters = useMemo(
+		() =>
+			(categoriesQuery.data ?? []).map(category => ({
+				text: category.categoryName,
+				value: category.id,
+			})),
+		[categoriesQuery.data],
+	);
+
+	const getSortOrder = (column: SortState['column']) => {
+		const sort = appliedSorts.find(current => current.column === column);
+		return sort ? (sort.ascending ? 'ascend' : 'descend') : null;
+	};
+
+	type TableSorter = Parameters<NonNullable<TableProps<StoreStockV2>['onChange']>>[2];
+
+	const getSortsFromTable = (tableSorter: TableSorter): SortState[] => {
+		const activeSorters = Array.isArray(tableSorter) ? tableSorter : [tableSorter];
+		const sortColumnMap: Record<string, { column: SortState['column']; priority: number }> = {
+			itemName: { column: 'item_name', priority: 2 },
+			createdAt: { column: 'created_at', priority: 1 },
+		};
+
+		return activeSorters
+			.flatMap(activeSorter => {
+				if (!activeSorter.order) return [];
+
+				const fieldName = Array.isArray(activeSorter.field)
+					? activeSorter.field.at(0)?.toString()
+					: activeSorter.field?.toString();
+				const sortColumn = fieldName === undefined ? undefined : sortColumnMap[fieldName];
+				if (sortColumn === undefined) return [];
+
+				return [
+					{
+						...sortColumn,
+						ascending: activeSorter.order === 'ascend',
+					},
+				];
+			})
+			.sort((a, b) => b.priority - a.priority)
+			.map(({ column, ascending }) => ({ column, ascending }));
+	};
+
+	const handleTableChange: TableProps<StoreStockV2>['onChange'] = (_pagination, filters, tableSorter) => {
+		const categoryFilter = filters.categoryId?.at(0);
+		const categoryId = Number(categoryFilter ?? 0);
+		const categoryName =
+			categoryId === 0
+				? 'unselected'
+				: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
+					selectedCategory.categoryName);
+
+		applyTableChange({ categoryId, categoryName }, getSortsFromTable(tableSorter));
+	};
+
+	const columns: TableColumnsType<StoreStockV2> = [
 		{
 			title: 'ID',
 			dataIndex: 'itemId',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.id - b.id,
 		},
 		{
 			title: 'Product',
 			dataIndex: 'itemName',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
+			sorter: { multiple: 2 },
+			sortOrder: getSortOrder('item_name'),
 		},
 		{
 			title: (
 				<span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
 					Selling Price
-					<Tooltip title="Selling price is what the customer pays. Edit the product to configure it.">
+					<Tooltip title="Selling price is what the customer pays.">
 						<HelpCircle size={13} color="#8c8c8c" style={{ cursor: 'help', flexShrink: 0 }} />
 					</Tooltip>
 				</span>
@@ -128,25 +186,26 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 		},
 		{
 			title: 'Category',
-			dataIndex: 'categoryName',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.categoryName.length - b.categoryName.length,
-			render: (categoryName: string) => (categoryName.length > 0 ? categoryName : '-'),
+			dataIndex: 'categoryId',
+			filters: categoryFilters,
+			filterMultiple: false,
+			filteredValue: selectedCategory.categoryId === 0 ? null : [selectedCategory.categoryId],
+			render: (_categoryId: number, item: StoreStockV2) => (item.categoryName.length > 0 ? item.categoryName : '-'),
 		},
 		{
 			title: 'Stocks',
 			dataIndex: 'stocks',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.stocks - b.stocks,
 		},
 		{
 			title: 'T/U',
 			dataIndex: 'stockType',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.stockType.length - b.stockType.length,
 			render: (stockType: StockType) => <p className="text-center">{stockType.at(0)}</p>,
 		},
 		{
 			title: 'Created At',
 			dataIndex: 'createdAt',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
+			sorter: { multiple: 1 },
+			sortOrder: getSortOrder('created_at'),
 			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
 		{
@@ -176,7 +235,6 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 					</div>
 				</div>
 			),
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 	];
 
@@ -187,6 +245,13 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 	useEffect(() => {
 		if (total > 0) setPagination({ ...pagination, total });
 	}, [total]);
+
+	useEffect(() => {
+		if (manageStocksQuery.isError) {
+			const error = manageStocksQuery.error;
+			setError(error instanceof Error ? error.message : 'Failed to load store stocks');
+		}
+	}, [manageStocksQuery.isError]);
 
 	useEffect(() => setIsMounted(true), []);
 
@@ -253,46 +318,6 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 					</div>
 					<div className="page-btn">
 						<button
-							className="btn border text-secondary"
-							data-bs-toggle="modal"
-							data-bs-target="#select-category"
-							onClick={() => setCategoryModal(true)}
-						>
-							{selectedCategory.categoryId === 0 ? 'Select Category' : `Category: ${selectedCategory.categoryName}`}
-						</button>
-					</div>
-					<div className="page-btn">
-						<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3 ms-auto">
-							<div className="dropdown mb-0">
-								<button
-									className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center text-gray-3"
-									data-bs-toggle="dropdown"
-								>
-									Order: Created at {sorts[0]?.ascending ? 'Oldest' : 'Latest'}
-								</button>
-								<ul className="dropdown-menu dropdown-menu-end p-3">
-									<li>
-										<button
-											className="dropdown-item rounded-1"
-											onClick={() => setSort({ column: 'created_at', ascending: false })}
-										>
-											Latest
-										</button>
-									</li>
-									<li>
-										<button
-											className="dropdown-item rounded-1"
-											onClick={() => setSort({ column: 'created_at', ascending: true })}
-										>
-											Oldest
-										</button>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					<div className="page-btn">
-						<button
 							className={`btn btn-primary w-100 ${isLoading || isFetching ? 'wait' : ''}`}
 							type="button"
 							disabled={isLoading || isFetching}
@@ -335,14 +360,16 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 				</div>
 
 				<div className="custom-datatable-filter table-responsive">
-					<Table<StoreStockV2>
-						rowKey={'itemId'}
-						columns={columns}
-						dataSource={storeStocks}
-						pagination={false}
-						loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
-						// onChange={}
-					/>
+					<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
+						<Table<StoreStockV2>
+							rowKey={'itemId'}
+							columns={columns}
+							dataSource={storeStocks}
+							pagination={false}
+							loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
+							onChange={handleTableChange}
+						/>
+					</ConfigProvider>
 				</div>
 
 				<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">
@@ -368,14 +395,6 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 				onConfirmEdit={body => handleOnConfirmEdit(body, token, queryClient, isFetching)}
 				storeId={selectedStore?.id ?? 0}
 				tenantId={currentTenantId}
-			/>
-			<SelectCategory
-				tenantId={currentTenantId}
-				isModalOpen={isSelectCategoryModalOpen}
-				onSelected={(categoryId, categoryName) => {
-					setCategoryModal(false);
-					setSelectedCategory({ categoryId, categoryName });
-				}}
 			/>
 			{/* This modal connect with Page: manage_stocks */}
 			<AddNewItem

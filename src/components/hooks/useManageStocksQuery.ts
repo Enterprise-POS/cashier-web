@@ -4,7 +4,7 @@ import { StoreStockV2 } from '@/_classes/StoreStock';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { StoreStockV2Def } from '@/_interface/StoreStockDef';
 import { getAllV2 } from '@/_lib/store_stock';
-import { buildQueryFilters } from '@/_lib/utils';
+import { buildQueryFilters, minutes } from '@/_lib/utils';
 import { Constants } from '@/components/core/data/constant';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useManageStocksStore } from '@/components/store/manageStocksStore';
@@ -48,7 +48,7 @@ export function useManageStocksQuery(token: string) {
 			};
 		},
 		enabled: storeId !== 0 && tenantId !== 0,
-		staleTime: 1000 * 60 * 5,
+		staleTime: minutes(5),
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: false,
 	});
