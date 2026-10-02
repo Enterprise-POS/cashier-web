@@ -1,7 +1,6 @@
 'use client';
 import { useQueryClient } from '@tanstack/react-query';
-import { Input, Pagination, Table, Tooltip } from 'antd';
-import { SorterResult } from 'antd/es/table/interface.js';
+import { Input, Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,14 +10,15 @@ import { Store } from '@/_classes/Store';
 import { StoreStockV2 } from '@/_classes/StoreStock';
 import { Tenant } from '@/_classes/Tenant';
 import { StockType } from '@/_interface/ItemDef';
+import type { SortState } from '@/_interface/QueryFilter';
 import { formatIDR } from '@/_lib/utils';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 import EditAdjustment from '@/components/edit_store_products/EditAdjustment';
 import { useEditStockInfoQuery } from '@/components/hooks/useEditStockInfoQuery';
 import SectionLoading from '@/components/partials/SectionLoading';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { useEditStockInfoStore } from '@/components/store/editStockInfoStore';
-import { all_routes as routes } from '@/components/core/data/all_routes';
 
 export default function EditStockInfoComponent({ token }: { token: string }) {
 	const router = useRouter();
@@ -30,6 +30,7 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 
 	const pagination = useEditStockInfoStore(s => s.pagination);
 	const nameQuery = useEditStockInfoStore(s => s.nameQuery);
+	const sorts = useEditStockInfoStore(s => s.sorts);
 	const isError = useEditStockInfoStore(s => s.isError);
 	const isSuccess = useEditStockInfoStore(s => s.isSuccess);
 	const errorMessage = useEditStockInfoStore(s => s.errorMessage);
@@ -37,7 +38,6 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 
 	const setPagination = useEditStockInfoStore(s => s.setPagination);
 	const setNameQuery = useEditStockInfoStore(s => s.setNameQuery);
-	// const setCreatedAtSorter = useEditStockInfoStore(s => s.setCreatedAtSorter);
 	const applyFilters = useEditStockInfoStore(s => s.applyFilters);
 	const clearError = useEditStockInfoStore(s => s.clearError);
 	const clearSuccess = useEditStockInfoStore(s => s.clearSuccess);
@@ -61,7 +61,46 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 
 	if (!isMounted || storeCtx.isStateLoading) return <SectionLoading caption="Loading store products..." />;
 
-	const columns = [
+	const getSortOrder = (column: SortState['column']) => {
+		const sort = sorts.find(current => current.column === column);
+		return sort ? (sort.ascending ? 'ascend' : 'descend') : null;
+	};
+
+	type TableSorter = Parameters<NonNullable<TableProps<StoreStockV2>['onChange']>>[2];
+
+	const getSortsFromTable = (tableSorter: TableSorter): SortState[] => {
+		const activeSorters = Array.isArray(tableSorter) ? tableSorter : [tableSorter];
+		const sortColumnMap: Record<string, { column: SortState['column']; priority: number }> = {
+			itemName: { column: 'item_name', priority: 2 },
+			createdAt: { column: 'created_at', priority: 1 },
+		};
+
+		return activeSorters
+			.flatMap(activeSorter => {
+				if (!activeSorter.order) return [];
+
+				const fieldName = Array.isArray(activeSorter.field)
+					? activeSorter.field.at(0)?.toString()
+					: activeSorter.field?.toString();
+				const sortColumn = fieldName === undefined ? undefined : sortColumnMap[fieldName];
+				if (sortColumn === undefined) return [];
+
+				return [
+					{
+						...sortColumn,
+						ascending: activeSorter.order === 'ascend',
+					},
+				];
+			})
+			.sort((a, b) => b.priority - a.priority)
+			.map(({ column, ascending }) => ({ column, ascending }));
+	};
+
+	const handleTableChange: TableProps<StoreStockV2>['onChange'] = (_pagination, _filters, tableSorter) => {
+		handleSortChange(getSortsFromTable(tableSorter));
+	};
+
+	const columns: TableColumnsType<StoreStockV2> = [
 		{
 			title: 'ID',
 			dataIndex: 'id',
@@ -70,7 +109,8 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 		{
 			title: 'Product',
 			dataIndex: 'itemName',
-			// sorter: (a: StoreStockV2, b: StoreStockV2) => a.itemName.length - b.itemName.length,
+			sorter: { multiple: 2 },
+			sortOrder: getSortOrder('item_name'),
 		},
 		{
 			title: (
@@ -129,7 +169,8 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 		{
 			title: 'Item Created At',
 			dataIndex: 'createdAt',
-			sorter: (a: StoreStockV2, b: StoreStockV2) => a.createdAt.getTime() - b.createdAt.getTime(),
+			sorter: { multiple: 1 },
+			sortOrder: getSortOrder('created_at'),
 			render: (date: Date) => date.toLocaleDateString('id-ID') + ' ' + date.toLocaleTimeString('id-ID'),
 		},
 		{
@@ -212,30 +253,6 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 								onSearch={applyFilters}
 							/>
 						</div>
-						{/* <div className="page-btn">
-							<div className="d-flex table-dropdown my-xl-auto right-content align-items-center flex-wrap row-gap-3 ms-auto">
-								<div className="dropdown mb-0">
-									<button
-										className="dropdown-toggle btn btn-white btn-md d-inline-flex align-items-center text-gray-3"
-										data-bs-toggle="dropdown"
-									>
-										Order: Created at {sortCreatedAt === SortBy.ASCENDING ? 'Oldest' : 'Latest'}
-									</button>
-									<ul className="dropdown-menu dropdown-menu-end p-3">
-										<li>
-											<button className="dropdown-item rounded-1" onClick={() => setCreatedAtSorter(SortBy.DESCENDING)}>
-												Latest
-											</button>
-										</li>
-										<li>
-											<button className="dropdown-item rounded-1" onClick={() => setCreatedAtSorter(SortBy.ASCENDING)}>
-												Oldest
-											</button>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div> */}
 						<button
 							className={`btn btn-primary ${isFetching ? 'wait' : ''}`}
 							disabled={isFetching}
@@ -272,9 +289,7 @@ export default function EditStockInfoComponent({ token }: { token: string }) {
 						dataSource={storeStocks}
 						pagination={false}
 						loading={{ spinning: isFetching, indicator: <SectionLoading /> }}
-						onChange={(_, __, sorter) =>
-							handleSortChange(sorter as SorterResult<StoreStockV2> | SorterResult<StoreStockV2>[])
-						}
+						onChange={handleTableChange}
 						footer={currentPageData => {
 							const tracked = currentPageData.filter(s => s.stockType === StockType.TRACKED).length;
 							const sellingPriceUnset = currentPageData.filter(s => s.price === 0).length;

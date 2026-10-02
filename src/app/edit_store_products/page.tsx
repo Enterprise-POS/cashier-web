@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { Constants } from '@/components/core/data/constant';
 import EditStockInfoComponent from '@/components/edit_store_products/EditStockInfoComponent';
 import Footer from '@/components/partials/footer';
-import RefreshIcon from '@/components/tooltip-content/refresh';
+import RefreshIcon from '@/components/tooltip-content/RefreshIcon';
 
 export default async function StockAdjustment() {
 	const cookieStore = await cookies();
@@ -21,7 +21,7 @@ export default async function StockAdjustment() {
 						</div>
 						<ul className="table-top-head">
 							{/* <TooltipIcons /> */}
-							<RefreshIcon />
+							<RefreshIcon queryKey={[Constants.ReactQueryKey.editStockInfo]} />
 							{/* <CollapseIcon /> */}
 						</ul>
 					</div>

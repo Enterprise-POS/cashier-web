@@ -7,12 +7,12 @@ import { getAllV2 } from '@/_lib/store_stock';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { useEditStockInfoStore } from '@/components/store/editStockInfoStore';
-import { Constants, SortBy } from '@/components/core/data/constant';
+import { Constants } from '@/components/core/data/constant';
 
 export function useEditStockInfoQuery(token: string) {
 	const storeCtx = useStore();
 	const tenantCtx = useTenant();
-	const { pagination, appliedNameQuery, sortCreatedAt } = useEditStockInfoStore();
+	const { pagination, appliedNameQuery, appliedSorts } = useEditStockInfoStore();
 
 	const storeId = storeCtx.data.selectedStoreId;
 	const tenantId = storeCtx.getCurrentTenantId();
@@ -25,7 +25,7 @@ export function useEditStockInfoQuery(token: string) {
 			pagination.current,
 			pagination.pageSize,
 			appliedNameQuery,
-			sortCreatedAt,
+			appliedSorts,
 		],
 		queryFn: () =>
 			getAllV2(
@@ -34,8 +34,8 @@ export function useEditStockInfoQuery(token: string) {
 				pagination.current!,
 				pagination.pageSize!,
 				appliedNameQuery,
-				0, // categoryId — not used on this page
-				[{ ascending: sortCreatedAt === SortBy.ASCENDING, column: 'created_at' }],
+				0,
+				appliedSorts,
 				token,
 			),
 		select: (data: HTTPResult<{ count: number; storeStockDefs: StoreStockV2Def[] }>) => {

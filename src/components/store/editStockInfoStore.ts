@@ -1,13 +1,12 @@
 import { QueryClient } from '@tanstack/react-query';
 import { TablePaginationConfig } from 'antd';
-import { SorterResult } from 'antd/es/table/interface';
 import { create } from 'zustand';
 
-import { StoreStockV2 } from '@/_classes/StoreStock';
 import { HTTPResult } from '@/_interface/HTTPResult';
+import type { SortState } from '@/_interface/QueryFilter';
 import { editStoreStock } from '@/_lib/store_stock';
 import { closeBootstrapModal } from '@/_lib/utils';
-import { Constants, SortBy } from '@/components/core/data/constant';
+import { Constants } from '@/components/core/data/constant';
 
 const INITIAL_PAGINATION: TablePaginationConfig = {
 	current: 1,
@@ -26,8 +25,9 @@ type FeedbackState = {
 
 type FilterState = {
 	nameQuery: string;
-	sortCreatedAt: SortBy;
+	sorts: SortState[];
 	appliedNameQuery: string;
+	appliedSorts: SortState[];
 };
 
 type EditStockInfoActions = {
@@ -39,11 +39,10 @@ type EditStockInfoActions = {
 
 	setPagination: (pagination: TablePaginationConfig) => void;
 	setNameQuery: (query: string) => void;
-	setCreatedAtSorter: (sortBy: SortBy) => void;
 	applyFilters: () => void;
 	resetFilters: () => void;
 
-	handleSortChange: (sorter: SorterResult<StoreStockV2> | SorterResult<StoreStockV2>[]) => void;
+	handleSortChange: (sorts: SortState[]) => void;
 	handleConfirmEdit: (
 		formData: FormData,
 		token: string,
@@ -65,7 +64,8 @@ export const useEditStockInfoStore = create<EditStockInfoStore>((set, get) => ({
 
 	nameQuery: '',
 	appliedNameQuery: '',
-	sortCreatedAt: SortBy.ASCENDING,
+	sorts: [{ column: 'created_at', ascending: true }],
+	appliedSorts: [{ column: 'created_at', ascending: true }],
 
 	setLoading: loading => set({ isLoading: loading }),
 	setError: message => set({ isError: true, isSuccess: false, errorMessage: message }),
@@ -75,25 +75,32 @@ export const useEditStockInfoStore = create<EditStockInfoStore>((set, get) => ({
 
 	setPagination: pagination => set({ pagination }),
 	setNameQuery: query => set({ nameQuery: query }),
-	setCreatedAtSorter: sortBy => set({ sortCreatedAt: sortBy }),
+	handleSortChange: sorts => {
+		const { nameQuery, pagination } = get();
+		set({
+			sorts,
+			appliedNameQuery: nameQuery,
+			appliedSorts: sorts,
+			pagination: { ...INITIAL_PAGINATION, total: pagination.total },
+		});
+	},
 
 	applyFilters: () => {
-		const { nameQuery, pagination } = get();
-		set({ appliedNameQuery: nameQuery, pagination: { ...INITIAL_PAGINATION, total: pagination.total } });
+		const { nameQuery, sorts, pagination } = get();
+		set({
+			appliedNameQuery: nameQuery,
+			appliedSorts: [...sorts],
+			pagination: { ...INITIAL_PAGINATION, total: pagination.total },
+		});
 	},
 	resetFilters: () =>
-		set({ nameQuery: '', appliedNameQuery: '', sortCreatedAt: SortBy.ASCENDING, pagination: INITIAL_PAGINATION }),
-
-	handleSortChange: (sorter: SorterResult<StoreStockV2> | SorterResult<StoreStockV2>[]) => {
-		const { setCreatedAtSorter, applyFilters } = get();
-
-		if (!Array.isArray(sorter)) {
-			if (sorter.field === 'createdAt') {
-				setCreatedAtSorter(sorter.order === 'ascend' ? SortBy.ASCENDING : SortBy.DESCENDING);
-				applyFilters();
-			}
-		}
-	},
+		set({
+			nameQuery: '',
+			appliedNameQuery: '',
+			sorts: [{ column: 'created_at', ascending: true }],
+			appliedSorts: [{ column: 'created_at', ascending: true }],
+			pagination: INITIAL_PAGINATION,
+		}),
 	handleConfirmEdit: async (formData, token, queryClient, isFetching) => {
 		if (isFetching) return;
 
