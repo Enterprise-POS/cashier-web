@@ -1,3 +1,6 @@
+@use "../utils/mixins";
+@use "../utils/variables";
+
 aside {
 	padding: 24px;
 }
@@ -23,15 +26,15 @@ aside {
 .video-section video {
 	max-width: 100%;
 	height: 100%;
-	@include rounded(10px 10px 0 0);
+	@include mixins.rounded(10px 10px 0 0);
 }
 .deleted-info {
 	display: none;
 	.bin-bg {
 		width: 184px;
 		height: 184px;
-		@include rounded(100%);
-		background: $light;
+		@include mixins.rounded(100%);
+		background: variables.$light;
 		margin: 0 auto;
 	}
 }
@@ -47,11 +50,11 @@ svg {
 }
 .files-list {
 	a {
-		@include rounded(5px);
+		@include mixins.rounded(5px);
 		&:hover,
 		&.active {
-			background: $dark-transparent;
-			color: $gray-900 !important;
+			background: variables.$dark-transparent;
+			color: variables.$gray-900 !important;
 		}
 	}
 }
@@ -68,14 +71,14 @@ svg {
 }
 .rating-select {
 	i {
-		color: $gray-500;
+		color: variables.$gray-500;
 		&.filled {
-			color: $warning;
+			color: variables.$warning;
 		}
 	}
 }
 .folder-wrap {
-	@include rounded(5px);
+	@include mixins.rounded(5px);
 	padding: 16px;
 	margin-bottom: 24px;
 	&:hover {
@@ -83,25 +86,25 @@ svg {
 	}
 }
 .video-wrap {
-	@include rounded(5px);
+	@include mixins.rounded(5px);
 	margin-bottom: 24px;
 	.video-content {
-		background: $white;
+		background: variables.$white;
 		padding: 20px;
-		@include rounded(0 0 5px 5px);
+		@include mixins.rounded(0 0 5px 5px);
 	}
 	&:hover {
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
 	}
 }
 .files-wrap {
-	@include rounded(5px);
+	@include mixins.rounded(5px);
 	margin-bottom: 24px;
 	.files-icon {
-		@include rounded(5px 5px 0 0);
+		@include mixins.rounded(5px 5px 0 0);
 	}
 	.files-content {
-		@include rounded(0 0 5px 5px);
+		@include mixins.rounded(0 0 5px 5px);
 	}
 	&:hover {
 		box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.15);
@@ -114,8 +117,8 @@ svg {
 	}
 }
 .file-type {
-	border: 1px solid $gray-200;
-	@include rounded(5px);
+	border: 1px solid variables.$gray-200;
+	@include mixins.rounded(5px);
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
@@ -140,7 +143,7 @@ svg {
 			position: absolute;
 			top: 0;
 			left: 16px;
-			border-color: $gray-200;
+			border-color: variables.$gray-200;
 			border-width: 1px;
 			width: 1px;
 			height: 100%;
@@ -160,9 +163,9 @@ svg {
 .user-icon {
 	width: 30px;
 	height: 30px;
-	background: $white;
-	color: $gray-700;
-	@include rounded(5px);
+	background: variables.$white;
+	color: variables.$gray-700;
+	@include mixins.rounded(5px);
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
@@ -173,15 +176,15 @@ svg {
 	-webkit-justify-content: center;
 	-ms-flex-pack: center;
 	&:hover {
-		background: $dark-transparent;
-		color: $gray-900;
+		background: variables.$dark-transparent;
+		color: variables.$gray-900;
 	}
 }
 .file-drop {
 	position: relative;
 	transition: all 0.5s;
-	border: 1px dashed $border-color;
-	@include rounded(4px);
+	border: 1px dashed variables.$border-color;
+	@include mixins.rounded(4px);
 	padding: 24px;
 	input {
 		opacity: 0;
