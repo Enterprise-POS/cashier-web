@@ -25,7 +25,7 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 								<Image src="/favicon.png" width={45} height={45} className="img-fluid logo" alt="logo" />
 								{/* <img src="assets/img/logo-white.svg" width={130} className="img-fluid logo-white" alt="logo" /> */}
 							</div>
-							{/* <p>3099 Kennedy Court Framingham, MA 01702</p> */}
+							{/* <p>3099 Kennedy Court F`ramingham, MA 01702</p> */}
 						</div>
 						<div className="col-md-6">
 							<div className=" text-end mb-3">
@@ -110,8 +110,12 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 						<div className="col-md-5">
 							<div className="text-end">{/* <img src="assets/img/sign.svg" className="img-fluid" alt="sign" /> */}</div>
 							<div className="text-end mb-3">
-								<h6 className="fs-14 fw-medium">Enterprise POS</h6>
-								<p>Staff</p>
+								<h6 className="fs-14 fw-medium">
+									{orderItem.responsibleUserNameSnapshot !== ''
+										? orderItem.responsibleUserNameSnapshot
+										: 'unrecorded user'}
+								</h6>
+								<p>ID: {orderItem.responsibleUserId !== 0 ? orderItem.responsibleUserId : '-'}</p>
 							</div>
 						</div>
 					</div>

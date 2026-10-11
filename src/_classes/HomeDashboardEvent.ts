@@ -2,6 +2,8 @@ import { DatePickerProps } from 'antd';
 import { RangePickerProps } from 'antd/es/date-picker/index';
 import dayjs from 'dayjs';
 
+import { SortState } from '@/_interface/QueryFilter';
+
 export abstract class HomeDashboardEvent {}
 
 export class OnClickGenerateReport extends HomeDashboardEvent {}
@@ -15,6 +17,11 @@ export class GetSalesReport extends HomeDashboardEvent {
 		public page: number,
 		public limit: number,
 	) {
+		super();
+	}
+}
+export class OnChangeSalesReportSort extends HomeDashboardEvent {
+	constructor(public sorts: SortState[]) {
 		super();
 	}
 }

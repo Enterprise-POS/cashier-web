@@ -1,3 +1,6 @@
+@use "../utils/mixins";
+@use "../utils/variables";
+
 table.dataTable > thead .sorting:after,
 table.dataTable > thead .sorting_asc:after,
 table.dataTable > thead .sorting_desc:after,
@@ -44,8 +47,8 @@ table.dataTable > thead .sku:before {
 	float: left;
 	padding-right: 15px;
 	font-size: 14px;
-	color: $gray-600;
-	font-weight: $font-weight-normal;
+	color: variables.$gray-600;
+	font-weight: variables.$font-weight-normal;
 	margin-top: -50px;
 	padding-bottom: 20px;
 }
@@ -55,7 +58,7 @@ table.dataTable > thead .sku:before {
 }
 .dataTables_paginate .pagination {
 	li {
-		@include margin-padding(0 5px, null);
+		@include mixins.margin-padding(0 5px, null);
 		a {
 			background: var(--Stroke, rgba(145, 158, 171, 0.3));
 			border-radius: 85px !important;
@@ -65,16 +68,16 @@ table.dataTable > thead .sku:before {
 			align-items: center;
 			justify-content: center;
 			color: #5b6670;
-			font-size: $font-size-12;
+			font-size: variables.$font-size-12;
 			&:hover {
-				background: $primary;
-				color: $white;
+				background: variables.$primary;
+				color: variables.$white;
 			}
 		}
 		&.active a.page-link {
-			background: $primary;
-			border-color: $primary;
-			@include rounded(85px);
+			background: variables.$primary;
+			border-color: variables.$primary;
+			@include mixins.rounded(85px);
 			width: 25px;
 			height: 25px;
 			display: flex;
@@ -128,14 +131,14 @@ table.dataTable thead > tr > th.no-sort.sorting::after {
 		-webkit-box-align: center;
 		-ms-flex-align: center;
 		align-items: center;
-		color: $gray-600;
-		font-size: $font-size-14;
+		color: variables.$gray-600;
+		font-size: variables.$font-size-14;
 		select {
-			border: 1px solid $input-border;
+			border: 1px solid variables.$input-border;
 			border-radius: 8px;
 			margin: 0 8px;
 			padding: 4px 25px 4px 10px;
-			font-size: $font-size-12;
+			font-size: variables.$font-size-12;
 		}
 	}
 }
@@ -160,8 +163,8 @@ table.dataTable {
 }
 .dataTables_length {
 	float: left;
-	font-size: $font-size-12;
-	@include respond-below(custom767) {
+	font-size: variables.$font-size-12;
+	@include mixins.respond-below(custom767) {
 		float: none;
 	}
 }
@@ -237,23 +240,23 @@ table.dataTable {
 }
 
 .ant-checkbox-checked .ant-checkbox-inner {
-	background-color: $primary;
-	border-color: $primary;
+	background-color: variables.$primary;
+	border-color: variables.$primary;
 }
 
 .ant-checkbox-checked .ant-checkbox-inner:hover {
-	background-color: $primary;
-	border-color: $primary;
+	background-color: variables.$primary;
+	border-color: variables.$primary;
 }
 
 .ant-checkbox-checked:not(.ant-checkbox-disabled):hover .ant-checkbox-inner {
-	background-color: $primary !important;
-	border-color: $primary !important;
+	background-color: variables.$primary !important;
+	border-color: variables.$primary !important;
 }
 
 .ant-checkbox-indeterminate .ant-checkbox-inner:after {
-	background-color: $primary;
-	border-color: $primary;
+	background-color: variables.$primary;
+	border-color: variables.$primary;
 }
 
 .table tbody tr td a:hover i {
@@ -268,11 +271,11 @@ table.dataTable {
 }
 
 .ant-select-focused .ant-select-selector {
-	border-color: $primary !important;
+	border-color: variables.$primary !important;
 }
 .ant-select-selector {
 	&:hover {
-		border-color: $primary !important;
+		border-color: variables.$primary !important;
 	}
 }
 // end table

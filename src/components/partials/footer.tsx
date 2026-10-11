@@ -7,7 +7,7 @@ export default function Footer() {
 			<p>
 				Designed &amp; Developed by{' '}
 				<a href="https://github.com/AaronFabian" className="text-primary">
-					Aaron Fabian Saputra
+					Enterprise POS
 				</a>
 			</p>
 		</div>

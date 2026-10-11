@@ -18,6 +18,8 @@ export class OrderItem {
 	paymentUrl: string;
 	transactionId: string;
 	isDataStockSync: boolean;
+	responsibleUserId: number;
+	responsibleUserNameSnapshot: string;
 
 	constructor(def: OrderItemDef) {
 		this.id = def.id;
@@ -34,6 +36,8 @@ export class OrderItem {
 		this.paymentUrl = def.payment_url;
 		this.transactionId = def.transaction_id;
 		this.isDataStockSync = def.is_data_stock_sync;
+		this.responsibleUserId = def.responsible_user_id;
+		this.responsibleUserNameSnapshot = def.responsible_user_name_snapshot;
 
 		this.createdAt = def.created_at !== undefined ? new Date(def.created_at) : new Date(); // ex: '2025-09-18T04:06:50.812337Z';
 	}

@@ -1,11 +1,12 @@
 'use client';
-import { Pagination, Table, Tooltip } from 'antd';
+import { Pagination, Table, TableColumnsType, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Delete, Eye } from 'react-feather';
 
 import {
 	GetSalesReport,
+	OnChangeSalesReportSort,
 	OnClickDeleteInvoiceBtn,
 	OnClickErrorToastCloseButton,
 	OnClickRefreshBtn,
@@ -13,6 +14,7 @@ import {
 import { OrderItem } from '@/_classes/OrderItem';
 import { PaymentStatus } from '@/_interface/PaymentStatus';
 import { PaymentType } from '@/_interface/PaymentType';
+import type { SortState } from '@/_interface/QueryFilter';
 import dayjs from '@/_lib/dayjs';
 import { formatIDR } from '@/_lib/utils';
 import { all_routes as routes } from '@/components/core/data/all_routes';
@@ -39,34 +41,47 @@ export default function SalesReport() {
 	useEffect(() => setIsMounted(true), []);
 	if (!isMounted) return null;
 
-	const columns = [
+	const getSortOrder = (column: SortState['column']) => {
+		const sort = state.sorts.find(current => current.column === column);
+		return sort ? (sort.ascending ? 'ascend' : 'descend') : null;
+	};
+
+	const handleTableChange: TableProps<OrderItem>['onChange'] = (_pagination, _filters, tableSorter) => {
+		const activeSorters = Array.isArray(tableSorter) ? tableSorter : [tableSorter];
+		const dateSorter = activeSorters.find(sorter => {
+			const fieldName = Array.isArray(sorter.field) ? sorter.field.at(0)?.toString() : sorter.field?.toString();
+			return sorter.columnKey?.toString() === 'created_at' || fieldName === 'createdAt';
+		});
+
+		const isAscending = dateSorter?.order === 'ascend';
+		const sorts: SortState[] = [{ column: 'created_at', ascending: isAscending }];
+
+		onEvent(new OnChangeSalesReportSort(sorts));
+	};
+
+	const columns: TableColumnsType<OrderItem> = [
 		{
 			title: 'ID',
 			dataIndex: 'id',
-			sorter: (a: OrderItem, b: OrderItem) => a.id - b.id,
 		},
 		{
 			title: 'Cash-in',
 			dataIndex: 'purchasedPrice',
-			sorter: (a: OrderItem, b: OrderItem) => a.purchasedPrice - b.purchasedPrice,
 			render: (purchasedPrice: number) => formatIDR(purchasedPrice),
 		},
 		// {
 		// 	title: 'Sub Total',
 		// 	dataIndex: 'subTotal',
-		// 	sorter: (a: OrderItem, b: OrderItem) => a.subTotal - b.subTotal,
 		// 	render: (subTotal: number) => formatIDR(subTotal),
 		// },
 		{
 			title: 'Revenue',
 			dataIndex: 'totalAmount',
-			sorter: (a: OrderItem, b: OrderItem) => a.totalAmount - b.totalAmount,
 			render: (totalAmount: number) => formatIDR(totalAmount),
 		},
 		{
 			title: 'Change',
 			dataIndex: 'id',
-			sorter: (a: OrderItem, b: OrderItem) => a.purchasedPrice - a.totalAmount - (b.purchasedPrice - b.totalAmount),
 			render: (id: number, orderItem: OrderItem) => formatIDR(orderItem.purchasedPrice - orderItem.totalAmount),
 		},
 		{
@@ -81,9 +96,12 @@ export default function SalesReport() {
 		},
 		{
 			title: 'Date',
+			key: 'created_at',
 			dataIndex: 'createdAt',
-			sorter: (a: OrderItem, b: OrderItem) => a.createdAt.getTime() - b.createdAt.getTime(),
-			render: (id: number, orderItem: OrderItem) =>
+			sorter: true,
+			sortDirections: ['descend', 'ascend', 'descend'],
+			sortOrder: getSortOrder('created_at'),
+			render: (_: unknown, orderItem: OrderItem) =>
 				dayjs.utc(orderItem.createdAt).local().format('ddd D MMM, YYYY - H:mm'),
 		},
 		{
@@ -117,7 +135,6 @@ export default function SalesReport() {
 					);
 				}
 			},
-			sorter: (a: OrderItem, b: OrderItem) => a.createdAt.getTime() - b.createdAt.getTime(),
 		},
 	];
 
@@ -146,6 +163,7 @@ export default function SalesReport() {
 						pagination={false}
 						columns={columns}
 						dataSource={dataSource}
+						onChange={handleTableChange}
 					/>
 				</div>
 				<div className="d-flex justify-content-center justify-content-md-end py-3 px-3">

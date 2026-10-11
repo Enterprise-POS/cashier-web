@@ -17,4 +17,6 @@ export interface OrderItemDef {
 	payment_url: string;
 	transaction_id: string;
 	is_data_stock_sync: boolean;
+	responsible_user_id: number;
+	responsible_user_name_snapshot: string;
 }

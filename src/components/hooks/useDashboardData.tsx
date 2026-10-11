@@ -2,8 +2,10 @@
 import { DateFilter } from '@/_interface/DateFilter';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { OrderItemDef } from '@/_interface/OrderItemDef';
+import { SortState } from '@/_interface/QueryFilter';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
 import { orderItemGetSearch, orderItemSalesReport } from '@/_lib/client_order_item';
+import { buildQueryFilters } from '@/_lib/utils';
 import { Constants } from '@/components/core/data/constant';
 
 import { useQuery } from '@tanstack/react-query';
@@ -14,8 +16,11 @@ export function useDashboardData(
 	page: number,
 	pageSize: number,
 	dateFilter: DateFilter,
+	sorts: SortState[],
 	token: string,
 ) {
+	const queryFilters = buildQueryFilters(sorts);
+
 	const salesQuery = useQuery({
 		queryKey: [Constants.ReactQueryKey.salesReport, tenantId, storeId, dateFilter],
 		queryFn: () => orderItemSalesReport(tenantId, storeId, dateFilter, token),
@@ -28,10 +33,10 @@ export function useDashboardData(
 	});
 
 	const orderItemsQuery = useQuery({
-		queryKey: [Constants.ReactQueryKey.orderItems, tenantId, storeId, page, pageSize, dateFilter],
-		queryFn: () => orderItemGetSearch(tenantId, storeId, pageSize, page, dateFilter, token),
+		queryKey: [Constants.ReactQueryKey.orderItems, tenantId, storeId, page, pageSize, dateFilter, sorts],
+		queryFn: () => orderItemGetSearch(tenantId, storeId, pageSize, page, dateFilter, queryFilters, token),
 		enabled: tenantId !== 0,
-		staleTime: 1000 * 60 * 5,
+		staleTime: 0,
 		select: (data: HTTPResult<{ defs: OrderItemDef[]; total_count: number }>) => {
 			if (data.error) throw new Error(data.error);
 			return data;

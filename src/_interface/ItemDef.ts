@@ -7,7 +7,7 @@ export interface ItemDef {
 	item_id: number;
 	item_name: string;
 	stocks: number;
-	is_active: number;
+	is_active: boolean;
 	stock_type: StockType;
 	created_at: string;
 	base_price: number;
