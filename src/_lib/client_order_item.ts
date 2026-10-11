@@ -3,6 +3,7 @@ import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { HTTPResult } from '@/_interface/HTTPResult';
 import { HTTPSuccessResponse } from '@/_interface/HTTPSuccessResponse';
 import { OrderItemDef } from '@/_interface/OrderItemDef';
+import { QueryFilter } from '@/_interface/QueryFilter';
 import { ReportResultDef } from '@/_interface/ReportResultDef';
 import { OrderItemFindByIdReturnType } from '@/_lib/order_item';
 import { getUserFacingHttpError } from '@/_lib/httpError';
@@ -66,6 +67,7 @@ export async function orderItemGetSearch(
 	limit: number,
 	page: number,
 	dateFilter: DateFilter | null,
+	filters: QueryFilter[],
 	token: string,
 ): Promise<HTTPResult<{ defs: OrderItemDef[]; total_count: number }>> {
 	try {
@@ -74,7 +76,7 @@ export async function orderItemGetSearch(
 			store_id: storeId,
 			limit: limit,
 			page: page,
-			filters: [],
+			filters,
 			date_filter: dateFilter,
 		};
 
