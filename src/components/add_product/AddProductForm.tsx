@@ -14,6 +14,7 @@ import { useFormState } from '@/components/hooks/useFormState';
 import { useCategoriesQuery } from '@/components/product_list/useProductListQuery';
 import { useTenant } from '@/components/provider/TenantProvider';
 import { RegisterCategory } from '@/_interface/RequestBody.js';
+import { Tooltip } from 'antd';
 
 type ProductRow = {
 	id: string;
@@ -173,7 +174,13 @@ export default function AddProductForm({ token }: { token: string }) {
 							<tr>
 								<th style={{ width: '3rem' }}>No</th>
 								<th>
-									Product Name <span className="text-danger">*</span>
+									<Tooltip
+										title="Name must start with a letter or number and can be up to 255 characters. You can use
+											letters, numbers, spaces and common punctuation and symbols (& - . , ' ( ) / % # $ € ¥ + © ® ™
+											°)."
+									>
+										Product Name <span className="text-danger">*</span>
+									</Tooltip>
 								</th>
 								<th style={{ width: '12rem' }}>Quantity</th>
 								<th style={{ width: '14rem' }}>Base Price</th>
@@ -283,10 +290,6 @@ export default function AddProductForm({ token }: { token: string }) {
 				</div>
 
 				<div className="d-flex align-items-center justify-content-end mb-4 gap-2">
-					<p className="align-self-start me-auto mb-0">
-						Name must start with a letter or number and can be up to 255 characters. You can use letters, numbers,
-						spaces and common punctuation and symbols (& - . , ' ( ) / % # $ € ¥ + © ® ™ °).
-					</p>
 					<button
 						type="button"
 						className="btn btn-secondary"

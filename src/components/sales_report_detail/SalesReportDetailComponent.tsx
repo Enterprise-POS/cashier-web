@@ -110,11 +110,12 @@ export default function SalesReportDetailComponents({ id, data }: { id: number; 
 						<div className="col-md-5">
 							<div className="text-end">{/* <img src="assets/img/sign.svg" className="img-fluid" alt="sign" /> */}</div>
 							<div className="text-end mb-3">
-								<h6 className="fs-14 fw-medium">Enterprise POS</h6>
-								<p>
-									Staff: {orderItem.responsibleUserNameSnapshot !== '' ? orderItem.responsibleUserNameSnapshot : '-'}{' '}
-									ID: {orderItem.responsibleUserId !== 0 ? orderItem.responsibleUserId : '-'}
-								</p>
+								<h6 className="fs-14 fw-medium">
+									{orderItem.responsibleUserNameSnapshot !== ''
+										? orderItem.responsibleUserNameSnapshot
+										: 'unrecorded user'}
+								</h6>
+								<p>ID: {orderItem.responsibleUserId !== 0 ? orderItem.responsibleUserId : '-'}</p>
 							</div>
 						</div>
 					</div>
