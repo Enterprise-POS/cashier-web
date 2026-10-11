@@ -7,6 +7,7 @@ import { createContext, useContext, useMemo, useState } from 'react';
 import {
 	GetSalesReport,
 	HomeDashboardEvent,
+	OnChangeSalesReportSort,
 	OnChangeSelectedStore,
 	OnClickDeleteInvoiceBtn,
 	OnClickErrorToastCloseButton,
@@ -20,6 +21,7 @@ import {
 } from '@/_classes/HomeDashboardEvent';
 import { OrderItem } from '@/_classes/OrderItem';
 import { ReportResult } from '@/_classes/ReportResult';
+import { SortState } from '@/_interface/QueryFilter';
 import { orderItemDeleteInvoice, orderItemExportProfit } from '@/_lib/order_item';
 import { convertTo } from '@/_lib/utils';
 import { useDashboardData } from '@/components/hooks/useDashboardData';
@@ -33,6 +35,7 @@ export type HomeDashboardState = {
 	dateRanges: [dayjs.Dayjs | null, dayjs.Dayjs | null];
 	selectedStoreId: number;
 	pagination: TablePaginationConfig;
+	sorts: SortState[];
 	singleSelectedTag: QuickFilterTag;
 	tobeDeletedInvoiceId: number;
 };
@@ -41,6 +44,7 @@ const initialState: HomeDashboardState = {
 	dateRanges: [todayStart, todayEnd],
 	selectedStoreId: 0,
 	pagination: { current: 1, pageSize: 20, total: 0, responsive: true },
+	sorts: [{ column: 'created_at', ascending: false }],
 	singleSelectedTag: QuickFilterTag.Today,
 	tobeDeletedInvoiceId: 0,
 };
@@ -93,6 +97,7 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 		state.pagination.current!,
 		state.pagination.pageSize!,
 		dateFilter,
+		state.sorts,
 		token, // pass the token
 	);
 
@@ -100,8 +105,8 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 	const isError = salesQuery.isError || orderItemsQuery.isError;
 	const errorMessage = salesQuery.error?.message || orderItemsQuery.error?.message || '';
 
+	// react query
 	const reportResult = salesQuery.isSuccess ? new ReportResult(salesQuery.data.result!) : undefined;
-
 	const orderItems = orderItemsQuery.isSuccess ? orderItemsQuery.data.result!.defs.map(def => new OrderItem(def)) : [];
 
 	// Derive total from actual API response
@@ -167,6 +172,15 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 					current: event.page,
 					pageSize: event.limit,
 				},
+			}));
+			return;
+		}
+
+		if (event instanceof OnChangeSalesReportSort) {
+			setState(v => ({
+				...v,
+				sorts: event.sorts,
+				pagination: { ...v.pagination, current: 1 },
 			}));
 			return;
 		}
