@@ -5,7 +5,7 @@ export class Item {
 	itemId: number;
 	itemName: string;
 	stocks: number;
-	isActive: number;
+	isActive: boolean;
 	createdAt: Date;
 	unit: string;
 	stockType: StockType;
@@ -38,7 +38,7 @@ export class CategoryWithItem extends Item {
 			item_name: def.item_name,
 			stocks: def.stocks,
 			created_at: def.warehouse_created_at,
-			is_active: 0,
+			is_active: true,
 			stock_type: def.stock_type,
 			base_price: def.base_price,
 			tenant_id: def.tenant_id,
