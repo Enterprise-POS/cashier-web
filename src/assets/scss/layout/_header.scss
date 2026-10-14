@@ -1268,6 +1268,47 @@ hr {
 		}
 	}
 }
+@include mixins.respond-below(custom991) {
+	.header .user-menu {
+		display: flex;
+		position: absolute;
+		top: 0;
+		left: 60px;
+		right: 60px;
+		justify-content: flex-end;
+		padding-right: 0;
+		z-index: 10;
+
+		> li:not(.select-store-dropdown) {
+			display: none;
+		}
+		> .select-store-dropdown {
+			max-width: 100%;
+			margin-left: 0;
+			.select-store {
+				max-width: 100%;
+				.user-info {
+					min-width: 0;
+					padding-right: 8px;
+				}
+				.user-detail {
+					min-width: 0;
+				}
+				.user-name {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+		}
+	}
+
+	.header .user-menu > .select-store-dropdown {
+		@include mixins.respond-below(custom575) {
+			display: none;
+		}
+	}
+}
 .header-collapse {
 	.user-menu {
 		height: 0;
