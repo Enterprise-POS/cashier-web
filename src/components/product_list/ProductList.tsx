@@ -54,10 +54,12 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 
 	const categoryFilters = useMemo(
 		() =>
-			(categoriesQuery.data ?? []).map(category => ({
-				text: category.categoryName,
-				value: category.id,
-			})),
+			(categoriesQuery.data ?? [])
+				.map(category => ({
+					text: category.categoryName,
+					value: category.id,
+				}))
+				.concat([{ text: 'Uncategorized', value: -1 }]),
 		[categoriesQuery.data],
 	);
 
@@ -98,12 +100,14 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 
 	const handleTableChange: TableProps<CategoryWithItem>['onChange'] = (_pagination, filters, tableSorter) => {
 		const categoryFilter = filters.categoryId?.at(0);
-		const categoryId = Number(categoryFilter ?? 0);
+		const categoryId = categoryFilter === undefined ? 0 : Number(categoryFilter);
 		const categoryName =
 			categoryId === 0
 				? 'unselected'
-				: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
-					selectedCategory.categoryName);
+				: categoryId === -1
+					? 'Uncategorized'
+					: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
+						selectedCategory.categoryName);
 
 		applyTableChange({ categoryId, categoryName }, getSortsFromTable(tableSorter));
 	};
@@ -136,8 +140,7 @@ export default function ProductList({ limit, page, token }: { limit: number; pag
 			filters: categoryFilters,
 			filterMultiple: false,
 			filteredValue: selectedCategory.categoryId === 0 ? null : [selectedCategory.categoryId],
-			onFilter: (value, record) => record.categoryId === value,
-			render: (_categoryId: number, item) => (item.categoryName.length > 0 ? item.categoryName : '-'),
+			render: (_categoryId: number, item) => (item.categoryName !== '' ? item.categoryName : '-'),
 		},
 		{
 			title: 'Stocks',

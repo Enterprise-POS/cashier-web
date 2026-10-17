@@ -71,10 +71,12 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 
 	const categoryFilters = useMemo(
 		() =>
-			(categoriesQuery.data ?? []).map(category => ({
-				text: category.categoryName,
-				value: category.id,
-			})),
+			(categoriesQuery.data ?? [])
+				.map(category => ({
+					text: category.categoryName,
+					value: category.id,
+				}))
+				.concat([{ text: 'Uncategorized', value: -1 }]),
 		[categoriesQuery.data],
 	);
 
@@ -119,8 +121,10 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 		const categoryName =
 			categoryId === 0
 				? 'unselected'
-				: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
-					selectedCategory.categoryName);
+				: categoryId === -1
+					? 'Uncategorized'
+					: (categoriesQuery.data?.find(category => category.id === categoryId)?.categoryName ??
+						selectedCategory.categoryName);
 
 		applyTableChange({ categoryId, categoryName }, getSortsFromTable(tableSorter));
 	};
@@ -190,7 +194,7 @@ export default function ManageStocksComponents({ token }: { token: string }) {
 			filters: categoryFilters,
 			filterMultiple: false,
 			filteredValue: selectedCategory.categoryId === 0 ? null : [selectedCategory.categoryId],
-			render: (_categoryId: number, item: StoreStockV2) => (item.categoryName.length > 0 ? item.categoryName : '-'),
+			render: (_categoryId: number, item: StoreStockV2) => (item.categoryName !== '' ? item.categoryName : '-'),
 		},
 		{
 			title: 'Stocks',
