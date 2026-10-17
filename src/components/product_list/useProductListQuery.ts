@@ -42,7 +42,7 @@ export function useProductListQuery(token: string, tenantId: number) {
 			};
 		},
 		enabled: tenantId !== 0,
-		staleTime: 0,
+		staleTime: minutes(5),
 		refetchOnWindowFocus: false,
 		refetchOnReconnect: true,
 	});
