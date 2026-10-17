@@ -215,6 +215,10 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 					start = now.startOf('day');
 					end = now.endOf('day');
 					break;
+				case QuickFilterTag.Yesterday:
+					start = now.subtract(1, 'day').startOf('day');
+					end = now.subtract(1, 'day').endOf('day');
+					break;
 				case QuickFilterTag.LastHour:
 					start = now.subtract(1, 'hour');
 					end = now;
@@ -231,9 +235,21 @@ function HomeDashboardProvider({ children, token }: { children: React.ReactNode;
 					start = now.subtract(7, 'day').startOf('day');
 					end = now.endOf('day');
 					break;
+				case QuickFilterTag.ThisWeek:
+					start = now.subtract((now.day() + 6) % 7, 'day').startOf('day');
+					end = now.endOf('day');
+					break;
+				case QuickFilterTag.LastWeek:
+					start = now.subtract((now.day() + 6) % 7 + 7, 'day').startOf('day');
+					end = now.subtract((now.day() + 6) % 7 + 1, 'day').endOf('day');
+					break;
 				case QuickFilterTag.ThisMonth:
 					start = now.startOf('month');
 					end = now.endOf('month');
+					break;
+				case QuickFilterTag.LastMonth:
+					start = now.subtract(1, 'month').startOf('month');
+					end = now.subtract(1, 'month').endOf('month');
 					break;
 				case QuickFilterTag.Custom:
 					return; // Let user pick manually, don't override

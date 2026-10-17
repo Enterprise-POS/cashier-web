@@ -47,7 +47,11 @@ export enum QuickFilterTag {
 	Last6Hours = 'last 6 hours',
 	Last12Hours = 'Last 12 hours',
 	Last7Days = 'Last 7 days',
+	Yesterday = 'Yesterday',
+	ThisWeek = 'This week',
+	LastWeek = 'Last week',
 	ThisMonth = 'This month',
+	LastMonth = 'Last month',
 	Custom = 'Custom',
 }
 
