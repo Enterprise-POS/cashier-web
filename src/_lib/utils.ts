@@ -2,6 +2,16 @@ import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { QueryFilter, SortState } from '@/_interface/QueryFilter';
 import { getUserFacingHttpError } from '@/_lib/httpError';
 
+export class HttpRequestError extends Error {
+	constructor(
+		message: string,
+		public readonly status: number,
+	) {
+		super(message);
+		this.name = 'HttpRequestError';
+	}
+}
+
 export const convertTo = {
 	number: (v: unknown) => {
 		const value = Number(v);
@@ -38,7 +48,7 @@ export async function ensureSuccess(response: Response): Promise<void> {
 	} catch {
 		message = response.statusText;
 	}
-	throw new Error(getUserFacingHttpError(response.status, message));
+	throw new HttpRequestError(getUserFacingHttpError(response.status, message), response.status);
 }
 
 export function closeBootstrapModal(selector: string) {
