@@ -104,6 +104,7 @@ export const all_routes: { [key: string]: RouteLink } = {
 	expiredProducts: '/expired_products',
 	lowStocks: '/low_stocks',
 	categoryList: '/category_list',
+	vouchers: '/vouchers',
 	subcategories: '/sub_categories',
 	editProduct: '<tenantId>/edit_product/<itemId>',
 	editStoreInfo: '/edit_store_info',

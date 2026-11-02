@@ -33,6 +33,9 @@ export const server_routes = {
 	unregisterCategory: `${baseURL}/${apiVersion}/categories/unregister/<tenantId>`, // DELETE
 	editItemCategory: `${baseURL}/${apiVersion}/categories/edit_item_category/<tenantId>`, // PUT
 
+	// voucher
+	vouchers: `${baseURL}/${apiVersion}/vouchers/<tenantId>`, // GET, POST, PUT, DELETE
+
 	// store
 	getStores: `${baseURL}/${apiVersion}/stores/<tenantId>`, // GET
 	createNewStore: `${baseURL}/${apiVersion}/stores/<tenantId>`, // POST
