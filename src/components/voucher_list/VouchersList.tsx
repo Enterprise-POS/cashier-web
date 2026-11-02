@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Table, TablePaginationConfig, TableProps } from 'antd';
+import { Alert, Table, TablePaginationConfig, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
@@ -59,7 +59,22 @@ function toTimestamp(value: string): number | undefined {
 }
 
 function formatDate(value: Date | null | undefined): string {
-	return value ? `${value.toLocaleDateString()} ${value.toLocaleTimeString()}` : '—';
+	return value ? `${value.toLocaleDateString()} ${value.toLocaleTimeString()}` : '--not set';
+}
+
+function formatOptionalValue(value: string | number | null | undefined): string | number {
+	return value === null || value === undefined || value === '' || value === 0 ? '--not set' : value;
+}
+
+function renderTruncatedText(value: string | null | undefined, maxWidth: number | string = 220) {
+	if (!value) return '--not set';
+	return (
+		<Tooltip title={value}>
+			<span className="d-inline-block text-truncate align-middle" style={{ maxWidth, verticalAlign: 'bottom' }}>
+				{value}
+			</span>
+		</Tooltip>
+	);
 }
 
 function getErrorMessage(error: unknown): string {
@@ -95,11 +110,18 @@ export default function VouchersList() {
 	const columns = useMemo<NonNullable<TableProps<Voucher>['columns']>>(
 		() => [
 			{
+				title: 'ID',
+				dataIndex: 'id',
+				key: 'id',
+				render: (value: number) => formatOptionalValue(value),
+			},
+			{
 				title: 'Code',
 				dataIndex: 'code',
 				key: 'code',
 				sorter: true,
 				sortOrder: sortColumn === 'code' ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null,
+				render: (value: string) => renderTruncatedText(value, 140),
 			},
 			{
 				title: 'Name',
@@ -107,6 +129,7 @@ export default function VouchersList() {
 				key: 'name',
 				sorter: true,
 				sortOrder: sortColumn === 'name' ? (sortOrder === 'asc' ? 'ascend' : 'descend') : null,
+				render: (value: string) => renderTruncatedText(value, 220),
 			},
 			{
 				title: 'Type',
@@ -126,7 +149,66 @@ export default function VouchersList() {
 				},
 			},
 			{
-				title: 'Created At',
+				title: 'Used count',
+				dataIndex: 'usedCount',
+				key: 'used_count',
+			},
+			{
+				title: 'Usage limit',
+				dataIndex: 'usageLimit',
+				key: 'usage_limit',
+			},
+			{
+				title: 'Start at',
+				dataIndex: 'startAt',
+				key: 'start_at',
+				render: formatDate,
+			},
+			{
+				title: 'End at',
+				dataIndex: 'endAt',
+				key: 'end_at',
+				render: formatDate,
+			},
+			{
+				title: 'Percentage',
+				dataIndex: 'percentage',
+				key: 'percentage',
+				render: (value: number) => (value === 0 ? '--not set' : `${value}%`),
+			},
+			{
+				title: 'Maximum decrement',
+				dataIndex: 'maximumDecrement',
+				key: 'maximum_decrement',
+				render: (value: number) => formatOptionalValue(value),
+			},
+			{
+				title: 'Rounding policy',
+				dataIndex: 'roundingPolicy',
+				key: 'rounding_policy',
+				render: (value: string) => renderTruncatedText(value, 120),
+			},
+			{
+				title: 'Decrement',
+				dataIndex: 'decrement',
+				key: 'decrement',
+				render: (value: number) => formatOptionalValue(value),
+			},
+			{
+				title: 'Item ID combinations',
+				dataIndex: 'itemIdCombinations',
+				key: 'item_id_combinations',
+				render: (value: number[] | null | undefined) =>
+					renderTruncatedText(value?.join(', '), 180),
+			},
+			{
+				title: 'Item quantities',
+				dataIndex: 'itemQuantities',
+				key: 'item_quantities',
+				render: (value: number) => formatOptionalValue(value),
+			},
+			{
+				title: 'Created at',
 				dataIndex: 'createdAt',
 				key: 'created_at',
 				sorter: true,
@@ -282,6 +364,7 @@ export default function VouchersList() {
 						columns={columns}
 						dataSource={query.data?.vouchers ?? []}
 						rowKey="id"
+						scroll={{ x: 'max-content' }}
 						pagination={{ ...pagination, pageSize: 20 }}
 						onChange={handleTableChange}
 						loading={{ spinning: query.isFetching, indicator: <SectionLoading /> }}

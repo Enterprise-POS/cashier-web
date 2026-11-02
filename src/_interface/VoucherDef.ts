@@ -25,7 +25,7 @@ export interface VoucherDef {
 	end_at?: string | number | null;
 	percentage?: number;
 	maximum_decrement?: number;
-	rounding_policy?: VoucherRoundingPolicy;
+	rounding_policy?: VoucherRoundingPolicy | '';
 	decrement?: number;
 	item_id_combinations?: number[] | null;
 	item_quantities?: number;

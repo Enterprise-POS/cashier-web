@@ -14,7 +14,7 @@ export class Voucher {
 	endAt: Date | null;
 	percentage: number;
 	maximumDecrement: number;
-	roundingPolicy: VoucherRoundingPolicy;
+	roundingPolicy: VoucherRoundingPolicy | '';
 	decrement: number;
 	itemIdCombinations: number[];
 	itemQuantities: number;
@@ -32,7 +32,7 @@ export class Voucher {
 		this.endAt = toDate(def.end_at);
 		this.percentage = def.percentage ?? 0;
 		this.maximumDecrement = def.maximum_decrement ?? 0;
-		this.roundingPolicy = def.rounding_policy ?? VoucherRoundingPolicy.ROUND;
+		this.roundingPolicy = def.rounding_policy ?? '';
 		this.decrement = def.decrement ?? 0;
 		this.itemIdCombinations = def.item_id_combinations ?? [];
 		this.itemQuantities = def.item_quantities ?? 0;
