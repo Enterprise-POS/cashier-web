@@ -1,11 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
 import { Input, Pagination, Tooltip } from 'antd';
 import { useEffect, useMemo, useState } from 'react';
 
 import { Item } from '@/_classes/Item';
 import { ItemDef, StockType } from '@/_interface/ItemDef';
-import { getActiveWarehouseItem } from '@/_lib/warehouse';
-import { Constants } from '@/components/core/data/constant';
+import { useWarehouseItemsQuery } from '@/components/hooks/useWarehouseItemsQuery';
 
 type SelectedEntry = { itemName: string; stocks: number; stockType: StockType };
 
@@ -28,12 +26,7 @@ export function SelectProductToAddNew({
 		if (isModalOpen) setSelectedItems(new Map());
 	}, [isModalOpen]);
 
-	const warehouseItemQuery = useQuery({
-		queryKey: [Constants.ReactQueryKey.warehouse, tenantId, page, appliedQuery],
-		queryFn: () => getActiveWarehouseItem(tenantId, limit, page, appliedQuery),
-		enabled: tenantId !== 0 && isModalOpen,
-		staleTime: 1000 * 60 * 5,
-	});
+	const warehouseItemQuery = useWarehouseItemsQuery(tenantId, page, appliedQuery, isModalOpen);
 
 	const { items, count } = useMemo(() => {
 		if (!warehouseItemQuery.isSuccess) return { items: [], count: 0 };

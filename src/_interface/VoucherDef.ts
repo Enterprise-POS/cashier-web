@@ -4,7 +4,10 @@ export type VoucherType =
 	| 'ITEM_COMBINATIONS'
 	| 'ITEM_QUANTITIES';
 
-export type CreatableVoucherType = 'FROM_TOTAL_LIMITED_PERCENTAGE' | 'FROM_TOTAL_LIMITED_STATIC_DECREMENT';
+export type CreatableVoucherType =
+	| 'FROM_TOTAL_LIMITED_PERCENTAGE'
+	| 'FROM_TOTAL_LIMITED_STATIC_DECREMENT'
+	| 'ITEM_COMBINATIONS';
 
 export enum VoucherRoundingPolicy {
 	CEIL = 'CEIL',
@@ -45,6 +48,7 @@ export interface CreateVoucherRequest {
 	maximum_decrement?: number;
 	rounding_policy?: VoucherRoundingPolicy;
 	decrement?: number;
+	item_id_combinations?: number[];
 	start_at?: number;
 	end_at?: number;
 }
