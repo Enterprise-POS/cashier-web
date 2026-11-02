@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, ConfigProvider, Table, TablePaginationConfig, TableProps, Tooltip } from 'antd';
+import { Alert, ConfigProvider, Input, Table, TablePaginationConfig, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
@@ -97,10 +97,15 @@ export default function VouchersList() {
 
 	const pagination = useVoucherStore(state => state.pagination);
 	const voucherType = useVoucherStore(state => state.voucherType);
+	const nameQuery = useVoucherStore(state => state.nameQuery);
+	const appliedNameQuery = useVoucherStore(state => state.appliedNameQuery);
 	const sortColumn = useVoucherStore(state => state.sortColumn);
 	const sortOrder = useVoucherStore(state => state.sortOrder);
 	const setPagination = useVoucherStore(state => state.setPagination);
 	const setVoucherType = useVoucherStore(state => state.setVoucherType);
+	const setNameQuery = useVoucherStore(state => state.setNameQuery);
+	const applyNameQuery = useVoucherStore(state => state.applyNameQuery);
+	const resetNameQuery = useVoucherStore(state => state.resetNameQuery);
 	const setSort = useVoucherStore(state => state.setSort);
 	const errorMessage = useVoucherStore(state => state.errorMessage);
 	const successMessage = useVoucherStore(state => state.successMessage);
@@ -146,7 +151,7 @@ export default function VouchersList() {
 				key: 'voucher_type',
 				filters: VOUCHER_TYPE_FILTERS,
 				filterMultiple: false,
-				filteredValue: voucherType ? [voucherType] : null,
+				filteredValue: voucherType ? [voucherType] : [],
 				filterResetToDefaultFilteredValue: false,
 				render: (voucherType: VoucherType) => {
 					switch (voucherType) {
@@ -211,8 +216,7 @@ export default function VouchersList() {
 				title: 'Item ID combinations',
 				dataIndex: 'itemIdCombinations',
 				key: 'item_id_combinations',
-				render: (value: number[] | null | undefined) =>
-					renderTruncatedText(value?.join(', '), 180),
+				render: (value: number[] | null | undefined) => renderTruncatedText(value?.join(', '), 180),
 			},
 			{
 				title: 'Item quantities',
@@ -271,12 +275,15 @@ export default function VouchersList() {
 		[clearFeedback, sortColumn, sortOrder, voucherType],
 	);
 
-	const handleTableChange: TableProps<Voucher>['onChange'] = (nextPagination: TablePaginationConfig, filters, sorter) => {
-		const voucherTypeFilter = filters.voucher_type;
-		const hasVoucherTypeFilterChange = voucherTypeFilter !== undefined;
-		const selectedType = voucherTypeFilter?.[0];
+	const handleTableChange: TableProps<Voucher>['onChange'] = (
+		nextPagination: TablePaginationConfig,
+		filters,
+		sorter,
+		extra,
+	) => {
+		const selectedType = filters.voucher_type?.[0];
 		const nextVoucherType = VOUCHER_TYPE_FILTERS.find(option => option.value === selectedType)?.value ?? null;
-		const didVoucherTypeChange = hasVoucherTypeFilterChange && nextVoucherType !== voucherType;
+		const didVoucherTypeChange = extra.action === 'filter' && nextVoucherType !== voucherType;
 		const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
 		const field = activeSorter.columnKey;
 		const order = activeSorter.order;
@@ -285,8 +292,7 @@ export default function VouchersList() {
 			typeof field === 'string' && allowedColumns.includes(field as VoucherSortColumn)
 				? (field as VoucherSortColumn)
 				: null;
-		const nextOrder: VoucherSortOrder | null =
-			order === 'ascend' ? 'asc' : order === 'descend' ? 'desc' : null;
+		const nextOrder: VoucherSortOrder | null = order === 'ascend' ? 'asc' : order === 'descend' ? 'desc' : null;
 
 		setSort(nextColumn, nextOrder);
 		if (didVoucherTypeChange) setVoucherType(nextVoucherType);
@@ -320,7 +326,8 @@ export default function VouchersList() {
 		const failures = errors
 			.map((error, index) => (error ? `Voucher ${index + 1} (${payloads[index].code}): ${error}` : null))
 			.filter((error): error is string => error !== null);
-		if (failures.length > 0) setError(`${successfulCount > 0 ? `${successfulCount} created. ` : ''}${failures.join(' ')}`);
+		if (failures.length > 0)
+			setError(`${successfulCount > 0 ? `${successfulCount} created. ` : ''}${failures.join(' ')}`);
 		return errors;
 	}
 
@@ -374,6 +381,42 @@ export default function VouchersList() {
 				/>
 			)}
 			<div className="card table-list-card">
+				<div className="card-header gap-3 d-flex align-items-center flex-wrap row-gap-3">
+					<div className="search-set" style={{ flex: '1 1 180px', maxWidth: 380 }}>
+						<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
+							<Input.Search
+								className="focus-ring"
+								placeholder="Search by voucher name or code..."
+								allowClear
+								value={nameQuery}
+								disabled={query.isFetching}
+								onChange={event => setNameQuery(event.target.value)}
+								onSearch={applyNameQuery}
+								style={{ width: '100%' }}
+							/>
+						</ConfigProvider>
+					</div>
+					<div className="page-btn">
+						<button
+							className={`btn btn-primary w-100 ${query.isFetching ? 'wait' : ''}`}
+							type="button"
+							disabled={query.isFetching}
+							onClick={applyNameQuery}
+						>
+							{query.isFetching ? 'Please wait' : 'Search'}
+						</button>
+					</div>
+					<div className="page-btn">
+						<button
+							className={`btn btn-primary-ghost w-100 ${query.isFetching ? 'disabled' : ''}`}
+							type="button"
+							disabled={query.isFetching}
+							onClick={resetNameQuery}
+						>
+							Reset
+						</button>
+					</div>
+				</div>
 				<div className="table-responsive">
 					<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
 						<Table<Voucher>
@@ -389,16 +432,8 @@ export default function VouchersList() {
 				</div>
 			</div>
 
-			<CreateVouchersModal
-				tenantId={tenantId}
-				isLoading={createMutation.isPending}
-				onSubmit={handleCreateVouchers}
-			/>
-			<EditVoucherModal
-				voucher={editingVoucher}
-				isLoading={editMutation.isPending}
-				onSubmit={handleEditVoucher}
-			/>
+			<CreateVouchersModal tenantId={tenantId} isLoading={createMutation.isPending} onSubmit={handleCreateVouchers} />
+			<EditVoucherModal voucher={editingVoucher} isLoading={editMutation.isPending} onSubmit={handleEditVoucher} />
 			<DeleteVoucherModal
 				voucher={deletingVoucher}
 				isLoading={deleteMutation.isPending}
@@ -420,7 +455,9 @@ function CreateVouchersModal({
 	const [drafts, setDrafts] = useState<VoucherDraft[]>([{ ...EMPTY_DRAFT }]);
 
 	function updateDraft(index: number, field: keyof VoucherDraft, value: string) {
-		setDrafts(current => current.map((draft, draftIndex) => (draftIndex === index ? { ...draft, [field]: value } : draft)));
+		setDrafts(current =>
+			current.map((draft, draftIndex) => (draftIndex === index ? { ...draft, [field]: value } : draft)),
+		);
 	}
 
 	function toRequest(draft: VoucherDraft): CreateVoucherRequest {
@@ -555,11 +592,7 @@ function CreateVouchersModal({
 														value={draft.rounding_policy}
 														required
 														onChange={event =>
-															updateDraft(
-																index,
-																'rounding_policy',
-																event.target.value as VoucherRoundingPolicy,
-															)
+															updateDraft(index, 'rounding_policy', event.target.value as VoucherRoundingPolicy)
 														}
 													>
 														<option value={VoucherRoundingPolicy.CEIL}>CEIL</option>
@@ -679,7 +712,13 @@ function EditVoucherModal({
 						<div className="modal-body">
 							<div className="mb-3">
 								<label className="form-label">Code *</label>
-								<input className="form-control" value={code} required maxLength={100} onChange={e => setCode(e.target.value)} />
+								<input
+									className="form-control"
+									value={code}
+									required
+									maxLength={100}
+									onChange={e => setCode(e.target.value)}
+								/>
 							</div>
 							<div className="mb-3">
 								<label className="form-label">Name *</label>

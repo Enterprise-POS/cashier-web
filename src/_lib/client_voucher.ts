@@ -12,11 +12,13 @@ export async function getVouchers(
 	limit: number,
 	sort: string | null,
 	voucherType: VoucherType | null,
+	nameQuery: string,
 	token: string,
 ): Promise<VoucherListResponse> {
 	const params = new URLSearchParams({ limit: limit.toString(), page: page.toString() });
 	if (sort) params.set('sort', sort);
 	if (voucherType) params.set('voucher_type', voucherType);
+	if (nameQuery) params.set('name_query', nameQuery);
 
 	const response = await fetch(`${voucherUrl(tenantId)}?${params.toString()}`, {
 		...authorizedRequest(token, 'GET'),
