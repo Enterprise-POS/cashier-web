@@ -44,7 +44,6 @@ export function useProductListQuery(token: string, tenantId: number) {
 		enabled: tenantId !== 0,
 		staleTime: minutes(5),
 		refetchOnWindowFocus: false,
-		refetchOnReconnect: true,
 	});
 }
 
@@ -59,6 +58,5 @@ export function useCategoriesQuery(tenantId: number) {
 		enabled: tenantId !== 0,
 		staleTime: minutes(5),
 		refetchOnWindowFocus: false,
-		refetchOnReconnect: true,
 	});
 }

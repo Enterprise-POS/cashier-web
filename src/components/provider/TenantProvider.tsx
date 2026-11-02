@@ -5,6 +5,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { Tenant } from '@/_classes/Tenant';
 import { getTenantWithUser } from '@/_lib/action';
 import { convertTo } from '@/_lib/utils';
+import { all_routes as routes } from '@/components/core/data/all_routes';
 import { Constants } from '@/components/core/data/constant';
 
 export type TenantProviderState = {
@@ -30,7 +31,7 @@ const initialState: TenantProviderState = {
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
-const EXCLUDED_ROUTES = ['/server_error'];
+const EXCLUDED_ROUTES = [routes.serverError];
 
 function TenantProvider({ children, token }: { children: React.ReactNode; token: string }) {
 	const [data, setTenantState] = useState<TenantProviderState>(initialState);
@@ -66,7 +67,7 @@ function TenantProvider({ children, token }: { children: React.ReactNode; token:
 				} else if (error.includes('[SERVER ERROR]')) {
 					sessionStorage.setItem('lastError', error);
 					sessionStorage.setItem('lastErrorTime', Date.now().toString());
-					router.push('/500');
+					router.push(routes.serverError);
 					return; // Navigating so return is required here
 				} else {
 					// Normal error, should show what cause error to user
