@@ -1,4 +1,4 @@
-import { CreateVoucherRequest, EditVoucherRequest, VoucherListResponse } from '@/_interface/VoucherDef';
+import { CreateVoucherRequest, EditVoucherRequest, VoucherListResponse, VoucherType } from '@/_interface/VoucherDef';
 import { authorizedRequest, ensureSuccess } from '@/_lib/utils';
 import { server_routes } from '@/components/core/data/server_routes';
 
@@ -11,10 +11,12 @@ export async function getVouchers(
 	page: number,
 	limit: number,
 	sort: string | null,
+	voucherType: VoucherType | null,
 	token: string,
 ): Promise<VoucherListResponse> {
 	const params = new URLSearchParams({ limit: limit.toString(), page: page.toString() });
 	if (sort) params.set('sort', sort);
+	if (voucherType) params.set('voucher_type', voucherType);
 
 	const response = await fetch(`${voucherUrl(tenantId)}?${params.toString()}`, {
 		...authorizedRequest(token, 'GET'),

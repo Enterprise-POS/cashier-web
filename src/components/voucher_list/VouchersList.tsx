@@ -1,6 +1,6 @@
 'use client';
 
-import { Alert, Table, TablePaginationConfig, TableProps, Tooltip } from 'antd';
+import { Alert, ConfigProvider, Table, TablePaginationConfig, TableProps, Tooltip } from 'antd';
 import Link from 'next/link';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { Edit, Trash2 } from 'react-feather';
@@ -43,6 +43,13 @@ const EMPTY_DRAFT: VoucherDraft = {
 	start_at: '',
 	end_at: '',
 };
+
+const VOUCHER_TYPE_FILTERS: Array<{ text: string; value: VoucherType }> = [
+	{ text: 'Limited percentage', value: 'FROM_TOTAL_LIMITED_PERCENTAGE' },
+	{ text: 'Static decrement', value: 'FROM_TOTAL_LIMITED_STATIC_DECREMENT' },
+	{ text: 'Item combinations', value: 'ITEM_COMBINATIONS' },
+	{ text: 'Item quantities', value: 'ITEM_QUANTITIES' },
+];
 
 function toDateTimeInput(timestamp?: string | number | null): string {
 	if (timestamp == null || timestamp === '') return '';
@@ -89,9 +96,11 @@ export default function VouchersList() {
 	const { createMutation, editMutation, deleteMutation } = useVoucherMutations(tenantId, token);
 
 	const pagination = useVoucherStore(state => state.pagination);
+	const voucherType = useVoucherStore(state => state.voucherType);
 	const sortColumn = useVoucherStore(state => state.sortColumn);
 	const sortOrder = useVoucherStore(state => state.sortOrder);
 	const setPagination = useVoucherStore(state => state.setPagination);
+	const setVoucherType = useVoucherStore(state => state.setVoucherType);
 	const setSort = useVoucherStore(state => state.setSort);
 	const errorMessage = useVoucherStore(state => state.errorMessage);
 	const successMessage = useVoucherStore(state => state.successMessage);
@@ -135,6 +144,10 @@ export default function VouchersList() {
 				title: 'Type',
 				dataIndex: 'voucherType',
 				key: 'voucher_type',
+				filters: VOUCHER_TYPE_FILTERS,
+				filterMultiple: false,
+				filteredValue: voucherType ? [voucherType] : null,
+				filterResetToDefaultFilteredValue: false,
 				render: (voucherType: VoucherType) => {
 					switch (voucherType) {
 						case 'FROM_TOTAL_LIMITED_PERCENTAGE':
@@ -255,14 +268,15 @@ export default function VouchersList() {
 				),
 			},
 		],
-		[clearFeedback, sortColumn, sortOrder],
+		[clearFeedback, sortColumn, sortOrder, voucherType],
 	);
 
-	const handleTableChange: TableProps<Voucher>['onChange'] = (
-		nextPagination: TablePaginationConfig,
-		_filters,
-		sorter,
-	) => {
+	const handleTableChange: TableProps<Voucher>['onChange'] = (nextPagination: TablePaginationConfig, filters, sorter) => {
+		const voucherTypeFilter = filters.voucher_type;
+		const hasVoucherTypeFilterChange = voucherTypeFilter !== undefined;
+		const selectedType = voucherTypeFilter?.[0];
+		const nextVoucherType = VOUCHER_TYPE_FILTERS.find(option => option.value === selectedType)?.value ?? null;
+		const didVoucherTypeChange = hasVoucherTypeFilterChange && nextVoucherType !== voucherType;
 		const activeSorter = Array.isArray(sorter) ? sorter[0] : sorter;
 		const field = activeSorter.columnKey;
 		const order = activeSorter.order;
@@ -275,9 +289,10 @@ export default function VouchersList() {
 			order === 'ascend' ? 'asc' : order === 'descend' ? 'desc' : null;
 
 		setSort(nextColumn, nextOrder);
+		if (didVoucherTypeChange) setVoucherType(nextVoucherType);
 		setPagination({
 			...pagination,
-			current: nextPagination.current ?? 1,
+			current: didVoucherTypeChange ? 1 : (nextPagination.current ?? 1),
 			pageSize: 20,
 			total: query.data?.count ?? 0,
 		});
@@ -360,15 +375,17 @@ export default function VouchersList() {
 			)}
 			<div className="card table-list-card">
 				<div className="table-responsive">
-					<Table<Voucher>
-						columns={columns}
-						dataSource={query.data?.vouchers ?? []}
-						rowKey="id"
-						scroll={{ x: 'max-content' }}
-						pagination={{ ...pagination, pageSize: 20 }}
-						onChange={handleTableChange}
-						loading={{ spinning: query.isFetching, indicator: <SectionLoading /> }}
-					/>
+					<ConfigProvider theme={{ token: { colorPrimary: '#fe9f43' } }}>
+						<Table<Voucher>
+							columns={columns}
+							dataSource={query.data?.vouchers ?? []}
+							rowKey="id"
+							scroll={{ x: 'max-content' }}
+							pagination={{ ...pagination, pageSize: 20 }}
+							onChange={handleTableChange}
+							loading={{ spinning: query.isFetching, indicator: <SectionLoading /> }}
+						/>
+					</ConfigProvider>
 				</div>
 			</div>
 
