@@ -368,6 +368,17 @@ export default function Sidebar() {
 							</ul>
 						</li>
 						<li className="submenu-open">
+							<h6 className="submenu-hdr">Promotions</h6>
+							<ul>
+								<li className={routes.vouchers === pathname ? 'active' : ''}>
+									<Link href={routes.vouchers} className="link-to-page-btn">
+										<i className="ti ti-ticket fs-16 me-2"></i>
+										<span>Vouchers</span>
+									</Link>
+								</li>
+							</ul>
+						</li>
+						<li className="submenu-open">
 							<h6 className="submenu-hdr">Stores</h6>
 							<ul>
 								<li className={routes.storeList === pathname ? 'active' : ''}>

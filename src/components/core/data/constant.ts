@@ -29,6 +29,7 @@ export const ReactQueryKey = {
 	editStockInfo: 'editStockInfo',
 	storeStocks: 'storeStocks',
 	categories: 'categories',
+	vouchers: 'vouchers',
 	warehouse: 'warehouse',
 	productList: 'productList',
 	productCategories: 'productCategories',

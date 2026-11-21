@@ -11,7 +11,7 @@ export default function Custom505() {
 		const lastError = sessionStorage.getItem('lastError');
 		const errorTime = sessionStorage.getItem('lastErrorTime');
 
-		// ✅ Only show error if recent (within 5 seconds)
+		// Only show error if recent (within 5 seconds)
 		if (lastError && errorTime) {
 			const timeDiff = Date.now() - parseInt(errorTime);
 			if (timeDiff < 5000) {

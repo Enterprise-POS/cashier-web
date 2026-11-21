@@ -1,4 +1,16 @@
+import { ErrorResponse } from '@/_interface/ErrorResponse';
 import { QueryFilter, SortState } from '@/_interface/QueryFilter';
+import { getUserFacingHttpError } from '@/_lib/httpError';
+
+export class HttpRequestError extends Error {
+	constructor(
+		message: string,
+		public readonly status: number,
+	) {
+		super(message);
+		this.name = 'HttpRequestError';
+	}
+}
 
 export const convertTo = {
 	number: (v: unknown) => {
@@ -6,6 +18,38 @@ export const convertTo = {
 		return isNaN(value) ? 0 : value;
 	},
 };
+
+export function toDate(value?: string | number | null): Date | null {
+	if (value == null || value === '') return null;
+	const normalized = typeof value === 'number' && value < 1_000_000_000_000 ? value * 1000 : value;
+	const date = new Date(normalized);
+	return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function authorizedRequest(token: string, method: RequestInit['method'], body?: unknown): RequestInit {
+	return {
+		method,
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${token}`,
+		},
+		...(body === undefined ? {} : { body: JSON.stringify(body) }),
+	};
+}
+
+export async function ensureSuccess(response: Response): Promise<void> {
+	if (response.ok) return;
+
+	let message: unknown;
+	try {
+		const body = (await response.json()) as Partial<ErrorResponse>;
+		message = body.message;
+	} catch {
+		message = response.statusText;
+	}
+	throw new HttpRequestError(getUserFacingHttpError(response.status, message), response.status);
+}
 
 export function closeBootstrapModal(selector: string) {
 	// Because bootstrap modal not maintained by react, programmatic close modal
