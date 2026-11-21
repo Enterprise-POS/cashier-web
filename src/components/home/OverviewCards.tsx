@@ -68,6 +68,38 @@ export default function OverviewCards() {
 					</div>
 				</div>
 			</div>
+			<div className="col-xl-6 col-sm-6 col-12 d-flex">
+				<div className="card border border-secondary sale-widget flex-fill">
+					<div className="card-body d-flex align-items-center">
+						<span className="sale-icon bg-secondary text-white">
+							<i className="ti ti-file-stack fs-24" />
+						</span>
+						<div className="ms-2">
+							<p className="fw-medium mb-1">Expenses</p>
+							<div>
+								<h3>{reportResult !== undefined ? formatIDR(reportResult.sumExpenses) : '-'}</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div className="col-xl-6 col-sm-6 col-12 d-flex">
+				<div className="card border border-primary sale-widget flex-fill">
+					<div className="card-body d-flex align-items-center">
+						<span className="sale-icon bg-primary text-white">
+							<i className="ti ti-report-money fs-24" />
+						</span>
+						<div className="ms-2">
+							<p className="fw-medium mb-1">Net Profit (Profit − Expenses)</p>
+							<div>
+								<h3 className={reportResult !== undefined && reportResult.netProfit < 0 ? 'text-danger' : ''}>
+									{reportResult !== undefined ? formatIDR(reportResult.netProfit) : '-'}
+								</h3>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	);
 }

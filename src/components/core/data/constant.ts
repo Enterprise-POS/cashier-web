@@ -33,6 +33,8 @@ export const ReactQueryKey = {
 	warehouse: 'warehouse',
 	productList: 'productList',
 	productCategories: 'productCategories',
+	expenses: 'expenses',
+	expenseCategories: 'expenseCategories',
 };
 
 export const Constants = {

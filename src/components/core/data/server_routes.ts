@@ -53,4 +53,9 @@ export const server_routes = {
 	orderItemGetSearch: `${baseURL}/${apiVersion}/order_items/search/<tenantId>`, // POST
 	orderItemFindById: `${baseURL}/${apiVersion}/order_items/details/<tenantId>`, // GET
 	orderItemExportProfit: `${baseURL}/${apiVersion}/order_items/export_profit/<tenantId>`, // POST
+
+	// expense
+	expenses: `${baseURL}/${apiVersion}/expenses/<tenantId>`, // POST create, PUT edit, DELETE
+	searchExpenses: `${baseURL}/${apiVersion}/expenses/search/<tenantId>`, // POST
+	expenseCategories: `${baseURL}/${apiVersion}/expense_categories/<tenantId>`, // GET, POST, PUT, DELETE
 };
