@@ -16,6 +16,8 @@ export class ReportResult {
 	sumTotalQuantity: number;
 	sumTransactions: number;
 	sumProfit: number;
+	sumExpenses: number;
+	netProfit: number;
 	avgOrderValue: number;
 	avgItemsPerOrder: number;
 	stockSyncPending: number;
@@ -40,6 +42,9 @@ export class ReportResult {
 		this.sumTotalQuantity = def.sum_total_quantity;
 		this.sumTransactions = def.sum_transactions;
 		this.sumProfit = def.sum_profit;
+		// ?? 0: an API deployed before the expense feature does not send these
+		this.sumExpenses = def.sum_expenses ?? 0;
+		this.netProfit = def.net_profit ?? def.sum_profit;
 		this.avgOrderValue = def.avg_order_value;
 		this.avgItemsPerOrder = def.avg_items_per_order;
 		this.stockSyncPending = def.stock_sync_pending;

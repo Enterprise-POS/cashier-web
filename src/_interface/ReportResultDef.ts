@@ -41,6 +41,8 @@ export interface ReportResultDef {
 	sum_base_price_success: number;
 	sum_purchased_price_success: number;
 	sum_profit: number;
+	sum_expenses: number; // manual expenses, by expense_date
+	net_profit: number; // sum_profit - sum_expenses
 	payment_status_count: Partial<Record<PaymentStatus, number>>;
 	payment_status_amount: Partial<Record<PaymentStatus, number>>;
 	payment_type_count: Partial<Record<PaymentType, number>>;

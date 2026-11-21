@@ -390,6 +390,17 @@ export default function Sidebar() {
 								</li>
 							</ul>
 						</li>
+						<li className="submenu-open">
+							<h6 className="submenu-hdr">Finance</h6>
+							<ul>
+								<li className={routes.expenses === pathname ? 'active' : ''}>
+									<Link href={routes.expenses} className="link-to-page-btn">
+										<i className="ti ti-file-stack fs-16 me-2"></i>
+										<span>Expenses</span>
+									</Link>
+								</li>
+							</ul>
+						</li>
 						{/* <li className="submenu-open">
 							<h6 className="submenu-hdr">Sales</h6>
 							<ul>

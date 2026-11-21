@@ -153,6 +153,7 @@ export const all_routes: { [key: string]: RouteLink } = {
 	customers: '/customers',
 	suppliers: '/suppliers',
 	storeList: '/store_list',
+	expenses: '/expenses',
 	manageStocks: '/manage_stocks',
 	editStoreProducts: '/edit_store_products',
 	stockTransfer: '/stock_transfer',
