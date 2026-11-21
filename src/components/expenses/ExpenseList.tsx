@@ -15,9 +15,11 @@ import {
 	useExpensesQuery,
 	useInvalidateExpenses,
 } from '@/components/expenses/useExpenseQueries';
+import { Constants } from '@/components/core/data/constant';
 import { useStore } from '@/components/provider/StoreProvider';
 import { useTenant } from '@/components/provider/TenantProvider';
 import CollapseIcon from '@/components/tooltip-content/collapse';
+import RefreshIcon from '@/components/tooltip-content/RefreshIcon';
 
 const { RangePicker } = DatePicker;
 const theme = { token: { colorPrimary: '#fe9f43' } };
@@ -193,6 +195,7 @@ export default function ExpenseList({ token }: { token: string }) {
 					</div>
 				</div>
 				<ul className="table-top-head">
+					<RefreshIcon queryKey={[Constants.ReactQueryKey.expenses]} />
 					<CollapseIcon />
 				</ul>
 				<div className="page-btn d-flex gap-2">
